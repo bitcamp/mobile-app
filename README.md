@@ -9,8 +9,17 @@ This is the the cross-platform mobile app for Bitcamp's hackathon, which is buil
 3. Globally install [expo-cli](https://docs.expo.io/versions/latest/get-started/installation/)
    - Optionally create an [expo account](https://expo.io/), and download the [expo mobile app](https://expo.io/tools#client) so you can run the app on your mobile device
 4. Clone the repository using `git clone https://github.com/bitcamp/mobile-app.git`
-5. Download the dependencies using `yarn add`
-6. Run the app using `expo start` or `yarn start`
+5. Download the dependencies using `yarn install`
+6. Create a configuration file called `config.js` at the root of the repository with all of your API keys. The file should look something like this:
+```js
+export const firebaseConfig = {
+  apiKey: "YOUR API KEY",
+  authDomain: "YOUR AUTH DOMAIN",
+  databaseURL: "YOUR DB URL",
+  storageBucket: "YOUR STORAGE BUCKET"
+};
+```
+7. Run the app using `expo start` or `yarn start`
 
 ## Contribution Guide
 We follow the [GitHub flow](https://guides.github.com/introduction/flow/) for managing this repository, which means that each new feature gets a branch off of master.
