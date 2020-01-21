@@ -1,18 +1,18 @@
-import React, { Component } from 'react';
-import { Text } from 'react-native'; // TODO: remove
-import FullScreenModal from './FullScreenModal';
-import PhotoView from 'react-native-photo-view';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import React, { Component } from "react";
+import PhotoView from "react-native-photo-view";
+import ScrollableTabView from "react-native-scrollable-tab-view";
+import { StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+import FullScreenModal from "./FullScreenModal";
 
-import AltModalHeader from './AltModalHeader';
-import CustomScheduleTabBar from '../schedule/CustomScheduleTabBar';
-import { colors } from '../Colors';
-import Images from '../../../assets/imgs';
-import { getDeviceWidth } from '../../utils/sizing';
+import AltModalHeader from "./AltModalHeader";
+import CustomScheduleTabBar from "../schedule/CustomScheduleTabBar";
+import { colors } from "../Colors";
+import Images from "../../../assets/imgs";
+import { getDeviceWidth } from "../../utils/sizing";
 
 export default class MapModal extends Component {
-
-  // TODO: I removed the use of rn-fetch blob to get it to build on expo, since that module isn't compatible with 
+  // TODO: I removed the use of rn-fetch blob to get it to build on expo, since that module isn't compatible with
   // expo.
   constructor() {
     super();
@@ -23,7 +23,7 @@ export default class MapModal extends Component {
         // 3: Images.floor4,
         // Parking: Images.parking
       },
-    }
+    };
     // this.setFloors();
   }
 
@@ -56,65 +56,77 @@ export default class MapModal extends Component {
   // }
 
   render() {
-    const props = this.props;
-    const floors = [1, 2, 3, 'Parking'].map(floorNumber => {
-      if (this.state.floors[floorNumber] === null) {
+    const { isModalVisible, toggleModal } = this.props;
+    const { floors } = this.state;
+    const renderedFloors = [1, 2, 3, "Parking"].map(floorNumber => {
+      if (floors[floorNumber] === null) {
         return (
           <PhotoView
             key={floorNumber}
-            tabLabel={(floorNumber === 'Parking' ? '' : 'Floor ')  + `${floorNumber}`}
+            tabLabel={`${
+              floorNumber === "Parking" ? "" : "Floor "
+            }${floorNumber}`}
             source={Images.not_found}
             minimumZoomScale={1}
             maximumZoomScale={8}
             androidScaleType="fitCenter"
-            onLoad={() => console.log("Image loaded!")}
-            style={{
-              width: getDeviceWidth(),
-              flex: 1,
-              backgroundColor: colors.backgroundColor.dark,
-            }}
+            style={styles.photo}
           />
         );
       }
       return (
         <PhotoView
           key={floorNumber}
-          tabLabel={(floorNumber === 'Parking' ? '' : 'Floor ')  + `${floorNumber}`}
-          source={this.state.floors[floorNumber]}
+          tabLabel={`${
+            floorNumber === "Parking" ? "" : "Floor "
+          }${floorNumber}`}
+          source={floors[floorNumber]}
           minimumZoomScale={1}
           maximumZoomScale={8}
           androidScaleType="fitCenter"
-          onLoad={() => console.log("Image loaded!")}
-          style={{
-            width: getDeviceWidth(),
-            flex: 1,
-            backgroundColor: colors.backgroundColor.dark,
-          }}
-        />  
+          style={styles.photo}
+        />
       );
     });
 
     return (
       <FullScreenModal
-        isVisible={props.isModalVisible}
+        isVisible={isModalVisible}
         backdropColor={colors.backgroundColor.dark}
-        onBackButtonPress={() => props.toggleModal()}
-        contentStyle={{ padding: 0 }}
+        onBackButtonPress={toggleModal}
+        contentStyle={styles.modalContainer}
         header={
           <AltModalHeader
             title="Map"
             rightText="Done"
-            rightAction={props.toggleModal}
+            rightAction={toggleModal}
           />
         }
       >
-          <ScrollableTabView
-            renderTabBar={() => <CustomScheduleTabBar/> }
-            style={{height: 530}}
-          >
-            {floors}
-          </ScrollableTabView>
+        <ScrollableTabView
+          renderTabBar={() => <CustomScheduleTabBar />}
+          style={styles.floorContainer}
+        >
+          {renderedFloors}
+        </ScrollableTabView>
       </FullScreenModal>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  floorContainer: {
+    height: 530,
+  },
+  modalContainer: { padding: 0 },
+  photo: {
+    backgroundColor: colors.backgroundColor.dark,
+    flex: 1,
+    width: getDeviceWidth(),
+  },
+});
+
+MapModal.propTypes = {
+  isModalVisible: PropTypes.bool.isRequired,
+  toggleModal: PropTypes.func.isRequired,
+};

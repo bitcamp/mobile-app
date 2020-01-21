@@ -12,7 +12,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20051,
         category: ["Mentor"],
-        caption: "Xfinity Gate A"
+        caption: "Xfinity Gate A",
       },
       {
         description: "",
@@ -24,7 +24,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20052,
         category: ["Main"],
-        caption: "Xfinity Gate A"
+        caption: "Xfinity Gate A",
       },
       {
         description: "",
@@ -36,7 +36,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20053,
         category: ["Main"],
-        caption: "Welcome fellow terps!"
+        caption: "Welcome fellow terps!",
       },
       {
         description: "nom nom nom",
@@ -48,7 +48,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20054,
         category: ["Food"],
-        caption: "Serving: Sbarro"
+        caption: "Serving: Sbarro",
       },
       {
         description: "",
@@ -60,7 +60,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20055,
         category: ["Sponsor"],
-        caption: "Elevator speech ready?"
+        caption: "Elevator speech ready?",
       },
       {
         description: "",
@@ -72,7 +72,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20056,
         category: ["Main"],
-        caption: "Cohosted by NSA"
+        caption: "Cohosted by NSA",
       },
       {
         description: "",
@@ -84,7 +84,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20057,
         category: ["Main"],
-        caption: "You have T-36 hours"
+        caption: "You have T-36 hours",
       },
       {
         description: "",
@@ -96,7 +96,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20058,
         category: ["Food"],
-        caption: "Serving: Cupcakes"
+        caption: "Serving: Cupcakes",
       },
       {
         description:
@@ -109,7 +109,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20059,
         category: ["Workshop", "Main"],
-        caption: "Learn the Ropes!"
+        caption: "Learn the Ropes!",
       },
       {
         description:
@@ -122,7 +122,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20060,
         category: ["Workshop", "Sponsor"],
-        caption: "By Esri"
+        caption: "By Esri",
       },
       {
         description: "",
@@ -134,7 +134,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20061,
         category: ["Main"],
-        caption: "Meet your future BFFs"
+        caption: "Meet your future BFFs",
       },
       {
         description:
@@ -147,7 +147,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20062,
         category: ["Workshop", "Main"],
-        caption: "How to Win Bitcamp: 101"
+        caption: "How to Win Bitcamp: 101",
       },
       {
         description:
@@ -160,7 +160,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20063,
         category: ["Workshop", "Mentor"],
-        caption: "CE for non-CE"
+        caption: "CE for non-CE",
       },
       {
         description:
@@ -173,7 +173,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20064,
         category: ["Workshop", "Mentor"],
-        caption: "Fake Meteorology"
+        caption: "Fake Meteorology",
       },
       {
         description:
@@ -186,7 +186,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20065,
         category: ["Workshop", "Mentor"],
-        caption: "Bling Bling"
+        caption: "Bling Bling",
       },
       {
         description:
@@ -199,9 +199,9 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20066,
         category: ["Workshop", "Mentor"],
-        caption: "Algorithms 101"
-      }
-    ]
+        caption: "Algorithms 101",
+      },
+    ],
   ],
   [
     "Saturday",
@@ -216,7 +216,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20067,
         category: ["Mini"],
-        caption: "Human Sized"
+        caption: "Human Sized",
       },
       {
         description: "",
@@ -228,7 +228,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20068,
         category: ["Sponsor", "Mini"],
-        caption: "By Capital One"
+        caption: "By Capital One",
       },
       {
         description: "nom nom nom",
@@ -240,7 +240,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20069,
         category: ["Food"],
-        caption: "Serving: UMD Dining"
+        caption: "Serving: UMD Dining",
       },
       {
         description:
@@ -253,7 +253,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20070,
         category: ["Workshop", "Mentor"],
-        caption: "Make your own Game in 3,2,1"
+        caption: "Make your own Game in 3,2,1",
       },
       {
         description:
@@ -266,7 +266,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20071,
         category: ["Workshop", "Mentor"],
-        caption: "By NSA"
+        caption: "By NSA",
       },
       {
         description: "",
@@ -278,7 +278,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20072,
         category: ["Main"],
-        caption: "Happy Little Campfires"
+        caption: "Happy Little Campfires",
       },
       {
         description:
@@ -291,7 +291,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20073,
         category: ["Workshop", "Mentor"],
-        caption: "LIT-igation and Appeals"
+        caption: "LIT-igation and Appeals",
       },
       {
         description:
@@ -304,7 +304,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20074,
         category: ["Workshop", "Sponsor"],
-        caption: "By FINRA"
+        caption: "By FINRA",
       },
       {
         description: "nom nom nom",
@@ -316,7 +316,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20075,
         category: ["Food"],
-        caption: "Serving: Sbarro/Taco Bell"
+        caption: "Serving: Sbarro/Taco Bell",
       },
       {
         description:
@@ -329,7 +329,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20076,
         category: ["Workshop", "Mentor"],
-        caption: "Battle Against Cyberattacks"
+        caption: "Battle Against Cyberattacks",
       },
       {
         description:
@@ -342,7 +342,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20077,
         category: ["Workshop", "Mentor"],
-        caption: "Making change byte by byte"
+        caption: "Making change byte by byte",
       },
       {
         description:
@@ -355,7 +355,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20078,
         category: ["Workshop", "Mentor"],
-        caption: "Say Goodbye to Wordpress"
+        caption: "Say Goodbye to Wordpress",
       },
       {
         description: "",
@@ -367,7 +367,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20079,
         category: ["Main"],
-        caption: "Get your money back!"
+        caption: "Get your money back!",
       },
       {
         description:
@@ -380,7 +380,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20080,
         category: ["Workshop", "Sponsor"],
-        caption: "By NSA"
+        caption: "By NSA",
       },
       {
         description:
@@ -393,7 +393,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20081,
         category: ["Workshop", "Mentor"],
-        caption: "Bring fearless opinions"
+        caption: "Bring fearless opinions",
       },
       {
         description:
@@ -406,7 +406,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20082,
         category: ["Workshop", "Mentor"],
-        caption: "Beyond the Grad Gown"
+        caption: "Beyond the Grad Gown",
       },
       {
         description:
@@ -419,7 +419,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20083,
         category: ["Workshop", "Sponsor"],
-        caption: "By TCS"
+        caption: "By TCS",
       },
       {
         description:
@@ -432,7 +432,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20084,
         category: ["Workshop", "Mentor"],
-        caption: "Mathematicians' Session"
+        caption: "Mathematicians' Session",
       },
       {
         description: "",
@@ -444,7 +444,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20085,
         category: ["Main"],
-        caption: "Rapid-fire! Live-design!"
+        caption: "Rapid-fire! Live-design!",
       },
       {
         description:
@@ -457,7 +457,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20086,
         category: ["Workshop", "Mentor"],
-        caption: "No Hassle Backend"
+        caption: "No Hassle Backend",
       },
       {
         description:
@@ -470,7 +470,7 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20087,
         category: ["Workshop", "Mentor"],
-        caption: "Now you can always be photogenic"
+        caption: "Now you can always be photogenic",
       },
       {
         description: "nom nom nom",
@@ -482,7 +482,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20088,
         category: ["Food"],
-        caption: "Serving: Chick Fil A"
+        caption: "Serving: Chick Fil A",
       },
       {
         description: "",
@@ -494,7 +494,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20089,
         category: ["Mini"],
-        caption: "Major League Hacking"
+        caption: "Major League Hacking",
       },
       {
         description:
@@ -507,7 +507,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20090,
         category: ["Workshop", "Mentor"],
-        caption: "Software via Web"
+        caption: "Software via Web",
       },
       {
         description:
@@ -520,7 +520,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20091,
         category: ["Workshop", "Mentor"],
-        caption: "Sorting algorithms, anyone?"
+        caption: "Sorting algorithms, anyone?",
       },
       {
         description: "",
@@ -532,7 +532,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20092,
         category: ["Mini"],
-        caption: "Get your groove on!"
+        caption: "Get your groove on!",
       },
       {
         description:
@@ -545,7 +545,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20093,
         category: ["Workshop", "Mentor"],
-        caption: "AR without a Hololens"
+        caption: "AR without a Hololens",
       },
       {
         description:
@@ -558,7 +558,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20094,
         category: ["Workshop", "Mentor"],
-        caption: "Pressed to impress"
+        caption: "Pressed to impress",
       },
       {
         description:
@@ -571,7 +571,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20095,
         category: ["Workshop", "Mentor"],
-        caption: "First time submitting?"
+        caption: "First time submitting?",
       },
       {
         description:
@@ -584,7 +584,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20096,
         category: ["Workshop", "Mentor"],
-        caption: "Just Add ML!"
+        caption: "Just Add ML!",
       },
       {
         description:
@@ -597,7 +597,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20097,
         category: ["Workshop", "Mentor"],
-        caption: "Art with Code"
+        caption: "Art with Code",
       },
       {
         description: "",
@@ -609,7 +609,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20107,
         category: ["Mini"],
-        caption: "The battle is building!"
+        caption: "The battle is building!",
       },
       {
         description: "",
@@ -621,9 +621,9 @@ export const mockSchedule = [
         featuredEvent: true,
         eventID: 20108,
         category: ["Mini"],
-        caption: "Choose your fighter"
-      }
-    ]
+        caption: "Choose your fighter",
+      },
+    ],
   ],
   [
     "Sunday",
@@ -638,7 +638,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20098,
         category: ["Mini"],
-        caption: "Get cozy with S'mores"
+        caption: "Get cozy with S'mores",
       },
       {
         description: "",
@@ -650,7 +650,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20099,
         category: ["Food"],
-        caption: "Ooey gooey goodness"
+        caption: "Ooey gooey goodness",
       },
       {
         description: "",
@@ -662,7 +662,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20100,
         category: ["Main"],
-        caption: "It's the FINAL countdown"
+        caption: "It's the FINAL countdown",
       },
       {
         description: "",
@@ -674,7 +674,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20101,
         category: ["Food"],
-        caption: "Serving: UMD Dining"
+        caption: "Serving: UMD Dining",
       },
       {
         description: "",
@@ -686,7 +686,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20102,
         category: ["Main"],
-        caption: "That's a wrap"
+        caption: "That's a wrap",
       },
       {
         description: "",
@@ -698,7 +698,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20103,
         category: ["Main"],
-        caption: "Show time!"
+        caption: "Show time!",
       },
       {
         description: "",
@@ -710,7 +710,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20104,
         category: ["Main"],
-        caption: "Encore!"
+        caption: "Encore!",
       },
       {
         description: "nom nom nom",
@@ -722,7 +722,7 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20105,
         category: ["Food"],
-        caption: "Serving: Subway"
+        caption: "Serving: Subway",
       },
       {
         description: "",
@@ -734,8 +734,8 @@ export const mockSchedule = [
         featuredEvent: false,
         eventID: 20106,
         category: ["Main"],
-        caption: "See you next year!"
-      }
-    ]
-  ]
+        caption: "See you next year!",
+      },
+    ],
+  ],
 ];

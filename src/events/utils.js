@@ -1,28 +1,32 @@
-import moment from 'moment';
-import _ from 'lodash';
-import Event from './Event';
-import EventGroup from './EventGroup';
-import EventDay from './EventDay';
-import { normalizeTimeLabel } from './timeUtils';
+import moment from "moment";
+import _ from "lodash";
+import Event from "./Event";
+import EventGroup from "./EventGroup";
+import EventDay from "./EventDay";
+import { normalizeTimeLabel } from "./timeUtils";
 
 // creates an EventGroup object from a collection of event json entries
 // which have already been grouped
 export function createEventGroup(eventGroupLabel, rawEventArray) {
-  let eventArray = [];
-  for (let i in rawEventArray) {
+  const eventArray = [];
+  for (const i in rawEventArray) {
     rawEvent = rawEventArray[i];
-    let banner_map = {
+    const banner_map = {
       opening_ceremony: "ceremony",
       closing_ceremony: "ceremony",
       expo_a: "demo",
       expo_b: "demo",
-      colorwar: "colorwar"
+      colorwar: "colorwar",
     };
-    let title = rawEvent.title.toLowerCase().replace(" ", "_");
-    let img =  "banner_" + (banner_map[title] != undefined ?
-      banner_map[title]
-      :
-      ((Array.isArray(rawEvent.category) ? rawEvent.category[0] : rawEvent.category).toLowerCase()));
+    const title = rawEvent.title.toLowerCase().replace(" ", "_");
+    const img = `banner_${
+      banner_map[title] != undefined
+        ? banner_map[title]
+        : (Array.isArray(rawEvent.category)
+            ? rawEvent.category[0]
+            : rawEvent.category
+          ).toLowerCase()
+    }`;
     eventArray.push(
       new Event(
         rawEvent.eventID,

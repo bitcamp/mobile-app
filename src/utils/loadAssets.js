@@ -5,19 +5,19 @@ import {
   EvilIcons,
   SimpleLineIcons,
   MaterialCommunityIcons,
-  AntDesign
+  AntDesign,
 } from "@expo/vector-icons";
 
 const fontList = [
   {
-    "Aleo-Bold": require("../../assets/fonts/Aleo-Bold.otf")
+    "Aleo-Bold": require("../../assets/fonts/Aleo-Bold.otf"),
   },
   FontAwesome.font,
   Ionicons.font,
   EvilIcons.font,
   SimpleLineIcons.font,
   MaterialCommunityIcons.font,
-  AntDesign.font
+  AntDesign.font,
 ];
 
 export async function loadAssets() {

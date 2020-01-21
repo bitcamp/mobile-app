@@ -22,7 +22,7 @@ export const mockFetch = async (uri, options) => {
       json: async () => respData,
       status: 200,
       statusText: "OK",
-      ok: true
+      ok: true,
     };
   } catch (e) {
     console.error(e);
@@ -35,51 +35,51 @@ const questionServerURL = "https://guarded-brook-59345.herokuapp.com";
 const requestTypes = {
   getUser: {
     uriPattern: new RegExp(`${apiURL}/api/users/\\d+/?`),
-    data: mockUser
+    data: mockUser,
   },
   favoriteEvent: {
     uriPattern: new RegExp(
       `${apiURL}/api/users/\\d+/favoriteFirebaseEvent/\\d+/?`
     ),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   unfavoriteEvent: {
     uriPattern: new RegExp(
       `${apiURL}/api/users/\\d+/unfavoriteFirebaseEvent/\\d+/?`
     ),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   favoriteCounts: {
     uriPattern: new RegExp(`${apiURL}/api/firebaseEvents/favoriteCounts/?`),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   requestEmailCode: {
     uriPattern: new RegExp(`${apiURL}/auth/login/requestCode/?`),
-    data: {} // No data needed (getting a 200 status code will run the correct logic)
+    data: {}, // No data needed (getting a 200 status code will run the correct logic)
   },
   submitEmailCode: {
     uriPattern: new RegExp(`${apiURL}/auth/login/code/?`),
     data: {
       user: mockUser,
-      token: "test"
-    }
+      token: "test",
+    },
   },
   getQuestions: {
     uriPattern: new RegExp(`${questionServerURL}/getquestions/.+@.+\\..+/?`),
-    data: mockQuestions
+    data: mockQuestions,
   },
   submitQuestion: {
     uriPattern: new RegExp(`${questionServerURL}/question/?`),
-    data: {} // No data needed (getting a 200 status code will run the correct logic)
+    data: {}, // No data needed (getting a 200 status code will run the correct logic)
   },
   checkInWithQRCode: {
     uriPattern: new RegExp(`${apiURL}/api/users/.+/checkIn/?`),
-    data: mockUser
+    data: mockUser,
   },
   schedule: {
     uriPattern: /schedule/,
-    data: mockSchedule
-  }
+    data: mockSchedule,
+  },
 };
 
 /**
@@ -89,7 +89,7 @@ const requestTypes = {
  */
 const getResponse = uri => {
   // Go through all request types and return the corresponding data
-  for (let type in requestTypes) {
+  for (const type in requestTypes) {
     const request = requestTypes[type];
 
     if (request.uriPattern.test(uri)) {

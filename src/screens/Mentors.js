@@ -1,14 +1,24 @@
 import moment from "moment";
 import React, { Component } from "react";
-import { Alert, AppState, AsyncStorage, FlatList, StyleSheet, TextInput, TouchableOpacity, View, ToastAndroid as Toast } from "react-native";
+import {
+  Alert,
+  AppState,
+  AsyncStorage,
+  FlatList,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ToastAndroid as Toast,
+} from "react-native";
 import firebase from "firebase";
-import AltModalHeader from '../components/modals/AltModalHeader';
+import AltModalHeader from "../components/modals/AltModalHeader";
 import { Button, PadContainer, ViewContainer } from "../components/Base";
 import { colors } from "../components/Colors";
 import ExternalLink from "../components/ExternalLink";
 import FullScreenModal from "../components/modals/FullScreenModal";
 import QuestionCard from "../components/QuestionCard";
-import SwitchInput from '../components/SwitchInput';
+import SwitchInput from "../components/SwitchInput";
 import { H2, H3, P } from "../components/Text";
 import { scale, verticalScale } from "../utils/scale";
 import { mockFetch } from "../mockData/mockFetch";
@@ -26,7 +36,7 @@ export default class Mentors extends Component {
       slackUsername: "",
       newQuestionScreen: false,
       listData: [],
-      needsDesignMentor: false
+      needsDesignMentor: false,
     };
     this.showToast = this.showToast.bind(this);
     this._handleAppStateChange = this._handleAppStateChange.bind(this);
@@ -37,8 +47,8 @@ export default class Mentors extends Component {
       method: "GET",
       headers: {
         Accept: "application/json",
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
       .then(response => response.json())
       .then(async responseJson => {
@@ -78,20 +88,22 @@ export default class Mentors extends Component {
   }
 
   clearInputs() {
-    this.setState({ 
+    this.setState({
       question: "",
-      needsDesignMentor: false, 
-      needsInPersonAssistance: false 
+      needsDesignMentor: false,
+      needsInPersonAssistance: false,
     });
   }
+
   cancelQuestion() {
     this.clearInputs();
     this.setState({
-      newQuestionScreen: !this.state.newQuestionScreen
+      newQuestionScreen: !this.state.newQuestionScreen,
     });
   }
+
   toggleModal() {
-    const newQuestionScreen = this.state.newQuestionScreen
+    const { newQuestionScreen } = this.state;
     this.setState({ newQuestionScreen: !newQuestionScreen });
   }
 
@@ -110,15 +122,17 @@ export default class Mentors extends Component {
 
   async sendQuestion() {
     const hasNoQuestion = this.state.question === "";
-    const hasNoLocation = this.state.location === "" && this.state.needsInPersonAssistance;
-    const hasNoUsername = this.state.slackUsername === "" && !this.state.needsInPersonAssistance;
+    const hasNoLocation =
+      this.state.location === "" && this.state.needsInPersonAssistance;
+    const hasNoUsername =
+      this.state.slackUsername === "" && !this.state.needsInPersonAssistance;
 
     let errorMessage;
-    if(hasNoQuestion) {
+    if (hasNoQuestion) {
       errorMessage = "Your question was empty";
-    } else if(hasNoLocation) {
+    } else if (hasNoLocation) {
       errorMessage = "Your location was empty";
-    } else if(hasNoUsername) {
+    } else if (hasNoUsername) {
       errorMessage = "Your slack username was empty";
     }
 
@@ -133,11 +147,8 @@ export default class Mentors extends Component {
       const fcmToken = await AsyncStorage.getItem("FCMToken");
       const user_data = await AsyncStorage.getItem("USER_DATA_STORE");
       const user_data_json = JSON.parse(user_data);
-      const name =
-        user_data_json.profile.firstName +
-        " " +
-        user_data_json.profile.lastName;
-      var questionObject = {
+      const name = `${user_data_json.profile.firstName} ${user_data_json.profile.lastName}`;
+      const questionObject = {
         question: this.state.question,
         location: this.state.location,
         slackUsername: this.state.slackUsername,
@@ -145,21 +156,21 @@ export default class Mentors extends Component {
         needsDesignMentor: this.state.needsDesignMentor,
         status: "Awaiting available mentors",
         key: moment().format(),
-        name: name,
-        email: user_data_json.email
+        name,
+        email: user_data_json.email,
       };
       if (fcmToken != null) {
         questionObject.fcmToken = fcmToken;
       }
 
-      var questionString = JSON.stringify(questionObject);
+      const questionString = JSON.stringify(questionObject);
       mockFetch(`${serverURL}/question`, {
         method: "POST",
         headers: {
           Accept: "application/json",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: questionString
+        body: questionString,
       }).catch(error => {
         console.log(error);
       });
@@ -171,23 +182,30 @@ export default class Mentors extends Component {
       setTimeout(() => console.log("List data", this.state.listData), 1000);
     }
   }
+
   renderHeading() {
     return (
       <View>
-        <H2 style={[modalStyles.bigTitle, { marginTop: 20, marginBottom: 5 }]}>Get help from a mentor</H2>
-        <P style={{ marginBottom: 20 }}>Bitcamp mentors are experts in helping you with your hack or answering any additional questions you might have.</P>
+        <H2 style={[modalStyles.bigTitle, { marginTop: 20, marginBottom: 5 }]}>
+          Get help from a mentor
+        </H2>
+        <P style={{ marginBottom: 20 }}>
+          Bitcamp mentors are experts in helping you with your hack or answering
+          any additional questions you might have.
+        </P>
       </View>
     );
   }
 
   renderNewQuestionModal() {
-    const { 
-      question, 
-      location, 
-      newQuestionScreen, 
-      slackUsername, 
-      needsInPersonAssistance, 
-      needsDesignMentor } = this.state;
+    const {
+      question,
+      location,
+      newQuestionScreen,
+      slackUsername,
+      needsInPersonAssistance,
+      needsDesignMentor,
+    } = this.state;
 
     return (
       <FullScreenModal
@@ -206,12 +224,10 @@ export default class Mentors extends Component {
         }
       >
         <View style={modalStyles.inputGroup}>
-          <H3 style={modalStyles.inputGroupTitle}>
-            QUESTION
-          </H3>
+          <H3 style={modalStyles.inputGroupTitle}>QUESTION</H3>
           <TextInput
-            style={[ modalStyles.input, modalStyles.textArea ]}
-            multiline={true}
+            style={[modalStyles.input, modalStyles.textArea]}
+            multiline
             numberOfLines={10}
             onChangeText={text => this.setState({ question: text })}
             value={question}
@@ -222,36 +238,46 @@ export default class Mentors extends Component {
           />
         </View>
         <View style={modalStyles.inputGroup}>
-          <H3 style={modalStyles.inputGroupTitle}>
-            I WOULD LIKE
-          </H3>
+          <H3 style={modalStyles.inputGroupTitle}>I WOULD LIKE</H3>
           <SwitchInput
             style={[modalStyles.input, modalStyles.topInput]}
-            onPress={() => this.setState({ needsInPersonAssistance: !needsInPersonAssistance})}
+            onPress={() =>
+              this.setState({
+                needsInPersonAssistance: !needsInPersonAssistance,
+              })
+            }
             text="In-person assistance"
             value={needsInPersonAssistance}
             isDisabled={needsDesignMentor}
           />
           <SwitchInput
             style={modalStyles.input}
-            onPress={() => this.setState({ 
-              needsDesignMentor: !needsDesignMentor,
-              needsInPersonAssistance: !needsDesignMentor || needsInPersonAssistance
-            })}
+            onPress={() =>
+              this.setState({
+                needsDesignMentor: !needsDesignMentor,
+                needsInPersonAssistance:
+                  !needsDesignMentor || needsInPersonAssistance,
+              })
+            }
             text="A Design Den mentor"
             value={needsDesignMentor}
           />
           <View style={modalStyles.inputDescriptionContainer}>
             {"Design Den mentors can help your team create effective visual design for your project."
-              .split(' ').map((word, index) => <P key={index} style={modalStyles.inputDescription}>{word+' '}</P>)
-            }
-            <ExternalLink text="Learn More..." url="https://medium.com/@bitcmp/design-den-907a6f40c3a9"/>
+              .split(" ")
+              .map((word, index) => (
+                <P key={index} style={modalStyles.inputDescription}>
+                  {`${word} `}
+                </P>
+              ))}
+            <ExternalLink
+              text="Learn More..."
+              url="https://medium.com/@bitcmp/design-den-907a6f40c3a9"
+            />
           </View>
         </View>
         <View style={modalStyles.inputGroup}>
-          <H3 style={modalStyles.inputGroupTitle}>
-            ABOUT YOU
-          </H3>
+          <H3 style={modalStyles.inputGroupTitle}>ABOUT YOU</H3>
           <TextInput
             style={[modalStyles.input, modalStyles.topInput]}
             onChangeText={text => this.setState({ location: text })}
@@ -270,22 +296,26 @@ export default class Mentors extends Component {
             autoCapitalize="none"
           />
           <View style={modalStyles.inputDescriptionContainer}>
-            { // In order for the link and the rest of the paragraph to display on one block, 
-              // we split the message into words and make each word its own text element
-              "A Bitcamp mentor will respond to your message over Slack and may approach your table to assist if needed. Make sure that you"
-                .split(' ')
-                .map((word, index) => 
-                  <P key={index} style={modalStyles.inputDescription}>{word+' '}</P>
-                )
-            }
-            <ExternalLink text="join Bitcamp's Slack workspace." url="https://bit.camp/slack"/>
+            {// In order for the link and the rest of the paragraph to display on one block,
+            // we split the message into words and make each word its own text element
+            "A Bitcamp mentor will respond to your message over Slack and may approach your table to assist if needed. Make sure that you"
+              .split(" ")
+              .map((word, index) => (
+                <P key={index} style={modalStyles.inputDescription}>
+                  {`${word} `}
+                </P>
+              ))}
+            <ExternalLink
+              text="join Bitcamp's Slack workspace."
+              url="https://bit.camp/slack"
+            />
           </View>
         </View>
       </FullScreenModal>
     );
   }
 
-  //TODO: reimplement when firebase is setup
+  // TODO: reimplement when firebase is setup
   async createNotificationListener() {
     // // updates when app is in foreground
     // this.notificationListener = firebase
@@ -293,7 +323,6 @@ export default class Mentors extends Component {
     //   .onNotification(notification => {
     //     this.grabQuestionsFromDB(notification.data.email);
     //   });
-
     // // updates when app is in the background
     // this.notificationOpenedListener = firebase
     //   .notifications()
@@ -306,7 +335,7 @@ export default class Mentors extends Component {
     console.log("notification received", notification.body);
     console.log(notification.data);
 
-    const key = notification.data.key;
+    const { key } = notification.data;
     const mentorName = notification.data.mentor_name;
 
     const questions = await AsyncStorage.getItem("questions");
@@ -326,9 +355,9 @@ export default class Mentors extends Component {
   }
 
   render() {
-  {
-    this.createNotificationListener();
-  }
+    {
+      this.createNotificationListener();
+    }
 
     return (
       <ViewContainer>
@@ -336,20 +365,16 @@ export default class Mentors extends Component {
           {this.renderHeading()}
           {this.renderNewQuestionModal()}
         </PadContainer>
-        <TouchableOpacity
-          
-        >
-          <Button 
-            style={{ 
-              padding: 16, 
+        <TouchableOpacity>
+          <Button
+            style={{
+              padding: 16,
               borderRadius: 8,
-              fontWeight: 'bold',
-              marginBottom: 40
-            }} 
+              fontWeight: "bold",
+              marginBottom: 40,
+            }}
             text="Ask a Question"
-            onPress={() => (
-              this.toggleModal()
-            )}
+            onPress={() => this.toggleModal()}
           />
         </TouchableOpacity>
         <PadContainer>
@@ -363,8 +388,7 @@ export default class Mentors extends Component {
                 status={question.status}
                 key={question.key}
               />
-            ))
-          }
+            ))}
         </PadContainer>
       </ViewContainer>
     );
@@ -376,50 +400,50 @@ const modalStyles = StyleSheet.create({
     fontSize: scale(22),
     marginBottom: scale(10),
   },
+  externalLink: {
+    color: colors.primaryColor,
+  },
   input: {
+    alignItems: "center",
     backgroundColor: colors.backgroundColor.normal,
-    fontSize: scale(14),
     color: colors.textColor.normal,
-    padding: 15,
+    flexDirection: "row",
+    fontSize: scale(14),
     minHeight: 40,
-    flexDirection: 'row',
-    alignItems: 'center'
+    padding: 15,
+  },
+  inputDescription: {
+    color: "#6d6d72",
+    fontSize: scale(12),
+  },
+  inputDescriptionContainer: {
+    padding: 15,
+    paddingTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  inputGroup: {
+    marginBottom: 5,
+    marginTop: verticalScale(20),
+  },
+  inputGroupTitle: {
+    color: "#6d6d72",
+    fontSize: 14,
+    fontWeight: "400",
+    marginBottom: 5,
+    paddingLeft: 15,
+  },
+  stretchyContainer: {
+    backgroundColor: colors.backgroundColor.dark,
+    flex: 1,
+    paddingHorizontal: 0,
+  },
+  textArea: {
+    minHeight: verticalScale(200),
+    textAlignVertical: "top",
   },
   topInput: {
     borderBottomColor: colors.borderColor.light,
     borderBottomWidth: 1,
   },
-  textArea: {
-    textAlignVertical: 'top',
-    minHeight: verticalScale(200),
-  },
-  inputGroupTitle: {
-    color: '#6d6d72', 
-    marginBottom: 5,
-    paddingLeft: 15,
-    fontSize: 14,
-    fontWeight: '400'
-  },
-  inputGroup: {
-    marginTop: verticalScale(20),
-    marginBottom: 5,
-  },
-  inputDescriptionContainer: {
-    padding: 15,
-    paddingTop: 8,
-    flexDirection: 'row',
-    flexWrap: 'wrap'
-  },
-  inputDescription: {
-    fontSize: scale(12),
-    color: '#6d6d72'
-  },
-  stretchyContainer: {
-    flex: 1,
-    backgroundColor: colors.backgroundColor.dark,
-    paddingHorizontal: 0,
-  },
-  externalLink: {
-    color: colors.primaryColor,
-  }
 });

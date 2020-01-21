@@ -1,11 +1,14 @@
-import React, { Component } from 'react';
-import { FlatList, ScrollView, StyleSheet } from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import React, { Component } from "react";
+import { FlatList, ScrollView, StyleSheet } from "react-native";
+import ScrollableTabView from "react-native-scrollable-tab-view";
 
-import { CenteredActivityIndicator, PlainViewContainer } from '../components/Base';
-import CustomScheduleTabBar from '../components/schedule/CustomScheduleTabBar';
-import EventGroupComponent from '../components/schedule/EventGroupComponent';
-import Saved from './Saved';
+import {
+  CenteredActivityIndicator,
+  PlainViewContainer,
+} from "../components/Base";
+import CustomScheduleTabBar from "../components/schedule/CustomScheduleTabBar";
+import EventGroupComponent from "../components/schedule/EventGroupComponent";
+import Saved from "./Saved";
 
 export default class Schedule extends Component<Props> {
   constructor(props) {
@@ -18,7 +21,7 @@ export default class Schedule extends Component<Props> {
 
   renderScheduleForDay(eventDayObj) {
     eventDay = eventDayObj.item;
-    //console.log(eventDayObj);
+    // console.log(eventDayObj);
     return (
       <FlatList
         key={eventDay.label}
@@ -42,37 +45,39 @@ export default class Schedule extends Component<Props> {
   }
 
   render() {
-    let eventDays = this.props.eventManager.getEventDays();
-    let tabNames = eventDays.map(eventDay => eventDay.label);
+    const eventDays = this.props.eventManager.getEventDays();
+    const tabNames = eventDays.map(eventDay => eventDay.label);
     console.log(eventDays);
-    if(eventDays.length == 0) {
-      return (
-        <CenteredActivityIndicator/>
-      )
+    if (eventDays.length == 0) {
+      return <CenteredActivityIndicator />;
     } else {
       return (
         <PlainViewContainer>
           <ScrollableTabView
             initialPage={0}
-            renderTabBar={() => <CustomScheduleTabBar/> }
+            renderTabBar={() => <CustomScheduleTabBar />}
           >
-            {eventDays.map((eventDay,index) =>
-              <ScrollView key={index} tabLabel={eventDay.label} style={styles.tabView}>
+            {eventDays.map((eventDay, index) => (
+              <ScrollView
+                key={index}
+                tabLabel={eventDay.label}
+                style={styles.tabView}
+              >
                 <FlatList
                   data={[eventDay]}
                   renderItem={this.renderScheduleForDay}
                   keyExtractor={(event, index) => index.toString()}
                 />
               </ScrollView>
-            )}
+            ))}
             <ScrollView tabLabel="ios-star" style={styles.tabView}>
-            <Saved
-              ref={mySaved => {
-                this.mySaved = mySaved;
-                this.props.eventManager.registerEventChangeListener(mySaved);
-              }}
-              eventManager={this.props.eventManager}
-            />
+              <Saved
+                ref={mySaved => {
+                  this.mySaved = mySaved;
+                  this.props.eventManager.registerEventChangeListener(mySaved);
+                }}
+                eventManager={this.props.eventManager}
+              />
             </ScrollView>
           </ScrollableTabView>
         </PlainViewContainer>
@@ -82,22 +87,22 @@ export default class Schedule extends Component<Props> {
 }
 
 const styles = StyleSheet.create({
-  tabView: {
-    flex: 1,
-    //padding: 10,
-    backgroundColor: 'rgba(0,0,0,0.01)'
-  },
   card: {
-    borderWidth: 1,
-    backgroundColor: 'white',
-    borderColor: 'black',
+    backgroundColor: "white",
     borderBottomWidth: 2,
+    borderColor: "black",
+    borderWidth: 1,
     height: 150,
     paddingLeft: 15,
     paddingRight: 15,
-    //shadowColor: '#ccc',
-    //shadowOffset: {width: 2, height: 2},
-    //shadowOpacity: 0.5,
-    //shadowRadius: 3
-  }
-})
+    // shadowColor: '#ccc',
+    // shadowOffset: {width: 2, height: 2},
+    // shadowOpacity: 0.5,
+    // shadowRadius: 3
+  },
+  tabView: {
+    flex: 1,
+    // padding: 10,
+    backgroundColor: "rgba(0,0,0,0.01)",
+  },
+});

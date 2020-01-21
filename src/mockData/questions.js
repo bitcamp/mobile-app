@@ -9,7 +9,7 @@ export const mockQuestions = [
     status: "Awaiting available mentors",
     key: "0913120912309123",
     name: "John Cena",
-    email: "john@cena.org"
+    email: "john@cena.org",
   },
   {
     question: "What's your favorite color?",
@@ -20,6 +20,6 @@ export const mockQuestions = [
     status: "Agent Mulder claimed your question",
     key: "13091230978109",
     name: "John Cena",
-    email: "john@cena.org"
-  }
+    email: "john@cena.org",
+  },
 ];

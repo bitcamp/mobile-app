@@ -1,40 +1,48 @@
-import React, { Component } from 'react';
-import { AsyncStorage, BackHandler, Image, SafeAreaView, StatusBar, TouchableHighlight, View } from 'react-native';
-import firebase from 'firebase';
-import { Colors } from 'react-native-paper';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { SimpleLineIcons } from '@expo/vector-icons';
-import { FontAwesome } from '@expo/vector-icons';
-import Images from '../../assets/imgs/index';
-import { colors } from '../components/Colors';
-import CustomTabBar from '../components/CustomTabBar';
-import MapModal from '../components/modals/MapModal';
-import SearchModal from '../components/modals/SearchModal';
-import Home from './Home';
-import Mentors from './Mentors';
-import Profile from './Profile';
-import Schedule from './Schedule';
-import { scale } from '../utils/scale';
-import { H1 } from '../components/Text';
+import React, { Component } from "react";
+import {
+  AsyncStorage,
+  BackHandler,
+  Image,
+  SafeAreaView,
+  StatusBar,
+  TouchableHighlight,
+  View,
+} from "react-native";
+import firebase from "firebase";
+import { Colors } from "react-native-paper";
+import ScrollableTabView from "react-native-scrollable-tab-view";
+import { SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
+
+import Images from "../../assets/imgs/index";
+import { colors } from "../components/Colors";
+import CustomTabBar from "../components/CustomTabBar";
+import MapModal from "../components/modals/MapModal";
+import SearchModal from "../components/modals/SearchModal";
+import Home from "./Home";
+import Mentors from "./Mentors";
+import Profile from "./Profile";
+import Schedule from "./Schedule";
+import { scale } from "../utils/scale";
+import { H1 } from "../components/Text";
 
 const channelId = "bitcamp-push-notifications";
 const channelName = "Bitcamp Announcements";
 
 export default class AppContainer extends Component {
-  static navigationOptions = ({navigation}) => ({
+  static navigationOptions = ({ navigation }) => ({
     headerStyle: {
       elevation: 0,
       shadowOpacity: 0,
-      shadowColor: 'transparent',
+      shadowColor: "transparent",
       borderBottomWidth: 0.5,
       backgroundColor: colors.backgroundColor.light,
       borderColor: colors.borderColor.normal,
-      height: scale(60)
+      height: scale(60),
     },
-    headerLayoutPreset: 'center',
+    headerLayoutPreset: "center",
     headerTintColor: colors.primaryColor,
     headerRight: AppContainer.getHeaderRight(navigation),
-    headerLeft: AppContainer.getHeaderLeft(navigation)
+    headerLeft: AppContainer.getHeaderLeft(navigation),
   });
 
   constructor(props) {
@@ -42,7 +50,7 @@ export default class AppContainer extends Component {
 
     this.state = {
       page: 0,
-      isMapModalVisible: false
+      isMapModalVisible: false,
     };
 
     this.toggleMapModal = this.toggleMapModal.bind(this);
@@ -63,92 +71,92 @@ export default class AppContainer extends Component {
 
   toggleMapModal = () => {
     this.props.navigation.setParams({
-      isMapModalVisible: !(this.props.navigation.getParam("isMapModalVisible"))
+      isMapModalVisible: !this.props.navigation.getParam("isMapModalVisible"),
     });
   };
 
   toggleSearchModal = () => {
     this.props.navigation.setParams({
-      isSearchModalVisible: !(this.props.navigation.getParam("isSearchModalVisible"))
+      isSearchModalVisible: !this.props.navigation.getParam(
+        "isSearchModalVisible"
+      ),
     });
   };
 
   static getHeaderRight = navigation => {
-    if(!navigation.getParam("showMapIcon") && !navigation.getParam("showSearchIcon")) {
-      return <View/>;
+    if (
+      !navigation.getParam("showMapIcon") &&
+      !navigation.getParam("showSearchIcon")
+    ) {
+      return <View />;
     }
 
     const searchShouldDisplay = navigation.getParam("showSearchIcon");
     const iconProps = { size: 30, color: colors.primaryColor };
 
-    return (  
+    return (
       <View>
-        <View style={{flexDirection:"row", paddingRight: 15}}>
-          <View style={{flex:1}}>
-          {searchShouldDisplay
-            ? <TouchableHighlight
+        <View style={{ flexDirection: "row", paddingRight: 15 }}>
+          <View style={{ flex: 1 }}>
+            {searchShouldDisplay ? (
+              <TouchableHighlight
                 onPress={navigation.getParam("toggleSearchModal")}
                 underlayColor="#f9f9f9"
               >
-                <SimpleLineIcons
-                  name="magnifier"
-                  {...iconProps}
-                />
+                <SimpleLineIcons name="magnifier" {...iconProps} />
               </TouchableHighlight>
-            : <TouchableHighlight
+            ) : (
+              <TouchableHighlight
                 onPress={navigation.getParam("toggleMapModal")}
                 underlayColor={Colors.white}
               >
-                <FontAwesome
-                  name="map"
-                  {...iconProps}
-                />
+                <FontAwesome name="map" {...iconProps} />
               </TouchableHighlight>
-          }
+            )}
           </View>
         </View>
-        {searchShouldDisplay 
-          ? <SearchModal
-              isModalVisible={
-                navigation.state.params
-                  ? navigation.getParam("isSearchModalVisible")
-                  : false
-              }
-              toggleModal={() => navigation.state.params.toggleSearchModal()}
-              eventDays={navigation.getParam("eventDays")}
-              eventManager={navigation.getParam("eventManager")}
-            />
-          : <MapModal
-              isModalVisible={
-                navigation.state.params
-                  ? navigation.getParam("isMapModalVisible")
-                  : false
-              }
-              toggleModal={() => navigation.state.params.toggleMapModal()}
-            />
-        }
+        {searchShouldDisplay ? (
+          <SearchModal
+            isModalVisible={
+              navigation.state.params
+                ? navigation.getParam("isSearchModalVisible")
+                : false
+            }
+            toggleModal={() => navigation.state.params.toggleSearchModal()}
+            eventDays={navigation.getParam("eventDays")}
+            eventManager={navigation.getParam("eventManager")}
+          />
+        ) : (
+          <MapModal
+            isModalVisible={
+              navigation.state.params
+                ? navigation.getParam("isMapModalVisible")
+                : false
+            }
+            toggleModal={() => navigation.state.params.toggleMapModal()}
+          />
+        )}
       </View>
     );
   };
 
   static getHeaderLeft = navigation => (
-    <View style={{flexDirection:"row", paddingLeft: 15}}>
-      <View style={{flex:1}}>
+    <View style={{ flexDirection: "row", paddingLeft: 15 }}>
+      <View style={{ flex: 1 }}>
         <Image
           source={Images.bitcamp_logo}
-          style={{width: 50, height: 50, paddingVertical: scale(10)}}
+          style={{ width: 50, height: 50, paddingVertical: scale(10) }}
         />
       </View>
-      <View style={{flex:1, paddingLeft: 20, paddingTop: 5}}>
+      <View style={{ flex: 1, paddingLeft: 20, paddingTop: 5 }}>
         <H1>{navigation.getParam("title")}</H1>
       </View>
     </View>
   );
 
-
   render() {
     this.configureNotificationSettings();
-    const eventManager = this.props.screenProps.eventManager;
+    const { eventManager } = this.props.screenProps;
     const { navigate } = this.props.navigation;
     return (
       <SafeAreaView
@@ -161,26 +169,26 @@ export default class AppContainer extends Component {
         <ScrollableTabView
           tabBarPosition="bottom"
           locked
-          style={{ backgroundColor: colors.backgroundColor.normal/*, paddingTop: 40*/ }}
+          style={{
+            backgroundColor:
+              colors.backgroundColor.normal /* , paddingTop: 40 */,
+          }}
           renderTabBar={() => <CustomTabBar />}
           onChangeTab={tab => {
             const tabIndex = tab.i;
-            const tabNames = [
-              "bitcamp",
-              "Schedule",
-              "Mentors",
-              "Profile"
-            ];
+            const tabNames = ["bitcamp", "Schedule", "Mentors", "Profile"];
 
-            this.props.navigation.setParams({ 
+            this.props.navigation.setParams({
               title: tabNames[tabIndex],
-              showMapIcon: (tabIndex === 0),
-              showSearchIcon: (tabIndex === 1)
+              showMapIcon: tabIndex === 0,
+              showSearchIcon: tabIndex === 1,
             });
 
-            if(tabIndex === 1) {
-              this.props.navigation.setParams({ eventDays: eventManager.getEventDays() });
-            } 
+            if (tabIndex === 1) {
+              this.props.navigation.setParams({
+                eventDays: eventManager.getEventDays(),
+              });
+            }
           }}
         >
           <Home
@@ -213,11 +221,11 @@ export default class AppContainer extends Component {
       "hardwareBackPress",
       this.handleBackButtonClick
     );
-    const eventManager = this.props.screenProps.eventManager;
+    const { eventManager } = this.props.screenProps;
   }
 
   componentWillUnmount() {
-    const eventManager = this.props.screenProps.eventManager;
+    const { eventManager } = this.props.screenProps;
     eventManager.removeEventChangeListener(this.myHome);
     eventManager.removeEventChangeListener(this.mySchedule);
     eventManager.removeEventChangeListener(this.mySaved);
@@ -230,14 +238,13 @@ export default class AppContainer extends Component {
   }
 
   handleBackButtonClick() {
-    //BackHandler.exitApp();
+    // BackHandler.exitApp();
     return true;
   }
 
   configureNotificationSettings() {
-    //create notifications channel
+    // create notifications channel
     // TODO: rework push notifications since firebase fcm only works on android when using expo
-
     // console.warn(firebase.notifications);
     // const channel = new firebase.notifications.Android.Channel(
     //   channelId,
@@ -246,9 +253,7 @@ export default class AppContainer extends Component {
     // ).setDescription(
     //   "Bitcamp notification channel for delivering important announcements"
     // );
-
     // firebase.notifications().android.createChannel(channel);
-
     // firebase
     //   .messaging()
     //   .hasPermission()
@@ -263,7 +268,6 @@ export default class AppContainer extends Component {
     //       }
     //     }
     //   });
-
     // firebase
     //   .messaging()
     //   .getToken()
@@ -276,9 +280,7 @@ export default class AppContainer extends Component {
     //       console.log("no token");
     //     }
     //   });
-
     // firebase.messaging().subscribeToTopic("announcements");
-
     // this.notificationDisplayedListener = firebase
     //   .notifications()
     //   .onNotificationDisplayed(notification => {
@@ -286,7 +288,6 @@ export default class AppContainer extends Component {
     //     // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
     //     console.log("notification displayed", notification);
     //   });
-
     // this.notificationListener = firebase
     //   .notifications()
     //   .onNotification(notification => {

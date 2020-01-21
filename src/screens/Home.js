@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { PadContainer, ViewContainer } from '../components/Base';
-import CountdownTimer from '../components/CountdownTimer';
-import EventColumns from '../components/events/EventColumns';
-import { H2 } from '../components/Text';
-import HappeningNowSlideshow from '../components/HappeningNowSlideshow';
+import React, { Component } from "react";
+import { StyleSheet, View } from "react-native";
+import { PadContainer, ViewContainer } from "../components/Base";
+import CountdownTimer from "../components/CountdownTimer";
+import EventColumns from "../components/events/EventColumns";
+import { H2 } from "../components/Text";
+import HappeningNowSlideshow from "../components/HappeningNowSlideshow";
 
 export default class Home extends Component<Props> {
   constructor(props) {
@@ -17,7 +17,13 @@ export default class Home extends Component<Props> {
     };
     this.toggleMapModal = this.toggleMapModal.bind(this);
     this.toggleUpdatesModal = this.toggleUpdatesModal.bind(this);
-    this.timer = setInterval(() => this.setState({happeningNow: this.props.eventManager.getHappeningNow()}), 1000*60);
+    this.timer = setInterval(
+      () =>
+        this.setState({
+          happeningNow: this.props.eventManager.getHappeningNow(),
+        }),
+      1000 * 60
+    );
   }
 
   toggleUpdatesModal() {
@@ -37,7 +43,7 @@ export default class Home extends Component<Props> {
             heading={heading}
             eventsArr={events}
             eventManager={this.props.eventManager}
-            origin={'Home'}
+            origin="Home"
           />
         </View>
       </View>
@@ -56,16 +62,17 @@ export default class Home extends Component<Props> {
           heading={heading}
           eventsArr={events}
           eventManager={this.props.eventManager}
-          origin={'Home'}
+          origin="Home"
         />
       </View>
     );
   };
 
   renderHappeningNow = () => {
-    const events = (this.state.happeningNow.length === 0) 
-      ? this.props.eventManager.getHappeningNow() 
-      : this.state.happeningNow;
+    const events =
+      this.state.happeningNow.length === 0
+        ? this.props.eventManager.getHappeningNow()
+        : this.state.happeningNow;
 
     return (
       <View style={styles.subSection}>
@@ -95,31 +102,31 @@ export default class Home extends Component<Props> {
 
 const styles = StyleSheet.create({
   bottomContainer: {
-    backgroundColor: "white"
-  },
-  heading: {
-    marginBottom: 20
-  },
-  headingRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems:'center'
-  },
-  subSection: {
-    paddingBottom: 20
-  },
-  subSectionHeading: {
-    paddingBottom: 10
-  },
-  columnContainer: {
-    flex: 1,
-    flexDirection: "row"
+    backgroundColor: "white",
   },
   column: {
     flex: 5,
-    flexDirection: "column"
+    flexDirection: "column",
+  },
+  columnContainer: {
+    flex: 1,
+    flexDirection: "row",
   },
   event: {
-    marginBottom: 15
-  }
+    marginBottom: 15,
+  },
+  heading: {
+    marginBottom: 20,
+  },
+  headingRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  subSection: {
+    paddingBottom: 20,
+  },
+  subSectionHeading: {
+    paddingBottom: 10,
+  },
 });

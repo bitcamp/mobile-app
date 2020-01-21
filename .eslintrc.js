@@ -1,12 +1,12 @@
 module.exports = {
-  plugins: ["prettier"],
+  root: true,
+
+  plugins: ["prettier", "react-native"],
 
   extends: [
     // Airbnb's React style guide
     "airbnb",
-
-    // React Native Community's style guide
-    "@react-native-community",
+    "airbnb/hooks",
 
     // Does 3 things:
     //  1. Turns prettier rules into eslint rules
@@ -18,5 +18,27 @@ module.exports = {
     "prettier/react",
   ],
 
-  ignorePatterns: ["node_modules/"],
+  // All custom rule overrides go here. Each override should include an explanation
+  // for why it is applied
+  rules: {
+    // Turn off this rule to allow StyleSheets to be placed at the bottom of files
+    // It might be good to disable this in the future and strip out StyleSheets
+    "no-use-before-define": "off",
+
+    // Prevents unused styling rules
+    "react-native/no-unused-styles": "error",
+
+    // Prevents inline styles
+    "react-native/no-inline-styles": "error",
+
+    // Sorts styles in alphabetical order
+    "react-native/sort-styles": "error",
+
+    // Prevents style arrays with only one element
+    "react-native/no-single-element-style-arrays": "error",
+
+    // TODO: add this in when we're ready to start stripping
+    // out styles that should be placed in a config file
+    // "react-native/no-color-literals": "error",
+  },
 };

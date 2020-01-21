@@ -1,4 +1,4 @@
-import { hasTimePassed, normalizeTimeLabel } from './timeUtils';
+import { hasTimePassed, normalizeTimeLabel } from "./timeUtils";
 
 export default class Event {
   constructor(
@@ -26,7 +26,7 @@ export default class Event {
   }
 
   get startTimeFormatted() {
-    return normalizeTimeLabel(this.startTime)
+    return normalizeTimeLabel(this.startTime);
   }
 
   get endTimeFormatted() {
@@ -44,15 +44,15 @@ export default class Event {
   get timeRangeString() {
     return this.startTimeFormatted === this.endTimeFormatted
       ? this.startTimeFormatted
-      : `from ${this.startTimeFormatted} - ${this.endTimeFormatted}`
+      : `from ${this.startTimeFormatted} - ${this.endTimeFormatted}`;
   }
 
   get clippedTitle() {
     const titleLimit = 30;
 
     // If the event has a title longer than the character limit, cut it off
-    return (this.title && this.title.length > titleLimit)
-      ? this.title.substring(0, titleLimit) + "…"
+    return this.title && this.title.length > titleLimit
+      ? `${this.title.substring(0, titleLimit)}…`
       : this.title;
   }
 }

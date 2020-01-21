@@ -44,7 +44,7 @@ export const mockUser = {
     needsReimbursement: false,
     reimbursementOrigin: "none",
 
-    //Bitcamp
+    // Bitcamp
     amtHackathons: "0",
     whyBitcamp: "it cool",
     buildBitcamp: "???",
@@ -57,7 +57,7 @@ export const mockUser = {
     devpost: "danny.devito.devpost",
     website: "danny.devito",
 
-    //Legal
+    // Legal
     mlhCOC: true,
     mlhTAC: true,
     bitcampWaiver: true,
@@ -71,7 +71,7 @@ export const mockUser = {
    * Extension of the user profile, but can only be edited after acceptance.
    */
   confirmation: {
-    confirmationAdditional: "test"
+    confirmationAdditional: "test",
   },
 
   status: {
@@ -85,7 +85,7 @@ export const mockUser = {
     checkedIn: true,
     checkInTime: 200,
     confirmBy: 200,
-    reimbursementGiven: false
+    reimbursementGiven: false,
   },
 
   /**
@@ -101,5 +101,5 @@ export const mockUser = {
   // TODO: Remove after Bitcamp 2019
   favoritedFirebaseEvents: [20056, 20074, 20082],
 
-  reimbursementLimit: 10
+  reimbursementLimit: 10,
 };

@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
-import moment from 'moment';
-import { H3, BaseText } from './Text';
-import { StyleSheet, Text } from 'react-native';
-import { colors } from './Colors';
+import React, { Component } from "react";
+import moment from "moment";
+import { StyleSheet, Text } from "react-native";
+import { H3, BaseText } from "./Text";
+import { colors } from "./Colors";
 
 // when hacking begins
 const START_TIME = moment("2019-04-12 21:00");
@@ -15,7 +15,7 @@ export default class CountdownTimer extends Component {
     this.state = {
       time: moment(),
     };
-  };
+  }
 
   componentDidMount() {
     this.timer = setInterval(() => {
@@ -42,29 +42,25 @@ export default class CountdownTimer extends Component {
 
     // If hacking hasn't begun
     if (this.state.time < startTime) {
-      return (
-        <H3 style={styles.countdownText}>
-          Bitcamp is April 12-14
-        </H3>
-      );
+      return <H3 style={styles.countdownText}>Bitcamp is April 12-14</H3>;
 
-    // If hacking is over
-    } else if (this.state.time > endTime) {
-      return <React.Fragment></React.Fragment>
-
-    // If hacking is currently happening
-    } else {
-      remain  = moment.duration(moment(endTime).diff(moment(this.state.time)));
-      days    = remain.days();
-      hours   = remain.hours();
-      minutes = remain.minutes();
-      seconds = remain.seconds();
+      // If hacking is over
     }
+    if (this.state.time > endTime) {
+      return <></>;
 
-    let daysText = (days > 0) ? `${days}d ` : ``;
-    let hoursText = `${hours}h `
-    let minutesText = `${minutes}m `;
-    let secondsText = `${seconds}s `;
+      // If hacking is currently happening
+    }
+    remain = moment.duration(moment(endTime).diff(moment(this.state.time)));
+    days = remain.days();
+    hours = remain.hours();
+    minutes = remain.minutes();
+    seconds = remain.seconds();
+
+    const daysText = days > 0 ? `${days}d ` : ``;
+    const hoursText = `${hours}h `;
+    const minutesText = `${minutes}m `;
+    const secondsText = `${seconds}s `;
 
     return (
       <H3 style={styles.countdownText}>
@@ -77,10 +73,10 @@ export default class CountdownTimer extends Component {
 
 const styles = StyleSheet.create({
   countdownText: {
-    paddingVertical: 10,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 18,
     flex: 1,
-  }
+    fontSize: 18,
+    fontWeight: "bold",
+    paddingVertical: 10,
+    textAlign: "center",
+  },
 });

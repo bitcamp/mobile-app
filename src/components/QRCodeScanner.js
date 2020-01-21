@@ -43,23 +43,23 @@ export default function QRCodeScanner(props) {
 }
 
 const styles = StyleSheet.create({
+  centeredText: {
+    textAlign: "center",
+  },
   container: {
+    alignItems: "center",
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 20
-  },
-  centeredText: {
-    textAlign: "center"
+    padding: 20,
   },
   description: {
     color: "white",
+    fontSize: 20,
     textAlign: "center",
-    fontSize: 20
-  }
+  },
 });
 
 QRCodeScanner.propTypes = {
   onScan: PropTypes.func.isRequired,
-  scannerIsOn: PropTypes.bool.isRequired
+  scannerIsOn: PropTypes.bool.isRequired,
 };

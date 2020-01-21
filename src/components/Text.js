@@ -1,27 +1,18 @@
-import React, { Component } from 'react';
-import { colors } from './Colors';
-import {
-  Text,
-  StyleSheet,
-  Platform
-} from 'react-native';
-import { scale } from '../utils/scale';
+import React, { Component } from "react";
+import { Text, StyleSheet, Platform } from "react-native";
+import { colors } from "./Colors";
+import { scale } from "../utils/scale";
 
 const styles = StyleSheet.create({
-  text: {
-    color: colors.textColor.normal,
-    fontFamily: 'System',
-    fontWeight: 'normal'
-  },
   h1: {
     color: colors.primaryColor,
-    fontFamily: 'Aleo-Bold',
+    fontFamily: "Aleo-Bold",
     fontSize: scale(32),
-    fontWeight: 'normal'
+    fontWeight: "normal",
   },
   h2: {
-    fontWeight: 'bold',
     fontSize: scale(18),
+    fontWeight: "bold",
   },
   h3: {
     fontSize: scale(15),
@@ -38,57 +29,59 @@ const styles = StyleSheet.create({
   p: {
     fontSize: scale(14),
   },
-
+  text: {
+    color: colors.textColor.normal,
+    fontFamily: "System",
+    fontWeight: "normal",
+  },
 });
 
-
-const H1 = (props) => (
+const H1 = props => (
   <Text {...props} style={[styles.text, styles.h1, props.style]}>
     {props.children}
   </Text>
 );
 
-const H2 = (props) => (
+const H2 = props => (
   <Text {...props} style={[styles.text, styles.h2, props.style]}>
     {props.children}
   </Text>
 );
 
-const H3 = (props) => (
+const H3 = props => (
   <Text {...props} style={[styles.text, styles.h3, props.style]}>
     {props.children}
   </Text>
 );
 
-const H4 = (props) => (
+const H4 = props => (
   <Text {...props} style={[styles.text, styles.h4, props.style]}>
     {props.children}
   </Text>
 );
 
-const H5 = (props) => (
+const H5 = props => (
   <Text {...props} style={[styles.text, styles.h5, props.style]}>
     {props.children}
   </Text>
 );
 
-const H6 = (props) => (
+const H6 = props => (
   <Text {...props} style={[styles.text, styles.h6, props.style]}>
     {props.children}
   </Text>
 );
 
-const P = (props) => (
+const P = props => (
   <Text {...props} style={[styles.text, styles.p, props.style]}>
     {props.children}
   </Text>
 );
 
-const BaseText = (props) => (
+const BaseText = props => (
   <Text {...props} style={[styles.text, props.style]}>
     {props.children}
   </Text>
 );
 
-
-export { H1, H2, H3, H4, H5, H6, P, BaseText }
+export { H1, H2, H3, H4, H5, H6, P, BaseText };

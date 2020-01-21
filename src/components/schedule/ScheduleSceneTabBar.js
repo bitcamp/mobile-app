@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
 
 import {
   Platform,
@@ -8,11 +8,11 @@ import {
   View,
   Animated,
   TouchableOpacity,
-  FlatList
-} from 'react-native';
+  FlatList,
+} from "react-native";
 
-import { colors } from '../Colors';
-import { H1, H2, H3, H4, P } from '../Text';
+import { colors } from "../Colors";
+import { H1, H2, H3, H4, P } from "../Text";
 
 export default class ScheduleSceneTabBar extends Component {
   render() {
@@ -20,20 +20,22 @@ export default class ScheduleSceneTabBar extends Component {
       <FlatList
         style={[styles.tabs, this.props.style]}
         data={this.props.tabs}
-        renderItem={(tabObj) => {
-          const isActive = (this.props.activeTab === tabObj.index);
+        renderItem={tabObj => {
+          const isActive = this.props.activeTab === tabObj.index;
           return (
             <TouchableOpacity
               onPress={() => this.props.goToSection(tabObj.index)}
               style={[styles.tab, styles.tabActive]}
             >
-              <H2 style={ isActive ? styles.activeText : styles.inactiveText }>{tabObj.item}&nbsp;</H2>
+              <H2 style={isActive ? styles.activeText : styles.inactiveText}>
+                {tabObj.item}&nbsp;
+              </H2>
               {/* <View style={isActive ? styles.bottomBorder : styles.bottomBorderInactive }></View> */}
             </TouchableOpacity>
           );
         }}
         ItemSeparatorComponent={() => <H2>&nbsp;&nbsp;</H2>}
-        horizontal={true}
+        horizontal
         keyExtractor={(item, index) => item}
       />
     );
@@ -43,7 +45,7 @@ export default class ScheduleSceneTabBar extends Component {
 ScheduleSceneTabBar.propTypes = {
   goToPage: PropTypes.func,
   activeTab: PropTypes.number,
-  tabs: PropTypes.array
+  tabs: PropTypes.array,
 };
 
 const styles = StyleSheet.create({
@@ -67,16 +69,16 @@ const styles = StyleSheet.create({
   //   // marginBottom: 10,
   // },
   tab: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    //marginBottom: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    // marginBottom: 40,
     // marginVertical: 10,
   },
   tabs: {
-    flexDirection: 'row',
-    borderTopWidth: 0,
+    borderBottomWidth: 0,
     borderLeftWidth: 0,
     borderRightWidth: 0,
-    borderBottomWidth: 0
-  }
+    borderTopWidth: 0,
+    flexDirection: "row",
+  },
 });

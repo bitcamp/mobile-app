@@ -1,24 +1,41 @@
 import React, { Component } from "react";
-import { Alert, AsyncStorage, StyleSheet, TouchableOpacity, View } from "react-native";
-import Modal from 'react-native-modal';
+import {
+  Alert,
+  AsyncStorage,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Modal from "react-native-modal";
 import QRCode from "react-native-qrcode-svg";
+import RNRestart from "react-native-restart";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  AntDesign,
+} from "@expo/vector-icons";
 import QRCodeScanner from "../components/QRCodeScanner";
-import RNRestart from 'react-native-restart';
-import { Ionicons, MaterialCommunityIcons, AntDesign } from '@expo/vector-icons';
-import { CenteredActivityIndicator, ModalHeader, PadContainer, SubHeading, ViewContainer, PlainViewContainer } from "../components/Base";
+import {
+  CenteredActivityIndicator,
+  ModalHeader,
+  PadContainer,
+  SubHeading,
+  ViewContainer,
+  PlainViewContainer,
+} from "../components/Base";
 import { colors } from "../components/Colors";
 import FullScreenModal from "../components/modals/FullScreenModal";
 import { H1, H2, H3 } from "../components/Text";
-import { scale } from '../utils/scale';
-import EasterEggUsername from '../components/EasterEggUsername';
+import { scale } from "../utils/scale";
+import EasterEggUsername from "../components/EasterEggUsername";
 import { mockFetch } from "../mockData/mockFetch";
 
 const FORCE_NORMAL_USER = false; // NOTE dangerous debug mode setting
 
-const APP_ID = '@com.technica.technica18:';
-const USER_TOKEN = APP_ID + 'JWT';
+const APP_ID = "@com.technica.technica18:";
+const USER_TOKEN = `${APP_ID}JWT`;
 const USER_DATA_STORE = "USER_DATA_STORE";
-const SCHEDULE_STORAGE_KEY = APP_ID + 'schedule';
+const SCHEDULE_STORAGE_KEY = `${APP_ID}schedule`;
 
 export default class Profile extends Component {
   constructor(props) {
@@ -35,17 +52,17 @@ export default class Profile extends Component {
       devoolooperMode: false,
       namePresses: 0,
       nameColor: colors.textColor.normal,
-      timeInterval: null
+      timeInterval: null,
     };
   }
 
   getFullName(user) {
-    const {email, profile: {firstName, lastName}} = user;
-    return (firstName && lastName) 
-        ? `${firstName} ${lastName}`
-        : email;
+    const {
+      email,
+      profile: { firstName, lastName },
+    } = user;
+    return firstName && lastName ? `${firstName} ${lastName}` : email;
   }
-
 
   async logout() {
     Alert.alert(
@@ -58,13 +75,13 @@ export default class Profile extends Component {
             AsyncStorage.removeItem(USER_DATA_STORE).then(() => {
               RNRestart.Restart();
             });
-          }
+          },
         },
         {
           text: "Cancel",
           onPress: () => console.log("Cancel Pressed"),
-          style: "cancel"
-        }
+          style: "cancel",
+        },
       ],
       { cancelable: true }
     );
@@ -78,15 +95,15 @@ export default class Profile extends Component {
     try {
       this.setState({ scannerIsOn: false });
       const userId = e.data;
-      const url =`https://api.bit.camp/api/users/${userId}/checkIn`;
+      const url = `https://api.bit.camp/api/users/${userId}/checkIn`;
       const token = await AsyncStorage.getItem(USER_TOKEN);
       const response = await mockFetch(url, {
         method: "POST",
         headers: {
-          "Accept": "application/json",
+          Accept: "application/json",
           "Content-Type": "application/json",
           "x-access-token": token,
-        }
+        },
       });
 
       const responseJSON = await response.json();
@@ -97,7 +114,7 @@ export default class Profile extends Component {
           scannedUserData: {
             displayName: this.getFullName(responseJSON),
             minorStatus: !userProfile.adult,
-            dietaryRestrictions: userProfile.dietaryRestrictions
+            dietaryRestrictions: userProfile.dietaryRestrictions,
           },
           scannedUser: true,
         });
@@ -117,9 +134,9 @@ export default class Profile extends Component {
           {
             text: "OK",
             onPress: () => {
-              this.setState({ scannerIsOn: true })
-            }
-          }
+              this.setState({ scannerIsOn: true });
+            },
+          },
         ],
         { cancelable: false }
       );
@@ -133,8 +150,10 @@ export default class Profile extends Component {
   }
 
   async componentDidMount() {
-    var loggedInUser = JSON.parse(await AsyncStorage.getItem(USER_DATA_STORE));
-    
+    const loggedInUser = JSON.parse(
+      await AsyncStorage.getItem(USER_DATA_STORE)
+    );
+
     if (FORCE_NORMAL_USER) {
       loggedInUser.admin = false;
     }
@@ -147,16 +166,15 @@ export default class Profile extends Component {
       });
     }
   }
-  
-  render() {
 
+  render() {
     const scannerView = (() => {
       return (
         <FullScreenModal
           isVisible={this.state.scanner}
           onBackButtonPress={() => this.toggleScanner()}
           contentStyle={{ padding: 0 }}
-          shouldntScroll={true}
+          shouldntScroll
           header={
             <ModalHeader
               origin="Profile"
@@ -193,26 +211,21 @@ export default class Profile extends Component {
 
         return (
           <ViewContainer>
-            {isOrganizer &&
-              scannerView}
+            {isOrganizer && scannerView}
             <View style={{ alignItems: "center" }}>
               <View style={styles.QRCode}>
                 {this.state.user.profile && (
-                  <QRCode
-                    value={id}
-                    size={scale(175)}
-                  />
+                  <QRCode value={id} size={scale(175)} />
                 )}
               </View>
               <H3 style={{ color: colors.textColor.light }}>
                 {isOrganizer
                   ? "Use this code for testing"
-                  : "Scan this code at check-in"
-                }
+                  : "Scan this code at check-in"}
               </H3>
             </View>
             <PadContainer>
-              {this.state.user.profile &&
+              {this.state.user.profile && (
                 <View style={{ alignItems: "center" }}>
                   <EasterEggUsername
                     username={this.getFullName(this.state.user)}
@@ -222,13 +235,24 @@ export default class Profile extends Component {
                     {this.state.user.email}
                   </SubHeading>
                 </View>
-              }
+              )}
             </PadContainer>
-            <View style={{ justifyContent: 'space-evenly', flexDirection: "row", marginTop: -15}}>
+            <View
+              style={{
+                justifyContent: "space-evenly",
+                flexDirection: "row",
+                marginTop: -15,
+              }}
+            >
               {isOrganizer && (
-                <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <View
+                  style={{ alignItems: "center", justifyContent: "center" }}
+                >
                   <TouchableOpacity
-                    style={[styles.actionButton, {backgroundColor: "#d2d1d7"}]}
+                    style={[
+                      styles.actionButton,
+                      { backgroundColor: "#d2d1d7" },
+                    ]}
                     onPress={() => this.toggleScanner()}
                   >
                     <MaterialCommunityIcons
@@ -237,29 +261,23 @@ export default class Profile extends Component {
                       color="black"
                     />
                   </TouchableOpacity>
-                  <H3 style={{ fontWeight: 'bold' }}>Scanner</H3>
+                  <H3 style={{ fontWeight: "bold" }}>Scanner</H3>
                 </View>
               )}
-              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <TouchableOpacity
-                  style={[styles.actionButton, {backgroundColor: 'red'}]}
+                  style={[styles.actionButton, { backgroundColor: "red" }]}
                   onPress={() => this.logout()}
                 >
-                  <AntDesign
-                    name="logout"
-                    size={45}
-                    color="white"
-                  />
+                  <AntDesign name="logout" size={45} color="white" />
                 </TouchableOpacity>
-                <H3 style={{fontWeight: "bold" }}>Sign Out</H3>
+                <H3 style={{ fontWeight: "bold" }}>Sign Out</H3>
               </View>
             </View>
           </ViewContainer>
         );
-
-      } else {
-        return <CenteredActivityIndicator />;
       }
+      return <CenteredActivityIndicator />;
     })();
 
     return defaultView;
@@ -291,67 +309,76 @@ const ScanResponseModal = props => {
           justifyContent: "center",
         }}
       >
-        {
-          !props.scannedUserData
-          ? <React.Fragment>
-              <Ionicons
-                name="md-close"
-                size={48}
-                color={colors.iconColor}
-                style={{ marginBottom: 10 }}
-              />
-              <H2 style={{ color: colors.textColor.normal, marginBottom: 20 }}>NOT FOUND</H2>
-              <H3 style={{ color: colors.textColor.light }}>Send to check-in table.</H3>
-            </React.Fragment>
-          : <React.Fragment>
-              <Ionicons
-                name="md-checkmark"
-                size={48}
-                color={colors.secondaryColor}
-                style={{ marginBottom: 10 }}
-              />
-              <H2 style={{ color: colors.secondaryColor, marginBottom: 20 }}>SUCCESS</H2>
-              <H1 style={{ marginBottom: 20, textAlign: 'center' }}>{props.scannedUserData.displayName}</H1>
-              {props.scannedUserData.minorStatus && (
-                <H3 style={{ color: colors.primaryColor }}>+ Minor</H3>
+        {!props.scannedUserData ? (
+          <>
+            <Ionicons
+              name="md-close"
+              size={48}
+              color={colors.iconColor}
+              style={{ marginBottom: 10 }}
+            />
+            <H2 style={{ color: colors.textColor.normal, marginBottom: 20 }}>
+              NOT FOUND
+            </H2>
+            <H3 style={{ color: colors.textColor.light }}>
+              Send to check-in table.
+            </H3>
+          </>
+        ) : (
+          <>
+            <Ionicons
+              name="md-checkmark"
+              size={48}
+              color={colors.secondaryColor}
+              style={{ marginBottom: 10 }}
+            />
+            <H2 style={{ color: colors.secondaryColor, marginBottom: 20 }}>
+              SUCCESS
+            </H2>
+            <H1 style={{ marginBottom: 20, textAlign: "center" }}>
+              {props.scannedUserData.displayName}
+            </H1>
+            {props.scannedUserData.minorStatus && (
+              <H3 style={{ color: colors.primaryColor }}>+ Minor</H3>
+            )}
+            {props.scannedUserData.dietaryRestrictions != null &&
+              props.scannedUserData.dietaryRestrictions.length > 0 &&
+              props.scannedUserData.dietaryRestrictions[0] !==
+                "I Have No Food Restrictions" && (
+                <H3 style={{ color: colors.primaryColor }}>
+                  + Dietary Restrictions
+                </H3>
               )}
-              {props.scannedUserData.dietaryRestrictions != null &&
-                props.scannedUserData.dietaryRestrictions.length > 0 &&
-                props.scannedUserData.dietaryRestrictions[0] !==
-                  "I Have No Food Restrictions" && (
-                  <H3 style={{ color: colors.primaryColor }}>+ Dietary Restrictions</H3>
-                )}
-            </React.Fragment>
-        }
+          </>
+        )}
       </View>
     </Modal>
   );
 };
 
-
 const styles = StyleSheet.create({
-  actionButton: {
-    marginBottom: scale(5),
-    borderRadius: scale(15),
-    padding: scale(15),
+  QRCode: {
+    backgroundColor: "white",
+    borderColor: "transparent",
+    borderRadius: 8,
+    borderWidth: 0,
+    marginTop: scale(15),
+    padding: scale(7),
   },
   QRMarker: {
-    width: '60%',
     aspectRatio: 1,
+    borderColor: colors.secondaryColor,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: colors.secondaryColor
+    width: "60%",
   },
-  QRCode: {
-    marginTop: scale(15),
-    backgroundColor: "white",
-    borderRadius: 8,
-    borderColor: 'transparent',
-    borderWidth: 0,
-    padding: scale(7)
+  actionButton: {
+    borderRadius: scale(15),
+    marginBottom: scale(5),
+    padding: scale(15),
   },
   username: {
-    textAlign: "center",
     marginTop: scale(-15),
-  }
+    textAlign: "center",
+  },
 });
