@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 // Use this file to staticly import images https://stackoverflow.com/questions/33907218/react-native-use-variable-for-image-file
 
 const Images = {

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { TouchableOpacity, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { H3 } from "../Text";
-import { colors } from "../Colors";
+import colors from "../Colors";
 import EventsManager from "../../events/EventsManager";
 
 export default class EventStar extends Component {

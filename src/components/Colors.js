@@ -27,7 +27,7 @@ const bitcampColorPalette = {
 };
 
 // "light" refers to a more subtle color
-export const colors = {
+const colors = {
   starColor: {
     selected: bitcampColorPalette.darkYellow,
     unselected: "#b7b7bb",
@@ -56,3 +56,5 @@ export const colors = {
     sky: bitcampColorPalette.blue.sky,
   },
 };
+
+export default colors;

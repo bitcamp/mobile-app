@@ -1,27 +1,26 @@
 // Use this class to interact with all of the events, never modify the state directly
 
 import { AsyncStorage, ToastAndroid as Toast } from "react-native";
-import firebase from "firebase";
+// import firebase from "firebase";
 import moment from "moment";
 import _ from "lodash";
 
 import { createEventDay } from "./utils";
-import { mockFetch } from "../mockData/mockFetch";
+import mockFetch from "../mockData/mockFetch";
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
 const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const SAVED_COUNT_STORE = `${APP_ID}SAVED_COUNT_STORE`;
-const EVENT_ID_PREFIX = `${APP_ID}eventNotification-`;
+// const EVENT_ID_PREFIX = `${APP_ID}eventNotification-`;
 const SCHEDULE_STORAGE_KEY = `${APP_ID}schedule`;
 const USER_DATA_STORE = "USER_DATA_STORE";
-const UPDATES_STORE = "RECENT_UPDATES_STORE";
+// const UPDATES_STORE = "RECENT_UPDATES_STORE";
 
-const notificationBufferMins = 15;
-const savedCountRefreshInterval = 10 * 60 * 1000;
-const HACKING_END_TIME = moment("2019-04-14 09:00");
+// const notificationBufferMins = 15;
+// const savedCountRefreshInterval = 10 * 60 * 1000;
 
-const channelId = "technica-push-notifications";
+// const channelId = "technica-push-notifications";
 
 let lastNetworkRequest = null;
 let networkCallExecuting = false;
@@ -62,15 +61,7 @@ export default class EventsManager {
         .then(responseData => responseData.json())
         .then(data => {
           // store new schedule on phone
-          AsyncStorage.setItem(
-            SCHEDULE_STORAGE_KEY,
-            JSON.stringify(data),
-            function(error) {
-              if (error) {
-                console.log(error);
-              }
-            }
-          );
+          AsyncStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(data));
 
           this.processNewEvents(data, true);
         });
@@ -93,12 +84,10 @@ export default class EventsManager {
   }
 
   processNewEvents(rawData, rescheduleNotifications) {
-    newEventDays = [];
-    // repeat process of scanning through events
-    for (const i in rawData) {
-      newEventDays.push(createEventDay(rawData[i]));
-    }
-    newCombinedEvents = _.flatten(
+    const newEventDays = rawData.map(rawEventData =>
+      createEventDay(rawEventData)
+    );
+    const newCombinedEvents = _.flatten(
       _.flatten(
         _.map(newEventDays, eventDay =>
           _.map(eventDay.eventGroups, eventGroup => eventGroup.events)
@@ -120,8 +109,8 @@ export default class EventsManager {
           this.isFavorited[newEvent.eventID] &&
           rescheduleNotifications
         ) {
-          this.deleteNotification(newEvent);
-          this.createNotification(newEvent);
+          EventsManager.deleteNotification(newEvent);
+          EventsManager.createNotification(newEvent);
         }
         changed = true;
 
@@ -147,7 +136,7 @@ export default class EventsManager {
 
   processRecentUpdates(updatesArray) {
     // sort events by time descending
-    sortedUpdates = _.sortBy(
+    const sortedUpdates = _.sortBy(
       updatesArray,
       update => -moment(update.time).unix()
     );
@@ -167,28 +156,17 @@ export default class EventsManager {
     mockFetch("https://api.bit.camp/api/firebaseEvents/favoriteCounts")
       .then(response => response.json())
       .then(responseJson => {
-        newSavedCount = responseJson;
+        const newSavedCount = responseJson;
         this.savedCounts = newSavedCount;
         // store new favorite counts on phone
-        AsyncStorage.setItem(
-          SAVED_COUNT_STORE,
-          JSON.stringify(newSavedCount),
-          function(error) {
-            if (error) {
-              console.log(error);
-            }
-          }
-        );
+        AsyncStorage.setItem(SAVED_COUNT_STORE, JSON.stringify(newSavedCount));
 
         this.updateEventComponents();
         this.updateHearts();
-      })
-      .catch(error => {
-        console.log(error);
       });
   }
 
-  compareUserData(oldData, newData) {
+  static compareUserData(oldData, newData) {
     return (
       oldData.admin === newData.admin &&
       _.isEqual(oldData.confirmation, newData.confirmation) &&
@@ -205,11 +183,11 @@ export default class EventsManager {
 
   async fetchNewUserData() {
     try {
-      result = await AsyncStorage.getItem(USER_DATA_STORE);
-      token = await AsyncStorage.getItem(USER_TOKEN);
+      const result = await AsyncStorage.getItem(USER_DATA_STORE);
+      const token = await AsyncStorage.getItem(USER_TOKEN);
       if (result != null && token != null) {
-        result = JSON.parse(result);
-        id = result.id;
+        const resultObj = JSON.parse(result);
+        const { id } = resultObj;
         const response = await mockFetch(
           `https://api.bit.camp/api/users/${id}/`,
           {
@@ -222,17 +200,17 @@ export default class EventsManager {
           }
         );
         const responseJson = await response.json();
-        if (response.status == 200) {
-          if (!this.compareUserData(result, responseJson)) {
-            Toast.show(
-              "Your user information is out of date! Please log out and log in again.",
-              Toast.LONG
-            );
-          }
+        if (
+          response.status === 200 &&
+          !EventsManager.compareUserData(resultObj, responseJson)
+        ) {
+          Toast.show(
+            "Your user information is out of date! Please log out and log in again.",
+            Toast.LONG
+          );
         }
       }
     } catch (error) {
-      console.log(error);
       Toast.show("Error grabbing new user data.", Toast.SHORT);
     }
     this.updateHearts();
@@ -244,7 +222,7 @@ export default class EventsManager {
   }
 
   getTopEvents() {
-    topSorted = _.sortBy(
+    const topSorted = _.sortBy(
       this.combinedEvents,
       event => -this.getSavedCount(event.eventID)
     );
@@ -258,9 +236,9 @@ export default class EventsManager {
 
   getHappeningNow() {
     const currentDateTime = moment(moment().format("YYYY-MM-DD HH:mm"));
-    return (events = _.filter(this.combinedEvents, event =>
+    return _.filter(this.combinedEvents, event =>
       currentDateTime.isBetween(moment(event.startTime), moment(event.endTime))
-    ));
+    );
   }
 
   getSavedEventsArray() {
@@ -280,10 +258,10 @@ export default class EventsManager {
 
   // key of event
   // time in minutes to warn before event
-  async favoriteEvent(eventID, refreshSaved) {
+  async favoriteEvent(eventID) {
     if (
       (lastNetworkRequest != null &&
-        moment().seconds() == lastNetworkRequest.seconds()) ||
+        moment().seconds() === lastNetworkRequest.seconds()) ||
       networkCallExecuting
     ) {
       Toast.show(
@@ -293,33 +271,33 @@ export default class EventsManager {
     }
     lastNetworkRequest = moment();
     await AsyncStorage.getItem(USER_DATA_STORE, (err, result) => {
-      AsyncStorage.getItem(USER_TOKEN, (err, token) => {
-        id = JSON.parse(result).id;
-        const response = mockFetch(
+      AsyncStorage.getItem(USER_TOKEN, (innerErr, token) => {
+        const { id } = JSON.parse(result);
+        mockFetch(
           `https://api.bit.camp/api/users/${id}/favoriteFirebaseEvent/${eventID}`,
           {
             method: "POST",
-            headers: new Headers({
+            headers: {
               "Content-Type": "application/json",
               "x-access-token": token,
-            }),
+            },
             body: JSON.stringify({
               firebaseId: eventID,
               userId: id,
             }),
           }
         ).then(myJson => {
-          if (myJson.status == 200) {
+          if (myJson.status === 200) {
             this.favoriteState[eventID] = true;
             this.savedCounts[eventID] = this.getSavedCount(eventID) + 1;
-            updateObj = {};
+            const updateObj = {};
             updateObj[eventID] = true;
             AsyncStorage.mergeItem(
               EVENT_FAVORITED_STORE,
               JSON.stringify(updateObj)
             );
-            event = this.eventIDToEventMap[eventID];
-            this.createNotification(event);
+            const event = this.eventIDToEventMap[eventID];
+            EventsManager.createNotification(event);
 
             this.updateHearts();
             // this.updateEventComponents();
@@ -333,10 +311,10 @@ export default class EventsManager {
     this.updateHearts();
   }
 
-  unfavoriteEvent(eventID, refreshSaved) {
+  unfavoriteEvent(eventID) {
     if (
       (lastNetworkRequest != null &&
-        moment().seconds() == lastNetworkRequest.seconds()) ||
+        moment().seconds() === lastNetworkRequest.seconds()) ||
       networkCallExecuting
     ) {
       Toast.show(
@@ -346,8 +324,8 @@ export default class EventsManager {
     }
     lastNetworkRequest = moment();
     AsyncStorage.getItem(USER_DATA_STORE, (err, result) => {
-      AsyncStorage.getItem(USER_TOKEN, (err, token) => {
-        id = JSON.parse(result).id;
+      AsyncStorage.getItem(USER_TOKEN, (innerErr, token) => {
+        const { id } = JSON.parse(result);
 
         mockFetch(
           `https://api.bit.camp/api/users/${id}/unfavoriteFirebaseEvent/${eventID}`,
@@ -363,18 +341,18 @@ export default class EventsManager {
             }),
           }
         ).then(myJson => {
-          if (myJson.status == 200) {
+          if (myJson.status === 200) {
             this.favoriteState[eventID] = false;
             this.savedCounts[eventID] = this.getSavedCount(eventID) - 1;
-            updateObj = {};
+            const updateObj = {};
             updateObj[eventID] = false;
             AsyncStorage.mergeItem(
               EVENT_FAVORITED_STORE,
               JSON.stringify(updateObj)
             );
 
-            event = this.eventIDToEventMap[eventID];
-            this.deleteNotification(event);
+            const event = this.eventIDToEventMap[eventID];
+            EventsManager.deleteNotification(event);
             this.updateHearts();
             // this.updateEventComponents();
             networkCallExecuting = false;
@@ -387,7 +365,7 @@ export default class EventsManager {
     this.updateHearts();
   }
 
-  createNotification(event) {
+  static createNotification(event) {
     if (event.hasPassed) {
       Toast.show("This event has ended.", Toast.SHORT);
     } else if (event.hasBegun) {
@@ -410,7 +388,7 @@ export default class EventsManager {
     }
   }
 
-  deleteNotification(event) {
+  static deleteNotification(event) {
     if (!event.hasBegun) {
       Toast.show("You will no longer be notified about this event.");
     }
@@ -434,7 +412,7 @@ export default class EventsManager {
   }
 
   updateHearts() {
-    this.heartListeners.forEach((component, comp, set) => {
+    this.heartListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
@@ -450,7 +428,7 @@ export default class EventsManager {
   }
 
   updateEventComponents() {
-    this.eventListeners.forEach((component, comp, set) => {
+    this.eventListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
@@ -466,14 +444,26 @@ export default class EventsManager {
   }
 
   updateUpdatesComponents() {
-    this.updatesListeners.forEach((component, comp, set) => {
+    this.updatesListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
     });
   }
 
-  static hackingIsOver() {
-    return moment().isAfter(HACKING_END_TIME);
+  static getHackingStartTime() {
+    return moment("2019-04-12 21:00", "YYYY-MM-DD hh:mm");
+  }
+
+  static getHackingEndTime() {
+    return moment("2019-04-14 09:00", "YYYY-MM-DD hh:mm");
+  }
+
+  static hackingHasStarted(currMoment = moment()) {
+    return currMoment.isAfter(this.getHackingStartTime());
+  }
+
+  static hackingHasEnded(currMoment = moment()) {
+    return currMoment.isAfter(this.getHackingEndTime());
   }
 }

@@ -6,8 +6,8 @@ import PropTypes from "prop-types";
 import FullScreenModal from "./FullScreenModal";
 
 import AltModalHeader from "./AltModalHeader";
-import CustomScheduleTabBar from "../schedule/CustomScheduleTabBar";
-import { colors } from "../Colors";
+import SwipableTabBar from "../SwipableTabBar";
+import colors from "../Colors";
 import Images from "../../../assets/imgs";
 import { getDeviceWidth } from "../../utils/sizing";
 
@@ -99,12 +99,15 @@ export default class MapModal extends Component {
           <AltModalHeader
             title="Map"
             rightText="Done"
+            leftText=""
             rightAction={toggleModal}
           />
         }
       >
         <ScrollableTabView
-          renderTabBar={() => <CustomScheduleTabBar />}
+          renderTabBar={({ goToPage, tabs, activeTab }) => (
+            <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
+          )}
           style={styles.floorContainer}
         >
           {renderedFloors}

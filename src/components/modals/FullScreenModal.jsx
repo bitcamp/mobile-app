@@ -2,7 +2,7 @@ import React from "react";
 import Modal from "react-native-modal";
 import { ViewPropTypes, StyleSheet, View, ScrollView } from "react-native";
 import PropTypes from "prop-types";
-import { colors } from "../Colors";
+import colors from "../Colors";
 import { scale } from "../../utils/scale";
 
 /* A <Modal> wrapper that uses a standard set of animations and colors */

@@ -3,6 +3,9 @@ module.exports = {
 
   plugins: ["prettier", "react-native"],
 
+  // Enable new features (such as class properties)
+  parser: "babel-eslint",
+
   extends: [
     // Airbnb's React style guide
     "airbnb",
@@ -36,6 +39,13 @@ module.exports = {
 
     // Prevents style arrays with only one element
     "react-native/no-single-element-style-arrays": "error",
+
+    // TODO: enable this rule in the future
+    // Enables prop spreading
+    "react/jsx-props-no-spreading": "off",
+
+    // Allows you to reassign the properties of function parameters
+    "no-param-reassign": ["error", { props: false }],
 
     // TODO: add this in when we're ready to start stripping
     // out styles that should be placed in a config file

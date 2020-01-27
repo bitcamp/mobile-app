@@ -10,7 +10,7 @@ import {
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import PropTypes from "prop-types";
 import { H3, P } from "../Text";
-import { colors } from "../Colors";
+import colors from "../Colors";
 import { scale } from "../../utils/scale";
 import { requireFunctionIfPresent, noop } from "../../utils/PropTypeUtils";
 
@@ -26,10 +26,10 @@ const AltModalHeader = ({
   rightAction,
   rightTextStyle,
 }) => (
-  <View style={[styles.menu, style]}>
+  <View style={{ ...styles.menu, style }}>
     <ConditionalSideText
       text={leftText}
-      func={leftAction}
+      action={leftAction}
       textStyle={[styles.leftText, leftTextStyle]}
     />
 
@@ -37,7 +37,7 @@ const AltModalHeader = ({
 
     <ConditionalSideText
       text={rightText}
-      func={rightAction}
+      action={rightAction}
       textStyle={rightTextStyle}
       containerStyle={styles.rightMenuItem}
     />
@@ -46,16 +46,16 @@ const AltModalHeader = ({
 
 /* A text componenent that acts like a button if a text property is supplied 
    or like an empty box otherwise */
-const ConditionalSideText = ({ containerStyle, text, action, textStyle }) => (
+const ConditionalSideText = ({ text, action, textStyle, containerStyle }) => (
   <View style={[styles.menuItem, containerStyle]}>
-    {text && (
+    {text ? (
       <TouchableOpacity
         onPress={action}
         hitSlop={{ top: 10, bottom: 10, left: 5, right: 5 }}
       >
         <P style={[styles.text, styles.link, textStyle]}>{text}</P>
       </TouchableOpacity>
-    )}
+    ) : null}
   </View>
 );
 
@@ -71,10 +71,10 @@ AltModalHeader.propTypes = {
 };
 
 AltModalHeader.defaultProps = {
-  leftText: "",
+  leftText: null,
   leftAction: noop,
   leftTextStyle: null,
-  rightText: "",
+  rightText: null,
   rightAction: noop,
   rightTextStyle: null,
   style: null,
@@ -83,8 +83,12 @@ AltModalHeader.defaultProps = {
 ConditionalSideText.propTypes = {
   text: PropTypes.string.isRequired,
   action: PropTypes.func.isRequired,
-  containerStyle: ViewPropTypes.style.isRequired,
   textStyle: Text.propTypes.style.isRequired,
+  containerStyle: ViewPropTypes.style,
+};
+
+ConditionalSideText.defaultProps = {
+  containerStyle: null,
 };
 
 const headerPadding = scale(15);

@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import Images from "../../../assets/imgs/index";
 import { scale } from "../../utils/scale";
 import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
-import { colors } from "../Colors";
+import colors from "../Colors";
 import { BaseText } from "../Text";
 import ClickableEvent from "./ClickableEvent";
 import Event from "../../events/Event";

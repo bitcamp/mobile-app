@@ -8,9 +8,11 @@ import {
   AntDesign,
 } from "@expo/vector-icons";
 
+const aleoBold = require("../../assets/fonts/Aleo-Bold.otf");
+
 const fontList = [
   {
-    "Aleo-Bold": require("../../assets/fonts/Aleo-Bold.otf"),
+    "Aleo-Bold": aleoBold,
   },
   FontAwesome.font,
   Ionicons.font,
@@ -20,6 +22,6 @@ const fontList = [
   AntDesign.font,
 ];
 
-export async function loadAssets() {
+export default async function loadAssets() {
   await Promise.all([...fontList.map(font => Font.loadAsync(font))]);
 }

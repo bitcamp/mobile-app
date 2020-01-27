@@ -14,13 +14,14 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import FullScreenModal from "./FullScreenModal";
 import { H3 } from "../Text";
-import { colors } from "../Colors";
-import PillBadge, { badgeStyles } from "../PillBadge";
+import colors from "../Colors";
+import PillBadge from "../PillBadge";
 import { scale } from "../../utils/scale";
 import SearchBarTabView from "../SearchBarTabView";
 import { getDeviceHeight } from "../../utils/sizing";
 import EventsManager from "../../events/EventsManager";
 import EventDay from "../../events/EventDay";
+import { eventCategories } from "../../events/eventConfig";
 
 export default class SearchModal extends Component {
   constructor(props) {
@@ -113,12 +114,12 @@ export default class SearchModal extends Component {
   }
 
   renderBadges() {
-    return Object.keys(badgeStyles).map(badgeTitle => (
+    return Array.from(eventCategories).map(badgeTitle => (
       <TouchableOpacity
         onPress={() => this.filterEvents(badgeTitle)}
         key={badgeTitle}
       >
-        <PillBadge category={badgeTitle} from="Modal" margin={5} />
+        <PillBadge category={badgeTitle} style={styles.badge} />
       </TouchableOpacity>
     ));
   }
@@ -201,6 +202,9 @@ export default class SearchModal extends Component {
 }
 
 const styles = StyleSheet.create({
+  badge: {
+    marginLeft: 5,
+  },
   exitText: {
     color: colors.primaryColor,
     padding: scale(15),
@@ -228,7 +232,6 @@ const styles = StyleSheet.create({
     borderRadius: scale(10),
   },
   modalStyle: {
-    borderColor: "pink",
     borderWidth: 2,
     padding: 0,
   },

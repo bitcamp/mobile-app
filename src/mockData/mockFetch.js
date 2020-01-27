@@ -1,7 +1,7 @@
-import { mockSchedule } from "./schedule";
-import { mockFavoriteCounts } from "./favoriteCounts";
-import { mockUser } from "./user";
-import { mockQuestions } from "./questions";
+import mockSchedule from "./mockSchedule";
+import mockFavoriteCounts from "./mockFavoriteCounts";
+import mockUser from "./mockUser";
+import mockQuestions from "./mockQuestions";
 
 /**
  *
@@ -15,7 +15,7 @@ import { mockQuestions } from "./questions";
  * @returns a promise that returns a Response object with a 200 status.
  * To access the response data, call the object's .json() method
  */
-export const mockFetch = async (uri, options) => {
+const mockFetch = async uri => {
   try {
     const respData = getResponse(uri);
     return {
@@ -25,7 +25,7 @@ export const mockFetch = async (uri, options) => {
       ok: true,
     };
   } catch (e) {
-    console.error(e);
+    return null;
   }
 };
 
@@ -89,8 +89,9 @@ const requestTypes = {
  */
 const getResponse = uri => {
   // Go through all request types and return the corresponding data
-  for (const type in requestTypes) {
-    const request = requestTypes[type];
+  const types = Object.keys(requestTypes);
+  for (let i = 0; i < types.length; i += 1) {
+    const request = requestTypes[types[i]];
 
     if (request.uriPattern.test(uri)) {
       return request.data;
@@ -100,3 +101,5 @@ const getResponse = uri => {
   // Otherwise, print that there was an error
   throw new Error(`Unsupported Request URI: ${uri}`);
 };
+
+export default mockFetch;

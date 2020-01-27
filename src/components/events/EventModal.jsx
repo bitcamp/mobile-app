@@ -5,8 +5,8 @@ import { Image, ScrollView, StyleSheet, View } from "react-native";
 import Images from "../../../assets/imgs/index";
 import { scale } from "../../utils/scale";
 import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
-import { ModalHeader } from "../Base";
-import { colors } from "../Colors";
+import ModalHeader from "../modals/ModalHeader";
+import colors from "../Colors";
 import FullScreenModal from "../modals/FullScreenModal";
 import PillBadge from "../PillBadge";
 import { H2, H3, H4, P } from "../Text";
@@ -49,7 +49,7 @@ const EventModal = ({
             {// Handle events with single and multiple categories
             [].concat(event.category).map((category, index) => (
               <View style={styles.badge} key={event.title + index.toString()}>
-                <PillBadge category={category} from="Modal" />
+                <PillBadge category={category} isBigger />
               </View>
             ))}
           </View>

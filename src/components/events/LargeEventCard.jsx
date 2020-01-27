@@ -16,11 +16,11 @@ const LargeEventCard = ({ eventManager, event, origin, ...props }) => (
     style={styles.event}
   >
     <Image
-      style={styles.image}
+      style={[styles.image, styles.roundedCorners]}
       source={Images[event.img]}
-      imageStyle={{ borderRadius: 13 }}
+      imageStyle={styles.roundedCorners}
     />
-    <EventDescription {...props} disabled />
+    <EventDescription {...props} />
   </ClickableEvent>
 );
 
@@ -31,9 +31,11 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   image: {
-    borderRadius: 13,
     height: imageHeight,
     width: imageWidth,
+  },
+  roundedCorners: {
+    borderRadius: 13,
   },
 });
 
