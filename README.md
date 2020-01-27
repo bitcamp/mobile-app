@@ -1,9 +1,9 @@
-# Bitcamp Mobile App
+# :fire: :iphone: Bitcamp Mobile App
 <p align="center"><img src="./screenshot.jpg" alt="App Screenshot" height="500"/></p>
 
 This is the the cross-platform mobile app for Bitcamp's hackathon, which is built using React Native and Expo. It provides hackers with up-to-date schedule information, custom QR codes, event notifications, and more.
 
-## Quick Start
+## :round_pushpin: Quick Start
 1. Install [node.js](https://nodejs.org/en/) and [git](https://git-scm.com/)
 2. Install [yarn](https://yarnpkg.com/en/docs/install)
 3. Globally install [expo-cli](https://docs.expo.io/versions/latest/get-started/installation/)
@@ -21,7 +21,7 @@ export const firebaseConfig = {
 ```
 7. Run the app using `expo start` or `yarn start`
 
-## Contribution Guide
+## :man_technologist: Contribution Guide
 We follow the [GitHub flow](https://guides.github.com/introduction/flow/) for managing this repository, which means that each new feature gets a branch off of master.
 ### Step-by-Step Instructions
 1. To make a new branch off of master, run
