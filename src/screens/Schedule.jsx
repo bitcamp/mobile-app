@@ -8,7 +8,7 @@ import {
 } from "../components/Base";
 import SwipableTabBar from "../components/SwipableTabBar";
 import EventGroupComponent from "../components/schedule/EventGroupComponent";
-import Saved from "./Saved";
+import Saved from "../components/events/Saved";
 import EventsManager from "../events/EventsManager";
 
 export default class Schedule extends Component {

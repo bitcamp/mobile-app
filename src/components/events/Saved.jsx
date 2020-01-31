@@ -1,19 +1,21 @@
-import React, { Component, Fragment } from "react";
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
-import { Button, PadContainer, SubHeading } from "../components/Base";
-import LargeEventCard from "../components/events/LargeEventCard";
+import React, { Component } from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+import { Button, PadContainer, SubHeading } from "../Base";
+import EventsManager from "../../events/EventsManager";
+import EventsList from "./EventsList";
 
 export default class Saved extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      refresh: false,
       isShowingPastEvents: false,
     };
   }
 
   render() {
     const { eventManager } = this.props;
+    const { isShowingPastEvents } = this.state;
     const events = eventManager.getSavedEventsArray();
 
     const pastEvents = events.filter(event => event.hasPassed);
@@ -29,25 +31,22 @@ export default class Saved extends Component {
           {// Show the past events button if there are past events
           pastEvents.length > 0 && (
             <Button
-              text={`${this.state.isShowingPastEvents ? "Hide" : "Show"} ${
+              text={`${isShowingPastEvents ? "Hide" : "Show"} ${
                 pastEvents.length
               } past event${pastEvents.length > 1 ? "s" : ""}`}
               style={styles.showPastEventsButton}
               onPress={() =>
-                this.setState({
-                  isShowingPastEvents: !this.state.isShowingPastEvents,
-                })
+                this.setState(({ isShowingPastEvents: showingPrevEvents }) => ({
+                  isShowingPastEvents: !showingPrevEvents,
+                }))
               }
               accessibilityLabel="Toggle Past Events"
             />
           )}
-
           <EventsList
             events={pastEvents}
             eventManager={eventManager}
-            shouldDisplay={
-              pastEvents.length > 0 && this.state.isShowingPastEvents
-            }
+            shouldDisplay={pastEvents.length > 0 && isShowingPastEvents}
           />
 
           <EventsList
@@ -61,47 +60,7 @@ export default class Saved extends Component {
   }
 }
 
-class EventsList extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillUnmount() {
-    this.props.eventManager.removeUpdatesListener(this.myEventsList);
-  }
-
-  render() {
-    const { events, eventManager, shouldDisplay } = this.props;
-    return (
-      shouldDisplay && (
-        <View
-          ref={myEventsList => {
-            this.myEventsList = myEventsList;
-            eventManager.registerUpdatesListener(myEventsList);
-          }}
-        >
-          {events.map(event => (
-            <LargeEventCard
-              key={event.eventID}
-              event={event}
-              eventManager={eventManager}
-              origin="Saved"
-            />
-          ))}
-        </View>
-      )
-    );
-  }
-}
-
 const styles = StyleSheet.create({
-  eventImgPassed: {
-    opacity: 0.3,
-  },
-  headingRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
   showPastEventsButton: {
     marginBottom: 20,
     marginHorizontal: 0,
@@ -112,3 +71,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+Saved.propTypes = {
+  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
+};

@@ -16,12 +16,10 @@ import {
 } from "@expo/vector-icons";
 import QRCodeScanner from "../components/QRCodeScanner";
 import {
-  CenteredActivityIndicator,
-  ModalHeader,
   PadContainer,
   SubHeading,
   ViewContainer,
-  PlainViewContainer,
+  CenteredActivityIndicator,
 } from "../components/Base";
 import colors from "../components/Colors";
 import FullScreenModal from "../components/modals/FullScreenModal";
@@ -29,34 +27,16 @@ import { H1, H2, H3 } from "../components/Text";
 import { scale } from "../utils/scale";
 import EasterEggUsername from "../components/EasterEggUsername";
 import mockFetch from "../mockData/mockFetch";
+import ModalHeader from "../components/modals/ModalHeader";
 
 const FORCE_NORMAL_USER = false; // NOTE dangerous debug mode setting
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
 const USER_DATA_STORE = "USER_DATA_STORE";
-const SCHEDULE_STORAGE_KEY = `${APP_ID}schedule`;
 
 export default class Profile extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: {},
-      scanner: false,
-
-      scannerIsOn: true,
-      scannedUser: false,
-      scannedUserData: {},
-
-      // For fun...
-      devoolooperMode: false,
-      namePresses: 0,
-      nameColor: colors.textColor.normal,
-      timeInterval: null,
-    };
-  }
-
-  getFullName(user) {
+  static getFullName(user) {
     const {
       email,
       profile: { firstName, lastName },
@@ -64,7 +44,7 @@ export default class Profile extends Component {
     return firstName && lastName ? `${firstName} ${lastName}` : email;
   }
 
-  async logout() {
+  static async logout() {
     Alert.alert(
       "Log Out",
       "Are you sure you want to log out?",
@@ -79,7 +59,6 @@ export default class Profile extends Component {
         },
         {
           text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"),
           style: "cancel",
         },
       ],
@@ -87,8 +66,39 @@ export default class Profile extends Component {
     );
   }
 
-  toggleScanner() {
-    this.setState({ scanner: !this.state.scanner });
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: {},
+      scanner: false,
+
+      scannerIsOn: true,
+      scannedUser: false,
+      scannedUserData: {},
+    };
+
+    this.onScanSuccess = this.onScanSuccess.bind(this);
+  }
+
+  async componentDidMount() {
+    const {
+      user: { profile },
+    } = this.state;
+
+    const loggedInUser = JSON.parse(
+      await AsyncStorage.getItem(USER_DATA_STORE)
+    );
+
+    if (FORCE_NORMAL_USER) {
+      loggedInUser.admin = false;
+    }
+    this.setState({ user: loggedInUser });
+    if (!profile) {
+      const keys = [USER_DATA_STORE, USER_TOKEN];
+      AsyncStorage.multiRemove(keys).then(() => {
+        RNRestart.Restart();
+      });
+    }
   }
 
   async onScanSuccess(e) {
@@ -107,12 +117,12 @@ export default class Profile extends Component {
       });
 
       const responseJSON = await response.json();
-      if (response.status == 200) {
+      if (response.status === 200) {
         const userProfile = responseJSON.profile;
         // Set state for SUCCESS modal
         this.setState({
           scannedUserData: {
-            displayName: this.getFullName(responseJSON),
+            displayName: Profile.getFullName(responseJSON),
             minorStatus: !userProfile.adult,
             dietaryRestrictions: userProfile.dietaryRestrictions,
           },
@@ -126,7 +136,6 @@ export default class Profile extends Component {
         });
       }
     } catch (error) {
-      console.log(error);
       Alert.alert(
         "No internet connection.",
         "Try again.",
@@ -145,33 +154,23 @@ export default class Profile extends Component {
     // this.scanner.reactivate();
   }
 
-  async verifyHacker() {
-    return true;
-  }
-
-  async componentDidMount() {
-    const loggedInUser = JSON.parse(
-      await AsyncStorage.getItem(USER_DATA_STORE)
-    );
-
-    if (FORCE_NORMAL_USER) {
-      loggedInUser.admin = false;
-    }
-    this.setState({ user: loggedInUser });
-    if (!this.state.user.profile) {
-      keys = [USER_DATA_STORE, USER_TOKEN];
-      AsyncStorage.multiRemove(keys).then(() => {
-        const navigate = this.props.navigation;
-        RNRestart.Restart();
-      });
-    }
+  toggleScanner() {
+    this.setState(({ scanner }) => ({ scanner: !scanner }));
   }
 
   render() {
+    const {
+      scanner,
+      scannerIsOn,
+      scannedUser,
+      scannedUserData,
+      user,
+    } = this.state;
+
     const scannerView = (() => {
       return (
         <FullScreenModal
-          isVisible={this.state.scanner}
+          isVisible={scanner}
           onBackButtonPress={() => this.toggleScanner()}
           contentStyle={{ padding: 0 }}
           shouldntScroll
@@ -183,12 +182,12 @@ export default class Profile extends Component {
           }
         >
           <QRCodeScanner
-            onScan={this.onScanSuccess.bind(this)}
-            scannerIsOn={this.state.scannerIsOn}
+            onScan={this.onScanSuccess}
+            scannerIsOn={scannerIsOn}
           />
           <ScanResponseModal
-            isVisible={this.state.scannedUser}
-            scannedUserData={this.state.scannedUserData}
+            isVisible={scannedUser}
+            scannedUserData={scannedUserData}
             onBack={() => {
               this.setState({ scannedUser: false, scannerIsOn: true });
             }}
@@ -198,25 +197,17 @@ export default class Profile extends Component {
     })();
 
     const defaultView = (() => {
-      if (this.state.user.profile) {
-        const phone_number = this.state.user.profile.phoneNumber
-          ? this.state.user.profile.phoneNumber
-          : "";
+      if (user.profile) {
+        const id = user.id || user.email; // TODO: possibly provide a more reasonable default
 
-        const id = this.state.user.id
-          ? this.state.user.id
-          : this.state.user.email; // TODO: possibly provide a more reasonable default
-
-        const isOrganizer = this.state.user.admin || this.state.user.organizer;
+        const isOrganizer = user.admin || user.organizer;
 
         return (
           <ViewContainer>
             {isOrganizer && scannerView}
             <View style={{ alignItems: "center" }}>
               <View style={styles.QRCode}>
-                {this.state.user.profile && (
-                  <QRCode value={id} size={scale(175)} />
-                )}
+                {user.profile && <QRCode value={id} size={scale(175)} />}
               </View>
               <H3 style={{ color: colors.textColor.light }}>
                 {isOrganizer
@@ -225,14 +216,14 @@ export default class Profile extends Component {
               </H3>
             </View>
             <PadContainer>
-              {this.state.user.profile && (
+              {user.profile && (
                 <View style={{ alignItems: "center" }}>
                   <EasterEggUsername
-                    username={this.getFullName(this.state.user)}
+                    username={this.getFullName(user)}
                     style={styles.username}
                   />
                   <SubHeading style={{ textAlign: "center", marginTop: -10 }}>
-                    {this.state.user.email}
+                    {user.email}
                   </SubHeading>
                 </View>
               )}
@@ -267,7 +258,7 @@ export default class Profile extends Component {
               <View style={{ alignItems: "center", justifyContent: "center" }}>
                 <TouchableOpacity
                   style={[styles.actionButton, { backgroundColor: "red" }]}
-                  onPress={() => this.logout()}
+                  onPress={() => Profile.logout()}
                 >
                   <AntDesign name="logout" size={45} color="white" />
                 </TouchableOpacity>
@@ -285,14 +276,15 @@ export default class Profile extends Component {
 }
 
 // TODO make this code less redundant
-const ScanResponseModal = props => {
+const ScanResponseModal = ({ isVisible, onBack, scannedUserData }) => {
+  const { displayName, minorStatus, dietaryRestrictions } = scannedUserData;
   return (
     <Modal
-      isVisible={props.isVisible}
+      isVisible={isVisible}
       backdropColor={colors.backgroundColor.normal}
       backdropOpacity={0.6}
-      onBackdropPress={props.onBack}
-      onBackButtonPress={props.onBack}
+      onBackdropPress={onBack}
+      onBackButtonPress={onBack}
       animationIn="fadeInUp"
       animationOut="fadeOutDown"
       animationInTiming={250}
@@ -309,7 +301,7 @@ const ScanResponseModal = props => {
           justifyContent: "center",
         }}
       >
-        {!props.scannedUserData ? (
+        {!scannedUserData ? (
           <>
             <Ionicons
               name="md-close"
@@ -336,15 +328,14 @@ const ScanResponseModal = props => {
               SUCCESS
             </H2>
             <H1 style={{ marginBottom: 20, textAlign: "center" }}>
-              {props.scannedUserData.displayName}
+              {displayName}
             </H1>
-            {props.scannedUserData.minorStatus && (
+            {minorStatus && (
               <H3 style={{ color: colors.primaryColor }}>+ Minor</H3>
             )}
-            {props.scannedUserData.dietaryRestrictions != null &&
-              props.scannedUserData.dietaryRestrictions.length > 0 &&
-              props.scannedUserData.dietaryRestrictions[0] !==
-                "I Have No Food Restrictions" && (
+            {dietaryRestrictions != null &&
+              dietaryRestrictions.length > 0 &&
+              dietaryRestrictions[0] !== "I Have No Food Restrictions" && (
                 <H3 style={{ color: colors.primaryColor }}>
                   + Dietary Restrictions
                 </H3>
@@ -364,13 +355,6 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     marginTop: scale(15),
     padding: scale(7),
-  },
-  QRMarker: {
-    aspectRatio: 1,
-    borderColor: colors.secondaryColor,
-    borderRadius: 8,
-    borderWidth: 2,
-    width: "60%",
   },
   actionButton: {
     borderRadius: scale(15),
