@@ -1,4 +1,4 @@
-# :fire: :iphone: Bitcamp Mobile App
+# :fire: Bitcamp Mobile App
 <p align="center"><img src="./screenshot.jpg" alt="App Screenshot" height="500"/></p>
 
 This is the the cross-platform mobile app for Bitcamp's hackathon, which is built using React Native and Expo. It provides hackers with up-to-date schedule information, custom QR codes, event notifications, and more.
