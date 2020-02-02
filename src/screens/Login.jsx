@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Alert, AsyncStorage, StyleSheet, TextInput } from "react-native";
-
 import PropTypes from "prop-types";
 import { Button, Heading, PadContainer, SubHeading } from "../components/Base";
 import colors from "../components/Colors";
@@ -14,6 +13,17 @@ const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const USER_DATA_STORE = "USER_DATA_STORE";
 
 export default class Login extends Component {
+  static createInitialState() {
+    return {
+      savedEmail: "",
+      fieldValue: "",
+      placeholder: "",
+      greeting: "Welcome to \nBitcamp 2019",
+      instruction: "Enter the email you used to sign up for Bitcamp.",
+      isOnEmailPage: true,
+    };
+  }
+
   static processUserEvents(events) {
     return events.reduce(
       (favoriteEventsMap, currEvent) => ({
@@ -27,23 +37,12 @@ export default class Login extends Component {
   constructor(props) {
     super(props);
 
-    this.state = this.createInitialState();
+    this.state = Login.createInitialState();
     this.sendEmail = this.sendEmail.bind(this);
     this.sendReceivedCode = this.sendReceivedCode.bind(this);
   }
 
-  createInitialState() {
-    return {
-      savedEmail: "",
-      fieldValue: "",
-      placeholder: "",
-      greeting: "Welcome to \nBitcamp 2019",
-      instruction: "Enter the email you used to sign up for Bitcamp.",
-      nextPage: (
-        <Button text="Next" style={styles.button} onPress={this.sendEmail} />
-      ),
-    };
-  }
+  componentDidMount() {}
 
   static navigationOptions = {
     header: null,
@@ -68,15 +67,7 @@ export default class Login extends Component {
             greeting: "Great!",
             instruction:
               "We've sent a verification code to your email. Please enter that code below to login.",
-            nextPage: (
-              <Button
-                onPress={this.sendReceivedCode}
-                text="Submit"
-                size={22}
-                color="white"
-                style={styles.button}
-              />
-            ),
+            isOnEmailPage: false,
             savedEmail: validEmail,
             fieldValue: "",
             placeholder: "xxxxxx",
@@ -85,7 +76,7 @@ export default class Login extends Component {
           Alert.alert(
             "Your email was not found.",
             "If you recently registered for Bitcamp, please try again in 24 hrs.",
-            [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+            [{ text: "OK" }],
             { cancelable: false }
           );
         }
@@ -93,7 +84,7 @@ export default class Login extends Component {
         Alert.alert(
           "There was an error requesting a code.",
           "Try again.",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          [{ text: "OK" }],
           { cancelable: false }
         );
       }
@@ -101,7 +92,7 @@ export default class Login extends Component {
       Alert.alert(
         "Invalid Email.",
         "Please enter a valid email.",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+        [{ text: "OK" }],
         { cancelable: false }
       );
     }
@@ -123,44 +114,31 @@ export default class Login extends Component {
       });
       const responseJson = await response.json();
       if (response.status === 200) {
-        await AsyncStorage.setItem(
-          USER_DATA_STORE,
-          JSON.stringify(responseJson.user)
-        );
-        await AsyncStorage.setItem(USER_TOKEN, responseJson.token);
-
         const userFavoritedEvents = Login.processUserEvents(
           responseJson.user.favoritedFirebaseEvents
         );
-        await AsyncStorage.setItem(
-          EVENT_FAVORITED_STORE,
-          JSON.stringify(userFavoritedEvents)
-        );
-        this.setState({ fieldValue: "" });
-        navigation.navigate("AppContainer");
+        // Store data in AsyncStorage, then reset state
+        await AsyncStorage.multiSet([
+          [USER_DATA_STORE, JSON.stringify(responseJson.user)],
+          [USER_TOKEN, responseJson.token],
+          [EVENT_FAVORITED_STORE, JSON.stringify(userFavoritedEvents)],
+        ]);
 
-        // TODO: investigate if you can just await this before the navigate statement
-        // this might happen after component is unmounted,
-        // however without a delay it will change back as it animates
-        // FYI this is kind of a hack since when the user navigates back we want to reset to the
-        // phone, not SMS if it does not unmount for some reason
-        setTimeout(() => {
-          this.setState(this.createInitialState());
-        }, 3000);
+        this.setState(Login.createInitialState());
+        navigation.navigate("AppContainer");
       } else {
         Alert.alert(
           "Failed to confirm pin.",
           "Please try again.",
-          [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+          [{ text: "OK" }],
           { cancelable: false }
         );
       }
     } catch (error) {
-      console.log(error);
       Alert.alert(
         "There was an error confirming the pin.",
         "Try again.",
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+        [{ text: "OK" }],
         { cancelable: false }
       );
     }
@@ -172,8 +150,8 @@ export default class Login extends Component {
       instruction,
       placeholder,
       fieldValue,
-      nextPage,
       greeting,
+      isOnEmailPage,
     } = this.state;
 
     return (
@@ -193,8 +171,11 @@ export default class Login extends Component {
             autoCapitalize="none"
             style={styles.input}
           />
-
-          {nextPage}
+          <Button
+            text={isOnEmailPage ? "Next" : "Submit"}
+            style={styles.button}
+            onPress={isOnEmailPage ? this.sendEmail : this.sendReceivedCode}
+          />
         </PadContainer>
       </KeyboardShift>
     );

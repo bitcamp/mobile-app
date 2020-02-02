@@ -1,22 +1,38 @@
 import PropTypes from "prop-types";
 
-// A utility for making a function required if the dependentProp is passed into this component
-export function requireFunctionIfPresent(dependentProp) {
-  return (props, propName) => {
-    // Disable this rule, since it would be much uglier to
-    // deconstruct with this variably-named prop
-    // eslint-disable-next-line react/destructuring-assignment
-    if (props[dependentProp]) {
+// Makes the given prop required if the given condition is satisfied.
+// Due to intricacies with the prop-types library, you have to supply
+// a custom validator to check if the prop is valid.
+// Code taken from https://github.com/jamiebuilds/react-required-if
+export function requiredIf(condition, propValidator) {
+  return (props, propName, componentName) => {
+    if (typeof condition !== "function") {
+      return new Error(
+        `Invalid requiredIf condition supplied to ${componentName}. Validation failed.`
+      );
+    }
+
+    if (typeof propValidator !== "function") {
+      return new Error(
+        `Invalid requiredIf propValidator supplied to ${componentName}. Validation failed.`
+      );
+    }
+
+    if (condition(props, propName, componentName)) {
       if (!props[propName]) {
         return new Error(
-          `You must provide '${propName}' if '${dependentProp}' is present`
+          `${propName} is a required prop, but its value was ${props[propName]}`
         );
       }
-      if (typeof props[propName] !== "function") {
-        return new Error(`The '${propName}' property isn't a function`);
+
+      if (!propValidator(props, propName, componentName)) {
+        return new Error(
+          `${propName} did not pass your validation in ${componentName}. The value provided was ${props[propName]}`
+        );
       }
     }
 
+    // Otherwise, it passed the prop type check
     return null;
   };
 }

@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { CenteredActivityIndicator } from "./Base";
+import { StyleSheet, View } from "react-native";
+import { H1 } from "./Text";
+import { scale } from "../utils/scale";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -14,6 +16,9 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    // It is useful if we encounter the error boundary to print out the error
+    // for debugging
+    // eslint-disable-next-line no-console
     console.error(error, errorInfo);
   }
 
@@ -21,12 +26,30 @@ export default class ErrorBoundary extends Component {
     const { children } = this.props;
     const { hasError } = this.state;
     if (hasError) {
-      return <CenteredActivityIndicator />; // TODO: add a more useful UI
+      return (
+        <View style={styles.fullScreen}>
+          <H1 style={styles.errorMessage}>Encountered a fatal error.</H1>
+          <H1 style={styles.errorMessage}> Please reload the app.</H1>
+        </View>
+      );
     }
 
     return children;
   }
 }
+
+const styles = StyleSheet.create({
+  errorMessage: {
+    fontSize: scale(25),
+    textAlign: "center",
+  },
+  fullScreen: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+});
 
 ErrorBoundary.propTypes = {
   children: PropTypes.node,

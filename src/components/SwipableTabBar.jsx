@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import {
   StyleSheet,
   View,
@@ -20,76 +20,60 @@ import { BaseText } from "./Text";
  * styles and input parameters. It should accept better props to better
  * deal with icon tab labels
  */
-export default class SwipableTabBar extends Component {
-  constructor(props) {
-    super(props);
-    this.setAnimationValue = this.setAnimationValue.bind(this);
+export default function SwipableTabBar({ tabs, style, goToPage, activeTab }) {
+  if (tabs.length === 0) {
+    return <React.Fragment key="EMPTY SEARCH TAB" />;
   }
-
-  // TODO: Check if this is even necessary (since setAnimationValue is currently a noop)
-  // componentDidMount() {
-  //   const { scrollValue } = this.props;
-  //   this._listener = scrollValue.addListener(this.setAnimationValue);
-  // }
-
-  setAnimationValue({ value }) {}
-
-  render() {
-    const { tabs, style, goToPage, activeTab } = this.props;
-    if (tabs.length === 0) {
-      return <React.Fragment key="EMPTY SEARCH TAB" />;
-    }
-    return (
-      <View style={[styles.tabs, style]}>
-        {tabs.map((tab, i) => {
-          let buttonIcon;
-          if (tab === "ios-star") {
-            buttonIcon = (
-              <Icon
-                name={tab}
-                size={27.5}
-                color={
-                  activeTab === i ? colors.primaryColor : colors.textColor.light
-                }
-              />
-            );
-          } else if (tab === "Parking") {
-            buttonIcon = (
-              <Ionicons
-                name="md-car"
-                size={22}
-                color={
-                  activeTab === i ? colors.primaryColor : colors.textColor.light
-                }
-              />
-            );
-          } else {
-            buttonIcon = (
-              <BaseText
-                style={[styles.text, activeTab === i && styles.textActive]}
-              >
-                {tab}
-              </BaseText>
-            );
-          }
-
-          return (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => goToPage(i)}
-              style={[
-                styles.tab,
-                activeTab === i ? styles.activetab : styles.inactivetab,
-                tab === "ios-star" ? styles.star : styles.weekdays,
-              ]}
-            >
-              {buttonIcon}
-            </TouchableOpacity>
+  return (
+    <View style={[styles.tabs, style]}>
+      {tabs.map((tab, i) => {
+        let buttonIcon;
+        if (tab === "ios-star") {
+          buttonIcon = (
+            <Icon
+              name={tab}
+              size={27.5}
+              color={
+                activeTab === i ? colors.primaryColor : colors.textColor.light
+              }
+            />
           );
-        })}
-      </View>
-    );
-  }
+        } else if (tab === "Parking") {
+          buttonIcon = (
+            <Ionicons
+              name="md-car"
+              size={22}
+              color={
+                activeTab === i ? colors.primaryColor : colors.textColor.light
+              }
+            />
+          );
+        } else {
+          buttonIcon = (
+            <BaseText
+              style={[styles.text, activeTab === i && styles.textActive]}
+            >
+              {tab}
+            </BaseText>
+          );
+        }
+
+        return (
+          <TouchableOpacity
+            key={tab}
+            onPress={() => goToPage(i)}
+            style={[
+              styles.tab,
+              activeTab === i ? styles.activetab : styles.inactivetab,
+              tab === "ios-star" ? styles.star : styles.weekdays,
+            ]}
+          >
+            {buttonIcon}
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

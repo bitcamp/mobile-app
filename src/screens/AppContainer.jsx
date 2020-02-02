@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-  // AsyncStorage,
   Image,
   SafeAreaView,
   StatusBar,
@@ -204,6 +203,8 @@ export default class AppContainer extends Component {
             }
           }}
         >
+          {/* TODO: Change to a tab navigator over this swipable tab view to improve 
+          efficiency and avoid everything rendering at once */}
           <Home
             ref={myHome => {
               this.myHome = myHome;
@@ -213,7 +214,6 @@ export default class AppContainer extends Component {
             eventManager={eventManager}
             tabLabel="home"
           />
-          {/* TODO: use an HOC to get the navigation prop */}
           <Schedule
             ref={mySchedule => {
               this.mySchedule = mySchedule;
@@ -221,11 +221,9 @@ export default class AppContainer extends Component {
             }}
             tabLabel="schedule"
             eventManager={eventManager}
-            navigation={navigation}
           />
           <Mentors tabLabel="mentors" />
-          {/* TODO: use an HOC to get the navigate function */}
-          <Profile tabLabel="profile" navigation={navigation.navigate} />
+          <Profile tabLabel="profile" />
         </ScrollableTabView>
       </SafeAreaView>
     );

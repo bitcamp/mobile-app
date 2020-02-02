@@ -21,6 +21,9 @@ export default class Saved extends Component {
     const pastEvents = events.filter(event => event.hasPassed);
     const upcomingEvents = events.filter(event => !event.hasPassed);
 
+    // TODO: investigate why unfavoriting an event doesn't update the saved events
+    // list. This might be fixed in the eventsmanager refactoring task.
+
     return (
       <ScrollView>
         <PadContainer>

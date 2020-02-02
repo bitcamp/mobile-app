@@ -20,6 +20,8 @@ export default class KeyboardShift extends Component {
       shift: new Animated.Value(0),
     };
     this.animationDuration = 250;
+    this.handleKeyboardDidShow = this.handleKeyboardDidShow.bind(this);
+    this.handleKeyboardDidHide = this.handleKeyboardDidHide.bind(this);
   }
 
   componentDidMount() {

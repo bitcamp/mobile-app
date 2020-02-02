@@ -20,11 +20,8 @@ export default class EasterEggUsername extends Component {
   }
 
   onNamePress() {
-    const {
-      namePresses: oldNamePresses,
-      isInEasterEggMode,
-      nameColor,
-    } = this.state;
+    const { namePresses: oldNamePresses, isInEasterEggMode } = this.state;
+
     const namePresses = oldNamePresses + 1;
     this.setState({ namePresses });
 
@@ -36,16 +33,23 @@ export default class EasterEggUsername extends Component {
         ]);
 
         const colorCycler = setInterval(() => {
+          // We have to grab these values from state each time
+          // to prevent using the old state from upper scope
+          const {
+            isInEasterEggMode: easterEggStatus,
+            nameColor: oldNameColor,
+          } = this.state;
+
           // Toggle the name color each time the interval runs
           this.setState({
             nameColor:
-              nameColor !== colors.primaryColor
+              oldNameColor !== colors.primaryColor
                 ? colors.primaryColor
                 : colors.secondaryColor,
           });
 
           // Return to the regular color when you exit easter egg mode
-          if (!isInEasterEggMode) {
+          if (!easterEggStatus) {
             clearInterval(colorCycler);
             this.setState({
               nameColor: colors.textColor.normal,
@@ -68,7 +72,7 @@ export default class EasterEggUsername extends Component {
 
   getEasterEggName() {
     const vowels = new Set(["a", "e", "i", "o", "u"]);
-    const { username } = this.state;
+    const { username } = this.props;
     const name = username.toLowerCase();
 
     // Create a new string that replaces all vowels with 'oo'

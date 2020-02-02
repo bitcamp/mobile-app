@@ -4,6 +4,47 @@ import PropTypes from "prop-types";
 import colors from "./Colors";
 import { scale } from "../utils/scale";
 
+const H1 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h1, style]}>
+    {children}
+  </Text>
+);
+const H2 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h2, style]}>
+    {children}
+  </Text>
+);
+const H3 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h3, style]}>
+    {children}
+  </Text>
+);
+const H4 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h4, style]}>
+    {children}
+  </Text>
+);
+const H5 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h5, style]}>
+    {children}
+  </Text>
+);
+const H6 = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.h6, style]}>
+    {children}
+  </Text>
+);
+const P = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, styles.p, style]}>
+    {children}
+  </Text>
+);
+const BaseText = ({ style, children, ...props }) => (
+  <Text {...props} style={[styles.text, style]}>
+    {children}
+  </Text>
+);
+
 const styles = StyleSheet.create({
   h1: {
     color: colors.primaryColor,
@@ -37,30 +78,87 @@ const styles = StyleSheet.create({
   },
 });
 
+H1.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H1.defaultProps = {
+  style: null,
+  children: null,
+};
+
+H2.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H2.defaultProps = {
+  style: null,
+  children: null,
+};
+
+H3.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H3.defaultProps = {
+  style: null,
+  children: null,
+};
+
+H4.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H4.defaultProps = {
+  style: null,
+  children: null,
+};
+
+H5.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H5.defaultProps = {
+  style: null,
+  children: null,
+};
+
+H6.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+H6.defaultProps = {
+  style: null,
+  children: null,
+};
+
+P.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+P.defaultProps = {
+  style: null,
+  children: null,
+};
+
+BaseText.propTypes = {
+  style: Text.propTypes.style,
+  children: PropTypes.node,
+};
+BaseText.defaultProps = {
+  style: null,
+  children: null,
+};
+
+export { H1, H2, H3, H4, H5, H6, P, BaseText };
+
+// TODO: investigate why this function, which is meant to reduce
+// redundancy in this file causes the app to fatally crash
 // Creates a text component with the specified style applied
-const createTextComponent = textStyle => ({ style, children, ...props }) => (
-  <Text {...props} style={[styles.text, textStyle, style]}>
-    {children}
-  </Text>
-);
 
-export const H1 = createTextComponent(styles.h1);
-export const H2 = createTextComponent(styles.h2);
-export const H3 = createTextComponent(styles.h3);
-export const H4 = createTextComponent(styles.h4);
-export const H5 = createTextComponent(styles.h5);
-export const H6 = createTextComponent(styles.h6);
-export const P = createTextComponent(styles.p);
-export const BaseText = createTextComponent(null);
-
-const components = [H1, H2, H3, H4, H5, H6, P, BaseText];
-components.forEach(component => {
-  component.propTypes = {
-    style: Text.propTypes.style,
-    children: PropTypes.node,
-  };
-  component.defaultProps = {
-    style: null,
-    children: null,
-  };
-});
+// const createTextComponent = textStyle => ({ style, children, ...props }) => (
+//   <Text {...props} style={[styles.text, textStyle, style]}>
+//     {children}
+//   </Text>
+// );
+// usage: const H1 = createTextComponent(styles.h1);

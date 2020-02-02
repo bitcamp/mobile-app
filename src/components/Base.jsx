@@ -1,16 +1,15 @@
 import React from "react";
 import {
   ActivityIndicator,
-  Image,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
   ViewPropTypes,
+  Text,
 } from "react-native";
 import PropTypes from "prop-types";
 import { Paper } from "react-native-paper";
-import Images from "../../assets/imgs/index";
 import { scale } from "../utils/scale";
 import colors from "./Colors";
 import { H1, H2, H3 } from "./Text";
@@ -31,21 +30,15 @@ const PadContainer = ({ style, children }) => (
   <View style={[styles.padContainer, style]}>{children}</View>
 );
 
-const Heading = ({ logo, style, children }) =>
-  logo ? (
-    <View style={[styles.headingContainer, style]}>
-      <Image source={Images.bitcamp_logo} style={styles.logo} />
-      <Heading style={styles.spacedHeading}>{children}</Heading>
-    </View>
-  ) : (
-    <View style={styles.heading}>
-      <H1 style={style}>{children}</H1>
-    </View>
-  );
+const Heading = ({ style, children }) => (
+  <View style={styles.heading}>
+    <H1 style={style}>{children}</H1>
+  </View>
+);
 
 const SubHeading = ({ style, children }) => (
   <View>
-    <H2 style={[styles.subHeading, style]}>{children}</H2>
+    <H2 style={(styles.subHeading, style)}>{children}</H2>
   </View>
 );
 
@@ -102,10 +95,6 @@ const styles = StyleSheet.create({
     marginBottom: scale(15),
     paddingTop: scale(25),
   },
-  headingContainer: {
-    alignItems: "center",
-    flexDirection: "row",
-  },
   horizontalLine: {
     backgroundColor: colors.borderColor.light,
     height: 1,
@@ -117,11 +106,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 10,
   },
-  logo: {
-    height: 45,
-    marginBottom: -10,
-    width: 45,
-  },
   padContainer: {
     flex: 1,
     paddingLeft: scale(15),
@@ -132,9 +116,6 @@ const styles = StyleSheet.create({
   },
   paperBody: {
     padding: 15,
-  },
-  spacedHeading: {
-    marginLeft: 12,
   },
   spacing: {
     height: scale(10),
@@ -159,17 +140,15 @@ ViewContainer.defaultProps = {
 
 Heading.propTypes = {
   children: PropTypes.node.isRequired,
-  style: ViewPropTypes.style,
-  logo: PropTypes.bool,
+  style: Text.propTypes.style,
 };
 Heading.defaultProps = {
   style: null,
-  logo: false,
 };
 
 SubHeading.propTypes = {
   children: PropTypes.node.isRequired,
-  style: ViewPropTypes.style,
+  style: Text.propTypes.style,
 };
 SubHeading.defaultProps = {
   style: null,
@@ -206,10 +185,10 @@ Button.defaultProps = {
 export {
   PlainViewContainer,
   ViewContainer,
+  PadContainer,
   Heading,
   SubHeading,
   PaperSheet,
-  PadContainer,
   HorizontalLine,
   Spacing,
   CenteredActivityIndicator,

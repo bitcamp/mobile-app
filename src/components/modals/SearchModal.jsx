@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
     borderRadius: scale(10),
   },
   modalStyle: {
-    borderWidth: 2,
     padding: 0,
   },
   tagContainer: {

@@ -4,7 +4,6 @@ import mockUser from "./mockUser";
 import mockQuestions from "./mockQuestions";
 
 /**
- *
  * A stand-in for the standard fetch() function that returns a barebones
  * API response using dummy data.
  *

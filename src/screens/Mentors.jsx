@@ -64,20 +64,14 @@ export default class Mentors extends Component {
     })
       .then(response => response.json())
       .then(async responseJson => {
-        console.log("questions found");
-        console.log(responseJson);
         this.setState({ listData: responseJson });
-      })
-      .catch(err => {
-        console.log("ERROR GRABBING QUESTIONS");
-        console.log(err);
       });
   }
 
+  // TODO: Investigate the purpose of this function
   async handleAppStateChange(nextAppState) {
     const { appState } = this.state;
     if (appState.match(/inactive|background/) && nextAppState === "active") {
-      console.log("App has come to the foreground!");
       const userData = await AsyncStorage.getItem("USER_DATA_STORE");
       const userDataJSON = JSON.parse(userData);
       this.grabQuestionsFromDB(userDataJSON.email);
@@ -128,12 +122,9 @@ export default class Mentors extends Component {
     }
 
     if (hasNoQuestion || hasNoLocation || hasNoUsername) {
-      Alert.alert(
-        "Try Again",
-        errorMessage,
-        [{ text: "OK", onPress: () => console.log("OK Pressed") }],
-        { cancelable: false }
-      );
+      Alert.alert("Try Again", errorMessage, [{ text: "OK" }], {
+        cancelable: false,
+      });
     } else {
       const fcmToken = await AsyncStorage.getItem("FCMToken");
       const userData = await AsyncStorage.getItem("USER_DATA_STORE");
@@ -265,7 +256,7 @@ export default class Mentors extends Component {
         <View style={styles.inputGroup}>
           <H3 style={styles.inputGroupTitle}>I WOULD LIKE</H3>
           <SwitchInput
-            style={[styles.input, styles.topInput]}
+            style={[styles.switchInput, styles.topInput]}
             onPress={() =>
               this.setState({
                 needsInPersonAssistance: !needsInPersonAssistance,
@@ -276,7 +267,7 @@ export default class Mentors extends Component {
             isDisabled={needsDesignMentor}
           />
           <SwitchInput
-            style={styles.input}
+            style={styles.switchInput}
             onPress={() =>
               this.setState({
                 needsDesignMentor: !needsDesignMentor,
@@ -291,6 +282,9 @@ export default class Mentors extends Component {
             {"Design Den mentors can help your team create effective visual design for your project."
               .split(" ")
               .map((word, index) => (
+                // Since we are using a constant string whose words will not be rearranged,
+                // there is no reason why using indices for keys will lead to bad behavior
+                // eslint-disable-next-line react/no-array-index-key
                 <P key={index} style={styles.inputDescription}>
                   {`${word} `}
                 </P>
@@ -326,6 +320,9 @@ export default class Mentors extends Component {
             "A Bitcamp mentor will respond to your message over Slack and may approach your table to assist if needed. Make sure that you"
               .split(" ")
               .map((word, index) => (
+                // Since we are using a constant string whose words will not be rearranged,
+                // there is no reason why using indices for keys will lead to bad behavior
+                // eslint-disable-next-line react/no-array-index-key
                 <P key={index} style={styles.inputDescription}>
                   {`${word} `}
                 </P>
@@ -388,6 +385,14 @@ function showSuccessToast() {
   }, 400);
 }
 
+const generalInputStyle = {
+  alignItems: "center",
+  backgroundColor: colors.backgroundColor.normal,
+  flexDirection: "row",
+  minHeight: 40,
+  padding: 15,
+};
+
 const styles = StyleSheet.create({
   bigTitle: {
     fontSize: scale(22),
@@ -401,13 +406,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    alignItems: "center",
-    backgroundColor: colors.backgroundColor.normal,
+    ...generalInputStyle,
     color: colors.textColor.normal,
-    flexDirection: "row",
     fontSize: scale(14),
-    minHeight: 40,
-    padding: 15,
   },
   inputDescription: {
     color: "#6d6d72",
@@ -432,7 +433,6 @@ const styles = StyleSheet.create({
   },
   questionButton: {
     borderRadius: 8,
-    fontWeight: "bold",
     marginBottom: 40,
     padding: 16,
   },
@@ -441,6 +441,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
   },
+  switchInput: generalInputStyle,
   textArea: {
     minHeight: verticalScale(200),
     textAlignVertical: "top",

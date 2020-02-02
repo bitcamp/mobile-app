@@ -20,8 +20,6 @@ export default class Expo extends Component {
     this.renderEventCard = this.renderEventCard.bind(this);
   }
 
-  componentDidMount() {}
-
   renderScheduleForDay(eventDayObj) {
     const eventDay = eventDayObj.item;
     // console.log(eventDayObj);

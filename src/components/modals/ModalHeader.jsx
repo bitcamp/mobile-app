@@ -8,6 +8,7 @@ import colors from "../Colors";
 import EventStar from "../events/EventStar";
 import EventsManager from "../../events/EventsManager";
 import { H3 } from "../Text";
+import { requiredIf } from "../../utils/PropTypeUtils";
 
 export default class ModalHeader extends Component {
   componentWillUnmount() {
@@ -102,12 +103,20 @@ ModalHeader.propTypes = {
   onBackButtonPress: PropTypes.func.isRequired,
   heart: PropTypes.bool,
   noArrow: PropTypes.bool,
-  eventID: PropTypes.string.isRequired,
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
+  eventID: requiredIf(
+    props => props.heart,
+    (props, propName) => typeof props[propName] === "string"
+  ),
+  eventManager: requiredIf(
+    props => props.heart,
+    (props, propName) => props[propName] instanceof EventsManager
+  ),
   origin: PropTypes.string.isRequired,
 };
 
 ModalHeader.defaultProps = {
   heart: false,
   noArrow: false,
+  eventManager: null,
+  eventID: null,
 };

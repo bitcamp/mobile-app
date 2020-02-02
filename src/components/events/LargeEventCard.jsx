@@ -20,7 +20,7 @@ const LargeEventCard = ({ eventManager, event, origin, ...props }) => (
       source={Images[event.img]}
       imageStyle={styles.roundedCorners}
     />
-    <EventDescription {...props} />
+    <EventDescription {...{ eventManager, event, origin, ...props }} />
   </ClickableEvent>
 );
 

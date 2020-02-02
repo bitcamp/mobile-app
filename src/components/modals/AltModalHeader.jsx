@@ -12,7 +12,7 @@ import PropTypes from "prop-types";
 import { H3, P } from "../Text";
 import colors from "../Colors";
 import { scale } from "../../utils/scale";
-import { requireFunctionIfPresent, noop } from "../../utils/PropTypeUtils";
+import { requiredIf, noop } from "../../utils/PropTypeUtils";
 
 /* An alternative modal header desgin with a centered title and 
    configurable action text on the left and right */
@@ -59,38 +59,6 @@ const ConditionalSideText = ({ text, action, textStyle, containerStyle }) => (
   </View>
 );
 
-AltModalHeader.propTypes = {
-  title: PropTypes.string.isRequired,
-  leftText: PropTypes.string,
-  leftAction: requireFunctionIfPresent("leftText"),
-  leftTextStyle: Text.propTypes.style,
-  rightText: PropTypes.string,
-  rightTextStyle: Text.propTypes.style,
-  rightAction: requireFunctionIfPresent("rightText"),
-  style: ViewPropTypes.style,
-};
-
-AltModalHeader.defaultProps = {
-  leftText: null,
-  leftAction: noop,
-  leftTextStyle: null,
-  rightText: null,
-  rightAction: noop,
-  rightTextStyle: null,
-  style: null,
-};
-
-ConditionalSideText.propTypes = {
-  text: PropTypes.string.isRequired,
-  action: PropTypes.func.isRequired,
-  textStyle: Text.propTypes.style.isRequired,
-  containerStyle: ViewPropTypes.style,
-};
-
-ConditionalSideText.defaultProps = {
-  containerStyle: null,
-};
-
 const headerPadding = scale(15);
 const styles = StyleSheet.create({
   leftText: {
@@ -129,5 +97,41 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+const propIsAFunction = (props, propName) =>
+  typeof props[propName] === "function" && props[propName] !== noop;
+
+AltModalHeader.propTypes = {
+  title: PropTypes.string.isRequired,
+  leftText: PropTypes.string,
+  leftAction: requiredIf(props => props.leftText, propIsAFunction),
+  leftTextStyle: Text.propTypes.style,
+  rightText: PropTypes.string,
+  rightTextStyle: Text.propTypes.style,
+  rightAction: requiredIf(props => props.rightText, propIsAFunction),
+  style: ViewPropTypes.style,
+};
+
+AltModalHeader.defaultProps = {
+  leftText: null,
+  leftAction: noop,
+  leftTextStyle: null,
+  rightText: null,
+  rightAction: noop,
+  rightTextStyle: null,
+  style: null,
+};
+
+ConditionalSideText.propTypes = {
+  text: PropTypes.string.isRequired,
+  action: PropTypes.func.isRequired,
+  textStyle: Text.propTypes.style,
+  containerStyle: ViewPropTypes.style,
+};
+
+ConditionalSideText.defaultProps = {
+  containerStyle: null,
+  textStyle: null,
+};
 
 export default AltModalHeader;

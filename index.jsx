@@ -23,11 +23,7 @@ const Main = () => {
       </PaperProvider>
     </ErrorBoundary>
   ) : (
-    <AppLoading
-      startAsync={loadAssets}
-      onFinish={() => setAppIsReady(true)}
-      onError={console.error}
-    />
+    <AppLoading startAsync={loadAssets} onFinish={() => setAppIsReady(true)} />
   );
 };
 
