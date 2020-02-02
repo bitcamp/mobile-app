@@ -7,7 +7,7 @@
     "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "icon": "./assets/imgs/app-icon.png",
-    "entryPoint": "./index.js",
+    "entryPoint": "./index.jsx",
     "splash": {
       "image": "./assets/imgs/splash-screen.png",
       "resizeMode": "cover",

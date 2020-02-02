@@ -1,28 +1,26 @@
 // Use this class to interact with all of the events, never modify the state directly
 
-import { AsyncStorage, ToastAndroid as Toast } from 'react-native';
-import firebase from 'firebase';
-import moment from 'moment';
-import _ from 'lodash';
+import { AsyncStorage, ToastAndroid as Toast } from "react-native";
+// import firebase from "firebase";
+import moment from "moment";
+import _ from "lodash";
 
-import { createEventDay } from './utils';
-import { mockFetch } from '../mockData/mockFetch';
+import { createEventDay } from "./utils";
+import mockFetch from "../mockData/mockFetch";
 
-const APP_ID = '@com.technica.technica18:';
-const USER_TOKEN = APP_ID + 'JWT';
-const EVENT_FAVORITED_STORE = APP_ID + 'EVENT_FAVORITED_STORE';
-const SAVED_COUNT_STORE = APP_ID + 'SAVED_COUNT_STORE';
-const EVENT_ID_PREFIX = APP_ID + 'eventNotification-';
-const SCHEDULE_STORAGE_KEY = APP_ID + 'schedule';
-const USER_DATA_STORE = 'USER_DATA_STORE';
-const UPDATES_STORE = 'RECENT_UPDATES_STORE';
+const APP_ID = "@com.technica.technica18:";
+const USER_TOKEN = `${APP_ID}JWT`;
+const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
+const SAVED_COUNT_STORE = `${APP_ID}SAVED_COUNT_STORE`;
+// const EVENT_ID_PREFIX = `${APP_ID}eventNotification-`;
+const SCHEDULE_STORAGE_KEY = `${APP_ID}schedule`;
+const USER_DATA_STORE = "USER_DATA_STORE";
+// const UPDATES_STORE = "RECENT_UPDATES_STORE";
 
+// const notificationBufferMins = 15;
+// const savedCountRefreshInterval = 10 * 60 * 1000;
 
-const notificationBufferMins = 15;
-const savedCountRefreshInterval = 10 * 60 * 1000;
-const HACKING_END_TIME = moment("2019-04-14 09:00");
-
-const channelId = 'technica-push-notifications';
+// const channelId = "technica-push-notifications";
 
 let lastNetworkRequest = null;
 let networkCallExecuting = false;
@@ -48,34 +46,30 @@ export default class EventsManager {
       this.updateHearts();
 
       // TODO: revert to firebase once we update the events database with real data
-      //loads the copy of the schedule on the users phone
+      // loads the copy of the schedule on the users phone
       // AsyncStorage.getItem(SCHEDULE_STORAGE_KEY, (err, result) => {
       //     if(result != null){
       //       this.processNewEvents(JSON.parse(result), false);
       //     }
 
-          // TODO: revert to firebase once we update the events database with real data
-          //after we load the local schedule we will finally add the database query listener for schedule
-          // firebase.database().ref('/Schedule')
-          //   .on('value', async (snapshot) => {
-          // let data = snapshot.val();
-            mockFetch('schedule')
-              .then(responseData => responseData.json())
-              .then(data => {
-                //store new schedule on phone
-                AsyncStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(data), function(error){
-                  if (error){
-                    console.log(error);
-                  }
-                });
+      // TODO: revert to firebase once we update the events database with real data
+      // after we load the local schedule we will finally add the database query listener for schedule
+      // firebase.database().ref('/Schedule')
+      //   .on('value', async (snapshot) => {
+      // let data = snapshot.val();
+      mockFetch("schedule")
+        .then(responseData => responseData.json())
+        .then(data => {
+          // store new schedule on phone
+          AsyncStorage.setItem(SCHEDULE_STORAGE_KEY, JSON.stringify(data));
 
-                this.processNewEvents(data, true);
-          });
-      });
+          this.processNewEvents(data, true);
+        });
+    });
 
     this.savedCounts = {};
     AsyncStorage.getItem(SAVED_COUNT_STORE, (err, result) => {
-      if(result != null) {
+      if (result != null) {
         this.savedCounts = JSON.parse(result);
       }
 
@@ -90,12 +84,10 @@ export default class EventsManager {
   }
 
   processNewEvents(rawData, rescheduleNotifications) {
-    newEventDays = [];
-    //repeat process of scanning through events
-    for (let i in rawData) {
-      newEventDays.push(createEventDay(rawData[i]));
-    }
-    newCombinedEvents = _.flatten(
+    const newEventDays = rawData.map(rawEventData =>
+      createEventDay(rawEventData)
+    );
+    const newCombinedEvents = _.flatten(
       _.flatten(
         _.map(newEventDays, eventDay =>
           _.map(eventDay.eventGroups, eventGroup => eventGroup.events)
@@ -107,52 +99,54 @@ export default class EventsManager {
     newCombinedEvents.forEach(newEvent => {
       const oldEvent = this.eventIDToEventMap[newEvent.eventID];
       // this event hasn't been seen yet
-      if(oldEvent == null) {
+      if (oldEvent == null) {
         changed = true;
         this.eventIDToEventMap[newEvent.eventID] = newEvent;
-      } else {
-        if(!_.isEqual(oldEvent, newEvent)) {
-          // if the start time has changed we need to create a new notification and delete the original one
-          if(newEvent.startTime !== oldEvent.startTime
-            && this.isFavorited[newEvent.eventID]
-            && rescheduleNotifications) {
-            this.deleteNotification(newEvent);
-            this.createNotification(newEvent);
-          }
-          changed = true;
-          
-          //update Event object with new properties
-          // TODO: clean this up
-          oldEvent.title = newEvent.title;
-          oldEvent.category = newEvent.category;
-          oldEvent.description = newEvent.description;
-          oldEvent.startTime = newEvent.startTime;
-          oldEvent.endTime = newEvent.endTime;
-          oldEvent.featured = newEvent.featured;
-          oldEvent.location = newEvent.location;
-          oldEvent.img = newEvent.img;
+      } else if (!_.isEqual(oldEvent, newEvent)) {
+        // if the start time has changed we need to create a new notification and delete the original one
+        if (
+          newEvent.startTime !== oldEvent.startTime &&
+          this.isFavorited[newEvent.eventID] &&
+          rescheduleNotifications
+        ) {
+          EventsManager.deleteNotification(newEvent);
+          EventsManager.createNotification(newEvent);
         }
+        changed = true;
+
+        // update Event object with new properties
+        // TODO: clean this up
+        oldEvent.title = newEvent.title;
+        oldEvent.category = newEvent.category;
+        oldEvent.description = newEvent.description;
+        oldEvent.startTime = newEvent.startTime;
+        oldEvent.endTime = newEvent.endTime;
+        oldEvent.featured = newEvent.featured;
+        oldEvent.location = newEvent.location;
+        oldEvent.img = newEvent.img;
       }
     });
 
-    if(changed) {
+    if (changed) {
       this.eventDays = newEventDays;
       this.combinedEvents = newCombinedEvents;
-      this.updateEventComponents()
+      this.updateEventComponents();
     }
   }
 
   processRecentUpdates(updatesArray) {
-
-    //sort events by time descending
-    sortedUpdates = _.sortBy(updatesArray, update => -moment(update.time).unix());
+    // sort events by time descending
+    const sortedUpdates = _.sortBy(
+      updatesArray,
+      update => -moment(update.time).unix()
+    );
 
     this.recentUpdates = _.map(sortedUpdates, update => {
       return {
         body: update.body,
         id: update.id,
-        time: moment(update.time).format("h:mma, dddd")
-      }
+        time: moment(update.time).format("h:mma, dddd"),
+      };
     });
 
     this.updateUpdatesComponents();
@@ -160,61 +154,63 @@ export default class EventsManager {
 
   fetchSavedCounts() {
     mockFetch("https://api.bit.camp/api/firebaseEvents/favoriteCounts")
-      .then((response) => response.json())
-      .then((responseJson) => {
-        newSavedCount = responseJson;
+      .then(response => response.json())
+      .then(responseJson => {
+        const newSavedCount = responseJson;
         this.savedCounts = newSavedCount;
-        //store new favorite counts on phone
-        AsyncStorage.setItem(SAVED_COUNT_STORE, JSON.stringify(newSavedCount), function(error){
-          if (error){
-            console.log(error);
-          }
-        });
+        // store new favorite counts on phone
+        AsyncStorage.setItem(SAVED_COUNT_STORE, JSON.stringify(newSavedCount));
 
         this.updateEventComponents();
         this.updateHearts();
-      })
-      .catch((error) => {
-        console.log(error);
       });
   }
 
-  compareUserData(oldData, newData) {
-    return oldData.admin === newData.admin &&
+  static compareUserData(oldData, newData) {
+    return (
+      oldData.admin === newData.admin &&
       _.isEqual(oldData.confirmation, newData.confirmation) &&
       oldData.email === newData.email &&
       _.isEmpty(_.xor(oldData.favoritedEvents, newData.favoritedEvents)) &&
-      _.isEmpty(_.xor(oldData.favoritedFirebaseEvents, newData.favoritedFirebaseEvents)) &&
+      _.isEmpty(
+        _.xor(oldData.favoritedFirebaseEvents, newData.favoritedFirebaseEvents)
+      ) &&
       oldData.id === newData.id &&
       _.isEqual(oldData.profile, newData.profile) &&
       _.isEqual(oldData.status, newData.status)
+    );
   }
 
   async fetchNewUserData() {
     try {
-      result = await AsyncStorage.getItem(USER_DATA_STORE);
-      token = await AsyncStorage.getItem(USER_TOKEN);
+      const result = await AsyncStorage.getItem(USER_DATA_STORE);
+      const token = await AsyncStorage.getItem(USER_TOKEN);
       if (result != null && token != null) {
-        result = JSON.parse(result);
-        id = result.id;
-        let response = await mockFetch(`https://api.bit.camp/api/users/${id}/`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'x-access-token': token,
-          },
-        });
-        let responseJson = await response.json();
-        if(response.status == 200){
-          if (!this.compareUserData(result, responseJson)) {
-            Toast.show("Your user information is out of date! Please log out and log in again.", Toast.LONG);
+        const resultObj = JSON.parse(result);
+        const { id } = resultObj;
+        const response = await mockFetch(
+          `https://api.bit.camp/api/users/${id}/`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+              "x-access-token": token,
+            },
           }
+        );
+        const responseJson = await response.json();
+        if (
+          response.status === 200 &&
+          !EventsManager.compareUserData(resultObj, responseJson)
+        ) {
+          Toast.show(
+            "Your user information is out of date! Please log out and log in again.",
+            Toast.LONG
+          );
         }
       }
-    }
-    catch(error) {
-      console.log(error);
+    } catch (error) {
       Toast.show("Error grabbing new user data.", Toast.SHORT);
     }
     this.updateHearts();
@@ -226,7 +222,7 @@ export default class EventsManager {
   }
 
   getTopEvents() {
-    topSorted = _.sortBy(
+    const topSorted = _.sortBy(
       this.combinedEvents,
       event => -this.getSavedCount(event.eventID)
     );
@@ -239,8 +235,10 @@ export default class EventsManager {
   }
 
   getHappeningNow() {
-    var currentDateTime = moment(moment().format("YYYY-MM-DD HH:mm"));
-    return events = _.filter(this.combinedEvents, event => currentDateTime.isBetween(moment(event.startTime), moment(event.endTime)));
+    const currentDateTime = moment(moment().format("YYYY-MM-DD HH:mm"));
+    return _.filter(this.combinedEvents, event =>
+      currentDateTime.isBetween(moment(event.startTime), moment(event.endTime))
+    );
   }
 
   getSavedEventsArray() {
@@ -258,44 +256,54 @@ export default class EventsManager {
     return this.favoriteState[key];
   }
 
-  //key of event
+  // key of event
   // time in minutes to warn before event
-  async favoriteEvent(eventID, refreshSaved) {
-
-    if (lastNetworkRequest != null && moment().seconds() == lastNetworkRequest.seconds() || networkCallExecuting) {
-      Toast.show('You have favorited or unfavorited an event too soon. Please try later.');
+  async favoriteEvent(eventID) {
+    if (
+      (lastNetworkRequest != null &&
+        moment().seconds() === lastNetworkRequest.seconds()) ||
+      networkCallExecuting
+    ) {
+      Toast.show(
+        "You have favorited or unfavorited an event too soon. Please try later."
+      );
       return;
     }
     lastNetworkRequest = moment();
     await AsyncStorage.getItem(USER_DATA_STORE, (err, result) => {
-      AsyncStorage.getItem(USER_TOKEN, (err, token) => {
-        id = JSON.parse(result).id;
-        let response = mockFetch(`https://api.bit.camp/api/users/${id}/favoriteFirebaseEvent/${eventID}`, {
-          method: 'POST',
-          headers: new Headers({
-            'Content-Type': 'application/json',
-            'x-access-token': token,
-          }),
-          body: JSON.stringify({
-            firebaseId: eventID,
-            userId: id
-          })
-        }).then((myJson) => {
-          if (myJson.status == 200) {
+      AsyncStorage.getItem(USER_TOKEN, (innerErr, token) => {
+        const { id } = JSON.parse(result);
+        mockFetch(
+          `https://api.bit.camp/api/users/${id}/favoriteFirebaseEvent/${eventID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": token,
+            },
+            body: JSON.stringify({
+              firebaseId: eventID,
+              userId: id,
+            }),
+          }
+        ).then(myJson => {
+          if (myJson.status === 200) {
             this.favoriteState[eventID] = true;
             this.savedCounts[eventID] = this.getSavedCount(eventID) + 1;
-            updateObj = {};
+            const updateObj = {};
             updateObj[eventID] = true;
-            AsyncStorage.mergeItem(EVENT_FAVORITED_STORE, JSON.stringify(updateObj));
-            event = this.eventIDToEventMap[eventID];
-            this.createNotification(event);
+            AsyncStorage.mergeItem(
+              EVENT_FAVORITED_STORE,
+              JSON.stringify(updateObj)
+            );
+            const event = this.eventIDToEventMap[eventID];
+            EventsManager.createNotification(event);
 
             this.updateHearts();
-            //this.updateEventComponents();
+            // this.updateEventComponents();
             networkCallExecuting = false;
-
           } else {
-            Toast.show('Could not unfavorite this event. Please try again.');
+            Toast.show("Could not unfavorite this event. Please try again.");
           }
         });
       });
@@ -303,53 +311,63 @@ export default class EventsManager {
     this.updateHearts();
   }
 
-  unfavoriteEvent(eventID, refreshSaved) {
-
-    if (lastNetworkRequest != null && moment().seconds() == lastNetworkRequest.seconds() || networkCallExecuting) {
-      Toast.show('You have favorited or unfavorited an event too soon. Please try later.');
+  unfavoriteEvent(eventID) {
+    if (
+      (lastNetworkRequest != null &&
+        moment().seconds() === lastNetworkRequest.seconds()) ||
+      networkCallExecuting
+    ) {
+      Toast.show(
+        "You have favorited or unfavorited an event too soon. Please try later."
+      );
       return;
     }
     lastNetworkRequest = moment();
     AsyncStorage.getItem(USER_DATA_STORE, (err, result) => {
-      AsyncStorage.getItem(USER_TOKEN, (err, token) => {
+      AsyncStorage.getItem(USER_TOKEN, (innerErr, token) => {
+        const { id } = JSON.parse(result);
 
-        id = JSON.parse(result).id;
-
-        mockFetch(`https://api.bit.camp/api/users/${id}/unfavoriteFirebaseEvent/${eventID}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-access-token': token,
-          },
-          body: JSON.stringify({
-            firebaseId: eventID,
-            userId: id
-          })
-        }).then((myJson) =>  {
-          if (myJson.status == 200) {
+        mockFetch(
+          `https://api.bit.camp/api/users/${id}/unfavoriteFirebaseEvent/${eventID}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-access-token": token,
+            },
+            body: JSON.stringify({
+              firebaseId: eventID,
+              userId: id,
+            }),
+          }
+        ).then(myJson => {
+          if (myJson.status === 200) {
             this.favoriteState[eventID] = false;
-            this.savedCounts[eventID]= this.getSavedCount(eventID) - 1;
-            updateObj = {};
+            this.savedCounts[eventID] = this.getSavedCount(eventID) - 1;
+            const updateObj = {};
             updateObj[eventID] = false;
-            AsyncStorage.mergeItem(EVENT_FAVORITED_STORE, JSON.stringify(updateObj));
+            AsyncStorage.mergeItem(
+              EVENT_FAVORITED_STORE,
+              JSON.stringify(updateObj)
+            );
 
-            event = this.eventIDToEventMap[eventID];
-            this.deleteNotification(event);
+            const event = this.eventIDToEventMap[eventID];
+            EventsManager.deleteNotification(event);
             this.updateHearts();
-            //this.updateEventComponents();
+            // this.updateEventComponents();
             networkCallExecuting = false;
           } else {
-            Toast.show('Could not unfavorite this event. Please try again.');
+            Toast.show("Could not unfavorite this event. Please try again.");
           }
         });
       });
-    })
+    });
     this.updateHearts();
   }
 
-  createNotification(event) {
-    if(event.hasPassed) {
-      Toast.show('This event has ended.', Toast.SHORT);
+  static createNotification(event) {
+    if (event.hasPassed) {
+      Toast.show("This event has ended.", Toast.SHORT);
     } else if (event.hasBegun) {
       Toast.show("This event is currently in progress", Toast.SHORT);
     } else {
@@ -358,24 +376,21 @@ export default class EventsManager {
       //   .setNotificationId(EVENT_ID_PREFIX + event.eventID)
       //   .setTitle(event.title)
       //   .setBody(notificationBufferMins + ' minutes until event starts.');
-
       // notification.android
       //   .setChannelId(channelId)
       //   .android.setSmallIcon('ic_launcher');
-
       // firebase.notifications().scheduleNotification(notification, {
       //   fireDate: moment(event.startTime)
       //     .subtract(notificationBufferMins, 'minutes')
       //     .valueOf()
       // });
-
       // Toast.show('You will be notified 15 min before this event.');
     }
   }
 
-  deleteNotification(event) {
-    if(! event.hasBegun) {
-      Toast.show('You will no longer be notified about this event.');
+  static deleteNotification(event) {
+    if (!event.hasBegun) {
+      Toast.show("You will no longer be notified about this event.");
     }
 
     // TODO: reimplement notification deletion
@@ -397,7 +412,7 @@ export default class EventsManager {
   }
 
   updateHearts() {
-    this.heartListeners.forEach((component, comp, set) => {
+    this.heartListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
@@ -413,7 +428,7 @@ export default class EventsManager {
   }
 
   updateEventComponents() {
-    this.eventListeners.forEach((component, comp, set) => {
+    this.eventListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
@@ -429,14 +444,26 @@ export default class EventsManager {
   }
 
   updateUpdatesComponents() {
-    this.updatesListeners.forEach((component, comp, set) => {
+    this.updatesListeners.forEach(component => {
       if (component != null) {
         component.forceUpdate();
       }
-    })
+    });
   }
 
-  static hackingIsOver() {
-    return moment().isAfter(HACKING_END_TIME);
+  static getHackingStartTime() {
+    return moment("2019-04-12 21:00", "YYYY-MM-DD hh:mm");
+  }
+
+  static getHackingEndTime() {
+    return moment("2019-04-14 09:00", "YYYY-MM-DD hh:mm");
+  }
+
+  static hackingHasStarted(currMoment = moment()) {
+    return currMoment.isAfter(this.getHackingStartTime());
+  }
+
+  static hackingHasEnded(currMoment = moment()) {
+    return currMoment.isAfter(this.getHackingEndTime());
   }
 }

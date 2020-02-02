@@ -1,12 +1,13 @@
-import {Dimensions} from 'react-native';
+import { Dimensions } from "react-native";
 
-const DEVICE_DIMENSIONS = Dimensions.get('window');
+const DEVICE_DIMENSIONS = Dimensions.get("window");
 
 const getDeviceDimensions = () => DEVICE_DIMENSIONS;
 const getDeviceWidth = () => DEVICE_DIMENSIONS.width;
 const getDeviceHeight = () => DEVICE_DIMENSIONS.height;
 
 /* Returns the height of an image given its width. Preserves a 38x67 aspect ratio */
-const getImageHeight = (imageWidth=getDeviceWidth()) => Math.round((imageWidth * 38) / 67);
+const getImageHeight = (imageWidth = getDeviceWidth()) =>
+  Math.round((imageWidth * 38) / 67);
 
 export { getDeviceDimensions, getDeviceWidth, getDeviceHeight, getImageHeight };

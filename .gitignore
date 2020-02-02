@@ -13,5 +13,8 @@ web-report/
 # macOS
 .DS_Store
 
-# ignore configuration file
+# vscode settings
+.vscode/**/*
+
+# ignore private app configuration file
 config.js

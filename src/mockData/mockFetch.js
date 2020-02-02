@@ -1,10 +1,9 @@
-import { mockSchedule } from "./schedule";
-import { mockFavoriteCounts } from "./favoriteCounts";
-import { mockUser } from "./user";
-import { mockQuestions } from "./questions";
+import mockSchedule from "./mockSchedule";
+import mockFavoriteCounts from "./mockFavoriteCounts";
+import mockUser from "./mockUser";
+import mockQuestions from "./mockQuestions";
 
 /**
- *
  * A stand-in for the standard fetch() function that returns a barebones
  * API response using dummy data.
  *
@@ -15,17 +14,17 @@ import { mockQuestions } from "./questions";
  * @returns a promise that returns a Response object with a 200 status.
  * To access the response data, call the object's .json() method
  */
-export const mockFetch = async (uri, options) => {
+const mockFetch = async uri => {
   try {
     const respData = getResponse(uri);
     return {
       json: async () => respData,
       status: 200,
       statusText: "OK",
-      ok: true
+      ok: true,
     };
   } catch (e) {
-    console.error(e);
+    return null;
   }
 };
 
@@ -35,51 +34,51 @@ const questionServerURL = "https://guarded-brook-59345.herokuapp.com";
 const requestTypes = {
   getUser: {
     uriPattern: new RegExp(`${apiURL}/api/users/\\d+/?`),
-    data: mockUser
+    data: mockUser,
   },
   favoriteEvent: {
     uriPattern: new RegExp(
       `${apiURL}/api/users/\\d+/favoriteFirebaseEvent/\\d+/?`
     ),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   unfavoriteEvent: {
     uriPattern: new RegExp(
       `${apiURL}/api/users/\\d+/unfavoriteFirebaseEvent/\\d+/?`
     ),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   favoriteCounts: {
     uriPattern: new RegExp(`${apiURL}/api/firebaseEvents/favoriteCounts/?`),
-    data: mockFavoriteCounts
+    data: mockFavoriteCounts,
   },
   requestEmailCode: {
     uriPattern: new RegExp(`${apiURL}/auth/login/requestCode/?`),
-    data: {} // No data needed (getting a 200 status code will run the correct logic)
+    data: {}, // No data needed (getting a 200 status code will run the correct logic)
   },
   submitEmailCode: {
     uriPattern: new RegExp(`${apiURL}/auth/login/code/?`),
     data: {
       user: mockUser,
-      token: "test"
-    }
+      token: "test",
+    },
   },
   getQuestions: {
     uriPattern: new RegExp(`${questionServerURL}/getquestions/.+@.+\\..+/?`),
-    data: mockQuestions
+    data: mockQuestions,
   },
   submitQuestion: {
     uriPattern: new RegExp(`${questionServerURL}/question/?`),
-    data: {} // No data needed (getting a 200 status code will run the correct logic)
+    data: {}, // No data needed (getting a 200 status code will run the correct logic)
   },
   checkInWithQRCode: {
     uriPattern: new RegExp(`${apiURL}/api/users/.+/checkIn/?`),
-    data: mockUser
+    data: mockUser,
   },
   schedule: {
     uriPattern: /schedule/,
-    data: mockSchedule
-  }
+    data: mockSchedule,
+  },
 };
 
 /**
@@ -89,8 +88,9 @@ const requestTypes = {
  */
 const getResponse = uri => {
   // Go through all request types and return the corresponding data
-  for (let type in requestTypes) {
-    const request = requestTypes[type];
+  const types = Object.keys(requestTypes);
+  for (let i = 0; i < types.length; i += 1) {
+    const request = requestTypes[types[i]];
 
     if (request.uriPattern.test(uri)) {
       return request.data;
@@ -100,3 +100,5 @@ const getResponse = uri => {
   // Otherwise, print that there was an error
   throw new Error(`Unsupported Request URI: ${uri}`);
 };
+
+export default mockFetch;
