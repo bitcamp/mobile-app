@@ -32,6 +32,29 @@ $ git checkout -b <descriptive-branch-name>
 3. Push your new branch to the repository
 4. Submit a merge request on GitHub when your feature is ready for review
 
+### VSCode ESLint Setup
+Our project uses ESLint to enforce style and formatting rules. To get automatic linting working (at least in VSCode), follow these steps:
+1. Download the [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) for VSCode
+2. Create a workspace configuration file at the root of your project (it should be called in `.vscode/settings.json`)
+3. Copy the following settings into your config file
+```js
+{
+  // Sets up yarn as the default package manager
+  "eslint.packageManager": "yarn",
+
+  // Turns off js & ts language validation so you don't get ts(...) errors on top of eslint errors
+  "javascript.validate.enable": false,
+  "typescript.validate.enable": false,
+
+  // Run eslint fix on save for ts, tsx, js, and jsx files. Do this
+  // by setting vscode eslint as the default formatter
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
+```
+4. Reload VSCode and start linting :smile:
+
 ### FAQ
 Here are some common development questions
  * How do I pull down new changes from master into a local branch?
