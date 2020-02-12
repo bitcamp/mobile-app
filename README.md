@@ -50,7 +50,10 @@ Our project uses ESLint to enforce style and formatting rules. To get automatic 
   // by setting vscode eslint as the default formatter
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
-  }
+  },
+
+  // Don't apply prettier on any of the following files (eslint will take care of formatting)
+  "prettier.disableLanguages": ["js", "jsx", "ts", "tsx", "json"]
 }
 ```
 4. Reload VSCode and start linting :smile:
