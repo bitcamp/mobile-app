@@ -8,8 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  ToastAndroid as Toast,
 } from "react-native";
+import Toast from "react-native-tiny-toast";
 // import firebase from "firebase";
 import AltModalHeader from "../components/modals/AltModalHeader";
 import { Button, PadContainer, ViewContainer } from "../components/Base";
