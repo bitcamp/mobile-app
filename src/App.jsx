@@ -18,11 +18,6 @@ YellowBox.ignoreWarnings([
   "Warning: Can't",
 ]);
 
-// Firebase initialization
-if (firebase.apps.length === 0) {
-  firebase.initializeApp(firebaseConfig);
-}
-
 const AppNavigator = createStackNavigator(
   {
     Loading: { screen: AppLoadingScreen },

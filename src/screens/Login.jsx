@@ -6,11 +6,14 @@ import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
 import isValidEmail from "../utils/isValidEmail";
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
 const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const USER_DATA_STORE = "USER_DATA_STORE";
+const EXPO_ENDPOINT = 'https://api.bit.camp/api/firebaseEvents/favoriteCounts/';
 
 export default class Login extends Component {
   static createInitialState() {
@@ -48,6 +51,32 @@ export default class Login extends Component {
     header: null,
   };
 
+  async registerForPushNotificationsAsync() {
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+
+    if (status !== 'granted') {
+      console.log('No notification permissions!');
+      return;
+    }
+
+    let token = await Notifications.getExpoPushTokenAsync();
+    console.log("Token is "+token);
+    
+    return mockFetch(EXPO_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: {
+          value: token,
+        },
+      }),
+    });
+  }
+
+  
   async sendEmail() {
     const { fieldValue: email } = this.state;
     const validEmail = isValidEmail(email);
@@ -114,6 +143,11 @@ export default class Login extends Component {
       });
       const responseJson = await response.json();
       if (response.status === 200) {
+        /* call mockFetch with parameters */
+        console.log("Registering for push notifications");
+        this.registerForPushNotificationsAsync();
+        console.log("Registered for push notifications");
+        
         const userFavoritedEvents = Login.processUserEvents(
           responseJson.user.favoritedFirebaseEvents
         );

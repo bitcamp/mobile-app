@@ -2,7 +2,6 @@
 
 import { AsyncStorage } from "react-native";
 import Toast from "react-native-tiny-toast";
-// import firebase from "firebase";
 import moment from "moment";
 import _ from "lodash";
 
@@ -20,8 +19,6 @@ const USER_DATA_STORE = "USER_DATA_STORE";
 
 // const notificationBufferMins = 15;
 // const savedCountRefreshInterval = 10 * 60 * 1000;
-
-// const channelId = "technica-push-notifications";
 
 let lastNetworkRequest = null;
 let networkCallExecuting = false;
@@ -372,20 +369,6 @@ export default class EventsManager {
     } else if (event.hasBegun) {
       Toast.show("This event is currently in progress", Toast.SHORT);
     } else {
-      // TODO: reimplement notifications
-      // let notification = new firebase.notifications.Notification()
-      //   .setNotificationId(EVENT_ID_PREFIX + event.eventID)
-      //   .setTitle(event.title)
-      //   .setBody(notificationBufferMins + ' minutes until event starts.');
-      // notification.android
-      //   .setChannelId(channelId)
-      //   .android.setSmallIcon('ic_launcher');
-      // firebase.notifications().scheduleNotification(notification, {
-      //   fireDate: moment(event.startTime)
-      //     .subtract(notificationBufferMins, 'minutes')
-      //     .valueOf()
-      // });
-      // Toast.show('You will be notified 15 min before this event.');
     }
   }
 
@@ -395,9 +378,6 @@ export default class EventsManager {
     }
 
     // TODO: reimplement notification deletion
-    // firebase
-    //   .notifications()
-    //   .cancelNotification(EVENT_ID_PREFIX + event.eventID.toString());
   }
 
   getSavedCount(key) {
