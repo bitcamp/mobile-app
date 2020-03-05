@@ -1,19 +1,18 @@
 import React, { Component } from "react";
-import { Alert, AsyncStorage, StyleSheet, TextInput } from "react-native";
+import { AsyncStorage, StyleSheet, TextInput, Alert } from "react-native";
 import PropTypes from "prop-types";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 import { Button, Heading, PadContainer, SubHeading } from "../components/Base";
 import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
-import isValidEmail from "../utils/isValidEmail";
-import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
 const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const USER_DATA_STORE = "USER_DATA_STORE";
-const EXPO_ENDPOINT = 'https://api.bit.camp/api/firebaseEvents/favoriteCounts/';
+const EXPO_ENDPOINT = "https://api.bit.camp/api/firebaseEvents/favoriteCounts/";
 
 export default class Login extends Component {
   static createInitialState() {
@@ -37,36 +36,22 @@ export default class Login extends Component {
     );
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = Login.createInitialState();
-    this.sendEmail = this.sendEmail.bind(this);
-    this.sendReceivedCode = this.sendReceivedCode.bind(this);
-  }
-
-  componentDidMount() {}
-
-  static navigationOptions = {
-    header: null,
-  };
-
-  async registerForPushNotificationsAsync() {
+  static async registerForPushNotificationsAsync() {
     const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
-    if (status !== 'granted') {
-      console.log('No notification permissions!');
+    if (status !== "granted") {
+      console.log("No notification permissions!");
       return;
     }
 
-    let token = await Notifications.getExpoPushTokenAsync();
-    console.log("Token is "+token);
-    
-    return mockFetch(EXPO_ENDPOINT, {
-      method: 'POST',
+    const token = await Notifications.getExpoPushTokenAsync();
+    console.log(`Token is ${token}`);
+
+    mockFetch(EXPO_ENDPOINT, {
+      method: "POST",
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         token: {
@@ -76,11 +61,30 @@ export default class Login extends Component {
     });
   }
 
-  
+  static isValidEmail(email) {
+    const emailRegex = RegExp("^.+@.+..+$");
+    if (emailRegex.test(email)) {
+      return email;
+    }
+    return null;
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.state = Login.createInitialState();
+    this.sendEmail = this.sendEmail.bind(this);
+    this.sendReceivedCode = this.sendReceivedCode.bind(this);
+  }
+
+  static navigationOptions = {
+    header: null,
+  };
+
   async sendEmail() {
     const { fieldValue: email } = this.state;
-    const validEmail = isValidEmail(email);
-    if (validEmail != null) {
+    const validEmail = "abc"; // Login.isValidEmail(email);
+    if (validEmail) {
       const url = "https://api.bit.camp/auth/login/requestCode";
       try {
         const response = await mockFetch(url, {
@@ -145,9 +149,9 @@ export default class Login extends Component {
       if (response.status === 200) {
         /* call mockFetch with parameters */
         console.log("Registering for push notifications");
-        this.registerForPushNotificationsAsync();
+        Login.registerForPushNotificationsAsync();
         console.log("Registered for push notifications");
-        
+
         const userFavoritedEvents = Login.processUserEvents(
           responseJson.user.favoritedFirebaseEvents
         );
