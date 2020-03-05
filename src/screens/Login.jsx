@@ -83,7 +83,7 @@ export default class Login extends Component {
 
   async sendEmail() {
     const { fieldValue: email } = this.state;
-    const validEmail = "abc"; // Login.isValidEmail(email);
+    const validEmail = Login.isValidEmail(email);
     if (validEmail) {
       const url = "https://api.bit.camp/auth/login/requestCode";
       try {
