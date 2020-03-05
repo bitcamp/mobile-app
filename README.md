@@ -42,10 +42,6 @@ Our project uses ESLint to enforce style and formatting rules. To get automatic 
   // Sets up yarn as the default package manager
   "eslint.packageManager": "yarn",
 
-  // Turns off js & ts language validation so you don't get ts(...) errors on top of eslint errors
-  "javascript.validate.enable": false,
-  "typescript.validate.enable": false,
-
   // Run eslint fix on save for ts, tsx, js, and jsx files. Do this
   // by setting vscode eslint as the default formatter
   "editor.codeActionsOnSave": {
