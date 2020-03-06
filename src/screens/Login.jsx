@@ -62,11 +62,8 @@ export default class Login extends Component {
   }
 
   static isValidEmail(email) {
-    const emailRegex = RegExp("^.+@.+..+$");
-    if (emailRegex.test(email)) {
-      return email;
-    }
-    return null;
+    const emailRegex = /^.+@.+..+$/;
+    return emailRegex.test(email);
   }
 
   constructor(props) {
@@ -83,8 +80,7 @@ export default class Login extends Component {
 
   async sendEmail() {
     const { fieldValue: email } = this.state;
-    const validEmail = Login.isValidEmail(email);
-    if (validEmail) {
+    if (Login.isValidEmail(email)) {
       const url = "https://api.bit.camp/auth/login/requestCode";
       try {
         const response = await mockFetch(url, {
@@ -93,7 +89,7 @@ export default class Login extends Component {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email: validEmail }),
+          body: JSON.stringify({ email }),
         });
         if (response.status === 200) {
           this.setState({
@@ -101,7 +97,7 @@ export default class Login extends Component {
             instruction:
               "We've sent a verification code to your email. Please enter that code below to login.",
             isOnEmailPage: false,
-            savedEmail: validEmail,
+            savedEmail: email,
             fieldValue: "",
             placeholder: "xxxxxx",
           });
