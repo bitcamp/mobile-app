@@ -2,6 +2,7 @@
 
 import { AsyncStorage } from "react-native";
 import Toast from "react-native-tiny-toast";
+import * as Permissions from "expo-permissions";
 import moment from "moment";
 import _ from "lodash";
 
@@ -363,12 +364,18 @@ export default class EventsManager {
     this.updateHearts();
   }
 
-  static createNotification(event) {
+  static async createNotification(event) {
     if (event.hasPassed) {
       Toast.show("This event has ended.", Toast.SHORT);
     } else if (event.hasBegun) {
       Toast.show("This event is currently in progress", Toast.SHORT);
     } else {
+      const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+      Toast.show(
+        status === "granted"
+          ? "You will be notified 15 min before this event."
+          : "Turn on notifications to be reminded about this event"
+      );
     }
   }
 

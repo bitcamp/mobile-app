@@ -2,11 +2,9 @@ import React from "react";
 import { YellowBox } from "react-native";
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
-import * as firebase from "firebase";
 import Login from "./screens/Login";
 import AppLoadingScreen from "./screens/AppLoadingScreen";
 import AppContainer from "./screens/AppContainer";
-import { firebaseConfig } from "../config";
 
 // TODO: add in react-native-screens optimization
 

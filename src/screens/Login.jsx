@@ -3,6 +3,7 @@ import { AsyncStorage, StyleSheet, TextInput, Alert } from "react-native";
 import PropTypes from "prop-types";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
+import Toast from "react-native-tiny-toast";
 import { Button, Heading, PadContainer, SubHeading } from "../components/Base";
 import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
@@ -39,26 +40,26 @@ export default class Login extends Component {
   static async registerForPushNotificationsAsync() {
     const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
-    if (status !== "granted") {
-      console.log("No notification permissions!");
-      return;
+    if (status === "granted") {
+      const token = await Notifications.getExpoPushTokenAsync();
+
+      try {
+        mockFetch(EXPO_ENDPOINT, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: {
+              value: token,
+            },
+          }),
+        });
+      } catch (e) {
+        Toast.show("Error registering for push notifications", Toast.SHORT);
+      }
     }
-
-    const token = await Notifications.getExpoPushTokenAsync();
-    console.log(`Token is ${token}`);
-
-    mockFetch(EXPO_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: {
-          value: token,
-        },
-      }),
-    });
   }
 
   static isValidEmail(email) {
