@@ -34,9 +34,9 @@ const colors = {
   },
   textColor: {
     primary: bitcampColorPalette.white, // on primary background
-
     light: bitcampColorPalette.darkGrey,
     normal: bitcampColorPalette.black,
+    error: bitcampColorPalette.red,
   },
   borderColor: {
     light: bitcampColorPalette.lightGrey,
