@@ -21,7 +21,12 @@
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.Bitcamp.Bitcamp",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.Bitcamp.Bitcamp",
+      "versionCode": 1
     }
   }
 }

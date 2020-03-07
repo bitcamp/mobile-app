@@ -1,10 +1,11 @@
 import React, { Component } from "react";
-import { AsyncStorage, StyleSheet, TextInput, Alert } from "react-native";
+import { AsyncStorage, StyleSheet, TextInput } from "react-native";
 import PropTypes from "prop-types";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import Toast from "react-native-tiny-toast";
 import { Button, Heading, PadContainer, SubHeading } from "../components/Base";
+import { BaseText } from "../components/Text";
 import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
@@ -15,6 +16,10 @@ const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const USER_DATA_STORE = "USER_DATA_STORE";
 const EXPO_ENDPOINT = "https://api.bit.camp/api/firebaseEvents/favoriteCounts/";
 
+// TODO: There is an issue with expo when there is an alert is dismissed when a keyboard is currently in focus
+// Right now the workaround is to just display a plain-text error below the text field,
+// however we'd probably want to have a more elegant solution.
+
 export default class Login extends Component {
   static createInitialState() {
     return {
@@ -24,6 +29,8 @@ export default class Login extends Component {
       greeting: "Welcome to \nBitcamp 2019",
       instruction: "Enter the email you used to sign up for Bitcamp.",
       isOnEmailPage: true,
+      isError: false,
+      errorMsg: "",
     };
   }
 
@@ -61,6 +68,9 @@ export default class Login extends Component {
       }
     }
   }
+
+  // TODO: This regex is not entirely accurate for emails.
+  // Need to find a better way to validating emails.
 
   static isValidEmail(email) {
     const emailRegex = /^.+@.+..+$/;
@@ -103,28 +113,23 @@ export default class Login extends Component {
             placeholder: "xxxxxx",
           });
         } else {
-          Alert.alert(
-            "Your email was not found.",
-            "If you recently registered for Bitcamp, please try again in 24 hrs.",
-            [{ text: "OK" }],
-            { cancelable: false }
-          );
+          this.setState({
+            isError: true,
+            errorMsg:
+              "Your email was not found. If you recently registered for Bitcamp, please try again in 24 hrs.",
+          });
         }
       } catch (error) {
-        Alert.alert(
-          "There was an error requesting a code.",
-          "Try again.",
-          [{ text: "OK" }],
-          { cancelable: false }
-        );
+        this.setState({
+          isError: true,
+          errorMsg: "There was an error requesting a code. Try again.",
+        });
       }
     } else {
-      Alert.alert(
-        "Invalid Email.",
-        "Please enter a valid email.",
-        [{ text: "OK" }],
-        { cancelable: false }
-      );
+      this.setState({
+        isError: true,
+        errorMsg: "Invalid Email. Please enter a valid email.",
+      });
     }
   }
 
@@ -162,20 +167,30 @@ export default class Login extends Component {
         this.setState(Login.createInitialState());
         navigation.navigate("AppContainer");
       } else {
-        Alert.alert(
-          "Failed to confirm pin.",
-          "Please try again.",
-          [{ text: "OK" }],
-          { cancelable: false }
-        );
+        this.setState({
+          isError: true,
+          errorMsg: "Failed to confirm pin. Please try again.",
+        });
       }
     } catch (error) {
-      Alert.alert(
-        "There was an error confirming the pin.",
-        "Try again.",
-        [{ text: "OK" }],
-        { cancelable: false }
-      );
+      this.setState({
+        isError: true,
+        errorMsg: "There was an error confirming the pin. Try again.",
+      });
+    }
+  }
+
+  handleButtonPress() {
+    const { isOnEmailPage } = this.state;
+    // Reset error
+    this.setState({
+      isError: false,
+      errorMsg: "",
+    });
+    if (isOnEmailPage) {
+      this.sendEmail();
+    } else {
+      this.sendReceivedCode();
     }
   }
 
@@ -187,6 +202,8 @@ export default class Login extends Component {
       fieldValue,
       greeting,
       isOnEmailPage,
+      isError,
+      errorMsg,
     } = this.state;
 
     return (
@@ -206,10 +223,11 @@ export default class Login extends Component {
             autoCapitalize="none"
             style={styles.input}
           />
+          <BaseText style={styles.error}>{isError ? errorMsg : " "}</BaseText>
           <Button
             text={isOnEmailPage ? "Next" : "Submit"}
             style={styles.button}
-            onPress={isOnEmailPage ? this.sendEmail : this.sendReceivedCode}
+            onPress={() => this.handleButtonPress()}
           />
         </PadContainer>
       </KeyboardShift>
@@ -220,7 +238,11 @@ export default class Login extends Component {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primaryColor,
-    marginTop: 20,
+    marginTop: 10,
+  },
+  error: {
+    color: colors.textColor.error,
+    marginTop: 10,
   },
   heading: {
     paddingBottom: 20,
