@@ -150,9 +150,7 @@ export default class Login extends Component {
       const responseJson = await response.json();
       if (response.status === 200) {
         /* call mockFetch with parameters */
-        console.log("Registering for push notifications");
         Login.registerForPushNotificationsAsync();
-        console.log("Registered for push notifications");
 
         const userFavoritedEvents = Login.processUserEvents(
           responseJson.user.favoritedFirebaseEvents
