@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { Image, SafeAreaView, StatusBar, View, StyleSheet } from "react-native";
-// import firebase from "firebase";
-// import colors from "react-native-paper"; TODO: see if this is needed
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import { SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
 import PropTypes from "prop-types";
@@ -18,9 +16,6 @@ import Schedule from "./Schedule";
 import { scale } from "../utils/scale";
 import { H1 } from "../components/Text";
 import EventsManager from "../events/EventsManager";
-
-// const channelId = "bitcamp-push-notifications";
-// const channelName = "Bitcamp Announcements";
 
 export default class AppContainer extends Component {
   static navigationOptions({ navigation }) {
@@ -222,61 +217,6 @@ export default class AppContainer extends Component {
       </SafeAreaView>
     );
   }
-
-  // configureNotificationSettings() {
-  // create notifications channel
-  // TODO: rework push notifications since firebase fcm only works on android when using expo
-  // console.warn(firebase.notifications);
-  // const channel = new firebase.notifications.Android.Channel(
-  //   channelId,
-  //   channelName,
-  //   firebase.notifications.Android.Importance.Max
-  // ).setDescription(
-  //   "Bitcamp notification channel for delivering important announcements"
-  // );
-  // firebase.notifications().android.createChannel(channel);
-  // firebase
-  //   .messaging()
-  //   .hasPermission()
-  //   .then(enabled => {
-  //     if (enabled) {
-  //       console.log("Permission enabled");
-  //     } else {
-  //       try {
-  //         firebase.messaging().requestPermission();
-  //       } catch (error) {
-  //         console.log("Error authenticating", error);
-  //       }
-  //     }
-  //   });
-  // firebase
-  //   .messaging()
-  //   .getToken()
-  //   .then(fcmToken => {
-  //     if (fcmToken) {
-  //       console.log("fcm token: ", fcmToken);
-  //       // store FCMToken for use with mentorship notifications
-  //       AsyncStorage.setItem("FCMToken", fcmToken);
-  //     } else {
-  //       console.log("no token");
-  //     }
-  //   });
-  // firebase.messaging().subscribeToTopic("announcements");
-  // this.notificationDisplayedListener = firebase
-  //   .notifications()
-  //   .onNotificationDisplayed(notification => {
-  //     // Process your notification as required
-  //     // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
-  //     console.log("notification displayed", notification);
-  //   });
-  // this.notificationListener = firebase
-  //   .notifications()
-  //   .onNotification(notification => {
-  //     console.log("notification received", notification);
-  //     notification.android.setChannelId(channelId);
-  //     firebase.notifications().displayNotification(notification);
-  //   });
-  // }
 }
 
 const styles = StyleSheet.create({
