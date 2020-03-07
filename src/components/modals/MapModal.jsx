@@ -1,131 +1,92 @@
-import React, { Component } from "react";
-import PhotoView from "react-native-photo-view";
+import React from "react";
 import ScrollableTabView from "react-native-scrollable-tab-view";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
+import { WebView } from "react-native-webview";
 import PropTypes from "prop-types";
+import { Asset } from "expo-asset";
 import FullScreenModal from "./FullScreenModal";
 
 import AltModalHeader from "./AltModalHeader";
 import SwipableTabBar from "../SwipableTabBar";
 import colors from "../Colors";
-import Images from "../../../assets/imgs";
-import { getDeviceWidth } from "../../utils/sizing";
+import Images from "../../../assets/imgs/index";
 
-export default class MapModal extends Component {
-  // TODO: I removed the use of rn-fetch blob to get it to build on expo, since that module isn't compatible with
-  // expo.
-  constructor() {
-    super();
-    this.state = {
-      floors: {
-        // 1: Images.floor1,
-        // 2: Images.floor2,
-        // 3: Images.floor4,
-        // Parking: Images.parking
-      },
-    };
-    // this.setFloors();
-  }
-
-  // async setFloors() {
-  //   await RNFetchBlob.session('floorMaps').dispose().then(() => {console.log("Removed all files in cache.")});
-  //   [1, 2, 3, 'Parking'].map(floorNumber => {
-  //     RNFetchBlob
-  //       .config({
-  //         fileCache : false,
-  //         // by adding this option, the temp files will have a file extension
-  //         appendExt : 'png',
-  //         session: 'floorMaps',
-  //       })
-  //       .fetch('GET', 'https://raw.githubusercontent.com/bitcamp/bitcamp-app-2019/master/assets/imgs/floor-maps/' + (floorNumber === 'Parking' ? '' : 'Floor_') + `${floorNumber}.png`, {
-  //       })
-  //       .then((res) => {
-  //         currFloors = this.state.floors;
-  //         currFloors[floorNumber] = 'https://raw.githubusercontent.com/bitcamp/bitcamp-app-2019/master/assets/imgs/floor-maps/' + (floorNumber === 'Parking' ? '' : 'Floor_') + `${floorNumber}.png`;
-  //         this.setState({floors: currFloors});
-  //       }).catch((error) => {
-  //         console.log(error);
-  //         currFloors = this.state.floors;
-  //         currFloors[floorNumber] = null;
-  //         this.setState({floors: currFloors});
-  //       });
-  //     });
-  // }
-
-  // componentDidMount() {
-  // }
-
-  render() {
-    const { isModalVisible, toggleModal } = this.props;
-    const { floors } = this.state;
-    const renderedFloors = [1, 2, 3, "Parking"].map(floorNumber => {
-      if (floors[floorNumber] === null) {
-        return (
-          <PhotoView
-            key={floorNumber}
-            tabLabel={`${
-              floorNumber === "Parking" ? "" : "Floor "
-            }${floorNumber}`}
-            source={Images.not_found}
-            minimumZoomScale={1}
-            maximumZoomScale={8}
-            androidScaleType="fitCenter"
-            style={styles.photo}
-          />
-        );
-      }
-      return (
-        <PhotoView
-          key={floorNumber}
-          tabLabel={`${
-            floorNumber === "Parking" ? "" : "Floor "
-          }${floorNumber}`}
-          source={floors[floorNumber]}
-          minimumZoomScale={1}
-          maximumZoomScale={8}
-          androidScaleType="fitCenter"
-          style={styles.photo}
-        />
-      );
-    });
-
-    return (
-      <FullScreenModal
-        isVisible={isModalVisible}
-        backdropColor={colors.backgroundColor.dark}
-        onBackButtonPress={toggleModal}
-        contentStyle={styles.modalContainer}
-        header={
-          <AltModalHeader
-            title="Map"
-            rightText="Done"
-            leftText=""
-            rightAction={toggleModal}
-          />
-        }
-      >
-        <ScrollableTabView
-          renderTabBar={({ goToPage, tabs, activeTab }) => (
-            <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
-          )}
-          style={styles.floorContainer}
+const getImageSource = moduleId =>
+  Platform.OS === "android"
+    ? {
+        html: `
+        <body style="
+          background-color: ${colors.backgroundColor.dark};
+          padding: 0; margin: 0;"
         >
-          {renderedFloors}
-        </ScrollableTabView>
-      </FullScreenModal>
-    );
-  }
+          <img src="${Asset.fromModule(moduleId).uri}" width="100%"/>
+        </body>`,
+        baseUrl: Asset.fromModule(moduleId).uri,
+      }
+    : moduleId;
+
+const floorSources = {
+  "Floor 1": getImageSource(Images.floor1),
+  "Floor 2": getImageSource(Images.floor2),
+  "Floor 3": getImageSource(Images.floor3),
+  Parking: getImageSource(Images.parking),
+};
+
+/**
+ * Displays scalable event maps
+ */
+export default function MapModal(props) {
+  const { isModalVisible, toggleModal } = props;
+  const renderedFloors = Object.entries(floorSources).map(
+    ([floorName, imageSource]) =>
+      imageSource && (
+        <WebView
+          key={floorName}
+          source={imageSource}
+          tabLabel={floorName}
+          style={styles.photo}
+          originWhitelist={["*"]}
+        />
+      )
+  );
+
+  return (
+    <FullScreenModal
+      isVisible={isModalVisible}
+      backdropColor={colors.backgroundColor.dark}
+      onBackButtonPress={toggleModal}
+      contentStyle={styles.modalContainer}
+      shouldntScroll
+      header={
+        <AltModalHeader
+          title="Map"
+          rightText="Done"
+          rightAction={toggleModal}
+        />
+      }
+    >
+      <ScrollableTabView
+        renderTabBar={({ goToPage, tabs, activeTab }) => (
+          <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
+        )}
+        style={styles.floorContainer}
+      >
+        {renderedFloors}
+      </ScrollableTabView>
+    </FullScreenModal>
+  );
 }
 
 const styles = StyleSheet.create({
   floorContainer: {
     height: 530,
   },
-  modalContainer: { padding: 0 },
+  modalContainer: {
+    padding: 0,
+  },
   photo: {
     backgroundColor: colors.backgroundColor.dark,
     flex: 1,
-    width: getDeviceWidth(),
   },
 });
 

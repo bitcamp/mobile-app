@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import {
-  Image,
-  SafeAreaView,
-  StatusBar,
-  TouchableHighlight,
-  View,
-  StyleSheet,
-} from "react-native";
+import { Image, SafeAreaView, StatusBar, View, StyleSheet } from "react-native";
 import ScrollableTabView from "react-native-scrollable-tab-view";
 import { SimpleLineIcons, FontAwesome } from "@expo/vector-icons";
 import PropTypes from "prop-types";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import Images from "../../assets/imgs/index";
 import colors from "../components/Colors";
 import CustomTabBar from "../components/CustomTabBar";
@@ -80,19 +74,19 @@ export default class AppContainer extends Component {
         <View style={styles.rightHeader}>
           <View style={styles.flex}>
             {searchShouldDisplay ? (
-              <TouchableHighlight
+              <TouchableOpacity
                 onPress={navigation.getParam("toggleSearchModal")}
-                underlayColor="#f9f9f9"
+                activeOpacity={0.7}
               >
                 <SimpleLineIcons name="magnifier" {...iconProps} />
-              </TouchableHighlight>
+              </TouchableOpacity>
             ) : (
-              <TouchableHighlight
+              <TouchableOpacity
                 onPress={navigation.getParam("toggleMapModal")}
-                underlayColor={colors.white}
+                activeOpacity={0.7}
               >
                 <FontAwesome name="map" {...iconProps} />
-              </TouchableHighlight>
+              </TouchableOpacity>
             )}
           </View>
         </View>
