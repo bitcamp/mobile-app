@@ -85,3 +85,6 @@ Here are some common development questions
 
 - I got an Expo error about using a LAN URL. How do I fix that?
    - Instead of running `yarn start`, run `yarn start --tunnel` \[[here's the Stack Overflow page for reference](https://stackoverflow.com/a/56738980)\]
+   
+- I got an error saying `Task :app:transformNativeLibsWithMergeJniLibsForDebug FAILED`. How do I fix that?
+   - Just run `yarn android` again, which usually fixes the error.
