@@ -32,6 +32,13 @@ const mockFetch = async uri => {
 const apiURL = "https://api.bit.camp";
 const questionServerURL = "https://guarded-brook-59345.herokuapp.com";
 const requestTypes = {
+  authenticateLogin: {
+    uriPattern: new RegExp(`${apiURL}/auth/login/?`),
+    data: {
+      user: mockUser,
+      token: "test",
+    },
+  },
   getUser: {
     uriPattern: new RegExp(`${apiURL}/api/users/\\d+/?`),
     data: mockUser,
@@ -55,13 +62,6 @@ const requestTypes = {
   requestEmailCode: {
     uriPattern: new RegExp(`${apiURL}/auth/login/requestCode/?`),
     data: {}, // No data needed (getting a 200 status code will run the correct logic)
-  },
-  submitEmailCode: {
-    uriPattern: new RegExp(`${apiURL}/auth/login/code/?`),
-    data: {
-      user: mockUser,
-      token: "test",
-    },
   },
   getQuestions: {
     uriPattern: new RegExp(`${questionServerURL}/getquestions/.+@.+\\..+/?`),

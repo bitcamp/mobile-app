@@ -1,14 +1,16 @@
 import React, { Component } from "react";
-import { AsyncStorage, StyleSheet, TextInput } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { AsyncStorage, StyleSheet, TextInput, View } from "react-native";
 import PropTypes from "prop-types";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import Toast from "react-native-tiny-toast";
-import { Button, Heading, PadContainer, SubHeading } from "../components/Base";
+import { Button, Heading, PadContainer } from "../components/Base";
 import { BaseText } from "../components/Text";
 import colors from "../components/Colors";
-import KeyboardShift from "../components/KeyboardShift";
+// import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
+import validateUser from "../models/user";
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
@@ -23,12 +25,10 @@ const EXPO_ENDPOINT = "https://api.bit.camp/api/firebaseEvents/favoriteCounts/";
 export default class Login extends Component {
   static createInitialState() {
     return {
-      savedEmail: "",
-      fieldValue: "",
+      emailField: "",
+      passwordField: "",
       placeholder: "",
-      greeting: "Welcome to \nBitcamp 2019",
-      instruction: "Enter the email you used to sign up for Bitcamp.",
-      isOnEmailPage: true,
+      greeting: "Welcome to \nBitcamp 20XX",
       isError: false,
       errorMsg: "",
     };
@@ -81,74 +81,46 @@ export default class Login extends Component {
     super(props);
 
     this.state = Login.createInitialState();
-    this.sendEmail = this.sendEmail.bind(this);
-    this.sendReceivedCode = this.sendReceivedCode.bind(this);
   }
 
   static navigationOptions = {
     header: null,
   };
 
-  async sendEmail() {
-    const { fieldValue: email } = this.state;
-    if (Login.isValidEmail(email)) {
-      const url = "https://api.bit.camp/auth/login/requestCode";
-      try {
-        const response = await mockFetch(url, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        });
-        if (response.status === 200) {
-          this.setState({
-            greeting: "Great!",
-            instruction:
-              "We've sent a verification code to your email. Please enter that code below to login.",
-            isOnEmailPage: false,
-            savedEmail: email,
-            fieldValue: "",
-            placeholder: "xxxxxx",
-          });
-        } else {
-          this.setState({
-            isError: true,
-            errorMsg:
-              "Your email was not found. If you recently registered for Bitcamp, please try again in 24 hrs.",
-          });
-        }
-      } catch (error) {
-        this.setState({
-          isError: true,
-          errorMsg: "There was an error requesting a code. Try again.",
-        });
-      }
-    } else {
+  async submitLogin() {
+    const { emailField: email, passwordField: password } = this.state;
+
+    this.setState({
+      isError: false,
+      errorMsg: "",
+    });
+
+    if (email === "" || !Login.isValidEmail(email) || password === "") {
       this.setState({
         isError: true,
-        errorMsg: "Invalid Email. Please enter a valid email.",
+        errorMsg: "Please enter a valid email/password.",
       });
+      return;
     }
-  }
 
-  async sendReceivedCode() {
-    const { fieldValue: code, savedEmail } = this.state;
+    const url = "https://api.bit.camp/auth/login";
     const { navigation } = this.props;
-    const url = "https://api.bit.camp/auth/login/code";
+
     try {
-      const email = savedEmail;
       const response = await mockFetch(url, {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, password }),
       });
       const responseJson = await response.json();
       if (response.status === 200) {
+        if (!validateUser(responseJson.user)) {
+          // TODO: Handle this type of error properly.
+          throw new "Received invalid user from response."();
+        }
         /* call mockFetch with parameters */
         Login.registerForPushNotificationsAsync();
 
@@ -167,68 +139,109 @@ export default class Login extends Component {
       } else {
         this.setState({
           isError: true,
-          errorMsg: "Failed to confirm pin. Please try again.",
+          errorMsg: "Failed to authenticate user. Please try again.",
         });
       }
     } catch (error) {
       this.setState({
         isError: true,
-        errorMsg: "There was an error confirming the pin. Try again.",
+        errorMsg: "Failed to authenticate user. Please try again.",
       });
-    }
-  }
-
-  handleButtonPress() {
-    const { isOnEmailPage } = this.state;
-    // Reset error
-    this.setState({
-      isError: false,
-      errorMsg: "",
-    });
-    if (isOnEmailPage) {
-      this.sendEmail();
-    } else {
-      this.sendReceivedCode();
     }
   }
 
   render() {
     const {
-      keyboardShown,
-      instruction,
-      placeholder,
-      fieldValue,
+      emailField,
+      passwordField,
       greeting,
-      isOnEmailPage,
       isError,
       errorMsg,
     } = this.state;
 
     return (
-      <KeyboardShift>
-        <PadContainer
-          style={keyboardShown ? styles.subSection2 : styles.subSection}
-        >
-          <Heading style={styles.heading}>{greeting}</Heading>
-          <SubHeading>{instruction}</SubHeading>
+      <PadContainer style={styles.subSection}>
+        <Heading style={styles.heading}>{greeting}</Heading>
+        {/* <SubHeading>Login</SubHeading> */}
+        <View style={styles.buttonContainer}>
+          <Ionicons
+            name="md-mail"
+            size={24}
+            color={colors.primaryColor}
+            style={styles.icon}
+          />
           <TextInput
-            placeholder={placeholder}
-            value={fieldValue}
+            placeholder="Email"
+            value={emailField}
             underlineColorAndroid="rgba(0,0,0,0)"
-            onChangeText={field => this.setState({ fieldValue: field })}
+            onChangeText={field => this.setState({ emailField: field })}
             placeholderTextColor={colors.textColor.light}
             keyboardType="email-address"
             autoCapitalize="none"
             style={styles.input}
           />
-          <BaseText style={styles.error}>{isError ? errorMsg : " "}</BaseText>
-          <Button
-            text={isOnEmailPage ? "Next" : "Submit"}
-            style={styles.button}
-            onPress={() => this.handleButtonPress()}
+        </View>
+        <View style={styles.buttonContainer}>
+          <Ionicons
+            name="md-lock"
+            size={24}
+            color={colors.primaryColor}
+            style={styles.icon}
           />
-        </PadContainer>
-      </KeyboardShift>
+          <TextInput
+            placeholder="Password"
+            value={passwordField}
+            autoCompleteType="password"
+            secureTextEntry
+            underlineColorAndroid="rgba(0,0,0,0)"
+            onChangeText={field => this.setState({ passwordField: field })}
+            placeholderTextColor={colors.textColor.light}
+            autoCapitalize="none"
+            style={styles.input}
+          />
+        </View>
+        <BaseText style={styles.error}>{isError ? errorMsg : " "}</BaseText>
+        <Button
+          text="Submit"
+          style={styles.button}
+          onPress={() => this.submitLogin()}
+        />
+      </PadContainer>
+      // <KeyboardShift>
+      //   <PadContainer
+      //     style={keyboardShown ? styles.subSection2 : styles.subSection}
+      //   >
+      //     <Heading style={styles.heading}>{greeting}</Heading>
+      //     {/* <SubHeading>Login</SubHeading> */}
+      //     <TextInput
+      //       placeholder="Email"
+      //       value={emailField}
+      //       underlineColorAndroid="rgba(0,0,0,0)"
+      //       onChangeText={field => this.setState({ emailField: field })}
+      //       placeholderTextColor={colors.textColor.light}
+      //       keyboardType="email-address"
+      //       autoCapitalize="none"
+      //       style={styles.input}
+      //     />
+      //     <TextInput
+      //       placeholder="Password"
+      //       value={passwordField}
+      //       autoCompleteType="password"
+      //       secureTextEntry
+      //       underlineColorAndroid="rgba(0,0,0,0)"
+      //       onChangeText={field => this.setState({ passwordField: field })}
+      //       placeholderTextColor={colors.textColor.light}
+      //       autoCapitalize="none"
+      //       style={styles.input}
+      //     />
+      //     <BaseText style={styles.error}>{isError ? errorMsg : " "}</BaseText>
+      //     <Button
+      //       text="Submit"
+      //       style={styles.button}
+      //       onPress={() => this.submitLogin()}
+      //     />
+      //   </PadContainer>
+      // </KeyboardShift>
     );
   }
 }
@@ -236,28 +249,44 @@ export default class Login extends Component {
 const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primaryColor,
-    marginTop: 10,
+    marginTop: 8,
+    padding: 12,
+  },
+  buttonContainer: {
+    alignContent: "center",
+    display: "flex",
+    flexDirection: "row",
+    paddingBottom: 5,
+    paddingTop: 5,
+    width: "80%",
   },
   error: {
     color: colors.textColor.error,
     marginTop: 10,
+    textAlign: "center",
   },
   heading: {
-    paddingBottom: 20,
+    // paddingBottom: 0,
+  },
+  icon: {
+    height: 32,
+    marginRight: 8,
+    marginTop: 8,
+    width: 24,
   },
   input: {
     borderBottomWidth: 1,
     borderColor: colors.borderColor.normal,
     color: colors.textColor.normal,
     fontSize: 24,
-    paddingBottom: 8,
+    width: "100%",
   },
   subSection: {
+    alignSelf: "center",
     backgroundColor: colors.backgroundColor.normal,
-    paddingTop: "30%",
-  },
-  subSection2: {
-    backgroundColor: colors.backgroundColor.normal,
+    display: "flex",
+    marginTop: "60%",
+    width: "90%",
   },
 });
 
