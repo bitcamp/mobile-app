@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import PropTypes from "prop-types";
 import { PadContainer, ViewContainer } from "../components/Base";
@@ -6,46 +6,32 @@ import CountdownTimer from "../components/CountdownTimer";
 import EventColumns from "../components/events/EventColumns";
 import { H2 } from "../components/Text";
 import HappeningNowSlideshow from "../components/HappeningNowSlideshow";
-import EventsManager from "../events/EventsManager";
+import { EventsContext } from "../events/EventsContext";
 
-export default class Home extends Component {
-  constructor(props) {
-    super(props);
-    const { eventManager } = this.props;
+export default function Home() {
+  const [happeningNow, setHappeningNow] = useState([]);
+  const { eventsManager } = useContext(EventsContext);
 
-    this.state = {
-      // updates: [],
-      isUpdatesModalVisible: false,
-      isMapModalVisible: false,
-      happeningNow: eventManager.getHappeningNow(),
+  // Continually grap the
+  useEffect(() => {
+    let didCancel = false;
+
+    const timer = setInterval(() => {
+      if (!didCancel) {
+        setHappeningNow(eventsManager.getHappeningNow());
+      }
+    }, 1000 * 60);
+
+    return () => {
+      clearInterval(timer);
+      didCancel = true;
     };
-    this.toggleMapModal = this.toggleMapModal.bind(this);
-    this.toggleUpdatesModal = this.toggleUpdatesModal.bind(this);
-    this.timer = setInterval(
-      () =>
-        this.setState({
-          happeningNow: eventManager.getHappeningNow(),
-        }),
-      1000 * 60
-    );
-  }
+  });
 
-  toggleUpdatesModal() {
-    this.setState(({ isUpdatesModalVisible }) => ({
-      isUpdatesModalVisible: !isUpdatesModalVisible,
-    }));
-  }
-
-  toggleMapModal() {
-    this.setState(({ isMapModalVisible }) => ({
-      isMapModalVisible: !isMapModalVisible,
-    }));
-  }
-
-  renderPopularEventsSection() {
-    const { eventManager } = this.props;
+  // TODO: create a common component for this
+  const renderPopularEventsSection = () => {
     const heading = "Popular Events";
-    const events = eventManager.getTopEvents();
+    const events = eventsManager.getTopEvents();
     return (
       <View style={styles.subSection}>
         <PadContainer style={styles.subSectionHeading}>
@@ -55,18 +41,18 @@ export default class Home extends Component {
           <EventColumns
             heading={heading}
             eventsArr={events}
-            eventManager={eventManager}
+            eventManager={eventsManager}
             origin="Home"
           />
         </View>
       </View>
     );
-  }
+  };
 
-  renderBestForBeginnersSection() {
-    const { eventManager } = this.props;
+  // TODO: create a common component for this (same as above)
+  const renderBestForBeginnersSection = () => {
     const heading = "Featured Events";
-    const events = eventManager.getFeaturedEvents();
+    const events = eventsManager.getFeaturedEvents();
     return (
       <View style={styles.subSection}>
         <PadContainer style={styles.subSectionHeading}>
@@ -75,39 +61,37 @@ export default class Home extends Component {
         <EventColumns
           heading={heading}
           eventsArr={events}
-          eventManager={eventManager}
+          eventManager={eventsManager}
           origin="Home"
         />
       </View>
     );
-  }
+  };
 
-  renderHappeningNow() {
-    const { happeningNow } = this.state;
-    const { eventManager } = this.props;
+  const renderHappeningNow = () => {
     const events =
-      happeningNow.length === 0 ? eventManager.getHappeningNow() : happeningNow;
+      happeningNow.length === 0
+        ? eventsManager.getHappeningNow()
+        : happeningNow;
 
     return (
       <View style={styles.subSection}>
         <HappeningNowSlideshow
           dataSource={events}
-          eventManager={eventManager}
+          eventManager={eventsManager}
         />
       </View>
     );
-  }
+  };
 
-  render() {
-    return (
-      <ViewContainer>
-        <CountdownTimer />
-        {this.renderHappeningNow()}
-        {this.renderPopularEventsSection()}
-        {this.renderBestForBeginnersSection()}
-      </ViewContainer>
-    );
-  }
+  return (
+    <ViewContainer>
+      <CountdownTimer />
+      {renderHappeningNow()}
+      {renderPopularEventsSection()}
+      {renderBestForBeginnersSection()}
+    </ViewContainer>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -120,5 +104,12 @@ const styles = StyleSheet.create({
 });
 
 Home.propTypes = {
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
+  route: PropTypes.shape({
+    params: PropTypes.shape({
+      modal: PropTypes.string,
+    }),
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+  }).isRequired,
 };

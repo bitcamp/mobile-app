@@ -46,7 +46,7 @@ export default class EventCard extends Component {
     const { event, eventManager, origin } = this.props;
 
     return (
-      <ClickableEvent eventManager={eventManager} event={event} origin={origin}>
+      <ClickableEvent event={event} origin={origin}>
         <View>
           <ImageBackground
             style={styles.imgBg}

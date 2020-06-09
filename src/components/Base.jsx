@@ -9,7 +9,6 @@ import {
   Text,
 } from "react-native";
 import PropTypes from "prop-types";
-import { Paper } from "react-native-paper";
 import { scale } from "../utils/scale";
 import colors from "./Colors";
 import { H1, H2, H3 } from "./Text";
@@ -40,15 +39,6 @@ const SubHeading = ({ style, children }) => (
   <View>
     <H2 style={(styles.subHeading, style)}>{children}</H2>
   </View>
-);
-
-const PaperSheet = ({ children }) => (
-  <>
-    {/* props.heading ? <H2 style={styles.paperHead}>{props.heading}</H2> : null */}
-    <Paper style={styles.paper}>
-      <View style={styles.paperBody}>{children}</View>
-    </Paper>
-  </>
 );
 
 const HorizontalLine = ({ style }) => (
@@ -111,12 +101,6 @@ const styles = StyleSheet.create({
     paddingLeft: scale(15),
     paddingRight: scale(15),
   },
-  paper: {
-    backgroundColor: colors.backgroundColor.white,
-  },
-  paperBody: {
-    padding: 15,
-  },
   spacing: {
     height: scale(10),
   },
@@ -154,10 +138,6 @@ SubHeading.defaultProps = {
   style: null,
 };
 
-PaperSheet.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
 PadContainer.propTypes = {
   children: PropTypes.node.isRequired,
   style: ViewPropTypes.style,
@@ -188,7 +168,6 @@ export {
   PadContainer,
   Heading,
   SubHeading,
-  PaperSheet,
   HorizontalLine,
   Spacing,
   CenteredActivityIndicator,

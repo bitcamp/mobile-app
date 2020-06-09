@@ -9,12 +9,7 @@ import EventsManager from "../../events/EventsManager";
 import Event from "../../events/Event";
 
 const LargeEventCard = ({ eventManager, event, origin, ...props }) => (
-  <ClickableEvent
-    eventManager={eventManager}
-    event={event}
-    origin={origin}
-    style={styles.event}
-  >
+  <ClickableEvent event={event} origin={origin} style={styles.event}>
     <Image
       style={[styles.image, styles.roundedCorners]}
       source={Images[event.img]}

@@ -48,6 +48,17 @@ export const imageType = PropTypes.oneOfType([
   }),
 ]);
 
+export const questionType = PropTypes.shape({
+  question: PropTypes.string,
+  location: PropTypes.string,
+  slackUsername: PropTypes.string,
+  needsInPersonAssistance: PropTypes.bool,
+  needsDesignMentor: PropTypes.bool,
+  status: PropTypes.string,
+  name: PropTypes.string,
+  email: PropTypes.string,
+});
+
 // A function that does nothing (should be used for any empty functions
 // (e.g. the defaultProp for a function)
 export const noop = () => {};

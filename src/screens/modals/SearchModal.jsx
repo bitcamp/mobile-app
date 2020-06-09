@@ -1,81 +1,38 @@
 import React, { Component } from "react";
-import {
-  View,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  Keyboard,
-  StyleSheet,
-} from "react-native";
+import { View, Platform, TouchableOpacity, StyleSheet } from "react-native";
 import { SearchBar } from "react-native-elements";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
-import { LinearGradient } from "expo-linear-gradient";
 import PropTypes from "prop-types";
 import _ from "lodash";
-import FullScreenModal from "./FullScreenModal";
-import { H3 } from "../Text";
-import colors from "../Colors";
-import PillBadge from "../PillBadge";
+import { ScrollView } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
+import FullScreenModal from "../../components/modals/FullScreenModal";
+import { H3 } from "../../components/Text";
+import colors from "../../components/Colors";
+import PillBadge from "../../components/PillBadge";
 import { scale } from "../../utils/scale";
-import SearchBarTabView from "../SearchBarTabView";
-import { getDeviceHeight } from "../../utils/sizing";
-import EventsManager from "../../events/EventsManager";
-import EventDay from "../../events/EventDay";
 import { eventCategories } from "../../events/eventConfig";
+import { EventsContext } from "../../events/EventsContext";
+import TabbedEventDays from "../../components/TabbedEventDays";
 
+/**
+ * Displays a searchable schedule containing all of the events.
+ */
 export default class SearchModal extends Component {
+  static contextType = EventsContext;
+
   constructor(props) {
     super(props);
     this.filterEvents = this.filterEvents.bind(this);
     this.state = {
       search: "",
       newSchedule: [],
-      height: {
-        ModalHeader: 0,
-        SearchBar: 0,
-        TagViewParent: 0,
-        TagScrollView: 0,
-      },
-      offsetHeight: 0,
-      keyboardHeight: 0,
     };
   }
 
-  componentDidMount() {
-    this.keyboardDidShowSub = Keyboard.addListener(
-      "keyboardDidShow",
-      this.handleKeyboardDidShow
-    );
-    this.keyboardDidHideSub = Keyboard.addListener(
-      "keyboardDidHide",
-      this.handleKeyboardDidHide
-    );
-  }
-
-  componentWillUnmount() {
-    this.keyboardDidShowSub.remove();
-    this.keyboardDidHideSub.remove();
-  }
-
-  // handleKeyboardDidShow(event) {
-  //   // this.setState({keyboardHeight: event.endCoordinates.height});
-  // }
-
-  // handleKeyboardDidHide() {
-  //   // this.setState({keyboardHeight: 0});
-  // }
-
-  measureView(event, view) {
-    const { height: newHeight } = this.state;
-    newHeight[view] = event.nativeEvent.layout.height;
-    this.setState({
-      height: newHeight,
-      offsetHeight: Object.values(newHeight).reduce((acc, h) => acc + h, 0),
-    });
-  }
-
   filterEvents(query) {
-    const { eventDays } = this.props;
+    const { eventsManager } = this.context;
+    const eventDays = eventsManager.getEventDays();
     const queryRegex = escapeRegExp(query.toLowerCase());
     let newSchedule = [];
 
@@ -125,26 +82,20 @@ export default class SearchModal extends Component {
   }
 
   render() {
-    const { isModalVisible, toggleModal, eventManager } = this.props;
-    const {
-      newSchedule: oldSchedule,
-      search,
-      offsetHeight,
-      keyboardHeight,
-    } = this.state;
+    const { navigation } = this.props;
+    const { newSchedule: oldSchedule, search } = this.state;
+
     const newSchedule = oldSchedule.filter(day => day.eventGroups.length > 0);
+
     return (
       <FullScreenModal
-        isVisible={isModalVisible}
+        isVisible
         backdropColor="#f7f7f7"
-        onBackButtonPress={toggleModal}
+        onBackButtonPress={navigation.goBack}
         contentStyle={styles.modalStyle}
         shouldntScroll
       >
-        <View
-          style={styles.headerContainer}
-          onLayout={event => this.measureView(event, "SearchBar")}
-        >
+        <View style={styles.headerContainer}>
           <SearchBar
             placeholder="Search"
             platform="android"
@@ -160,18 +111,17 @@ export default class SearchModal extends Component {
             returnKeyType="search"
           />
           <View style={styles.textButtonContainer}>
-            <TouchableOpacity onPress={toggleModal} style={styles.inflexible}>
+            <TouchableOpacity
+              onPress={navigation.goBack}
+              style={styles.inflexible}
+            >
               <H3 style={styles.exitText}>Cancel</H3>
             </TouchableOpacity>
           </View>
         </View>
-        <View onLayout={event => this.measureView(event, "TagViewParent")}>
+        <View>
           <View style={styles.tagContainer}>
-            <ScrollView
-              horizontal
-              onLayout={event => this.measureView(event, "TagScrollView")}
-              showsHorizontalScrollIndicator={false}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {this.renderBadges()}
             </ScrollView>
             <LinearGradient
@@ -189,13 +139,7 @@ export default class SearchModal extends Component {
             />
           </View>
         </View>
-        <SearchBarTabView
-          screenHeight={getDeviceHeight()}
-          offsetHeight={offsetHeight}
-          keyboardHeight={keyboardHeight}
-          schedule={newSchedule}
-          eventManager={eventManager}
-        />
+        <TabbedEventDays eventDays={newSchedule} />
       </FullScreenModal>
     );
   }
@@ -234,12 +178,6 @@ const styles = StyleSheet.create({
   modalStyle: {
     padding: 0,
   },
-  tagContainer: {
-    flexGrow: 1,
-    padding: 9,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
   textButtonContainer: {
     flex: 0,
     flexDirection: "row",
@@ -247,13 +185,12 @@ const styles = StyleSheet.create({
   },
 });
 
-SearchModal.propTypes = {
-  isModalVisible: PropTypes.bool.isRequired,
-  toggleModal: PropTypes.func.isRequired,
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
-  eventDays: PropTypes.arrayOf(PropTypes.instanceOf(EventDay)).isRequired,
-};
-
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
+
+SearchModal.propTypes = {
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
+};
