@@ -1,3 +1,6 @@
+/* eslint-disable react/prop-types */
+// Disabling to avoid annoying error with icon props validation
+// (see https://github.com/react-navigation/react-navigation/issues/710)
 import React from "react";
 import { SafeAreaView, StyleSheet } from "react-native";
 import { FontAwesome, Ionicons, EvilIcons } from "@expo/vector-icons";
