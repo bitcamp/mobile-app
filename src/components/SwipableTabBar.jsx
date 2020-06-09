@@ -28,10 +28,10 @@ export default function SwipableTabBar({ tabs, style, goToPage, activeTab }) {
     <View style={[styles.tabs, style]}>
       {tabs.map((tab, i) => {
         let buttonIcon;
-        if (tab === "ios-star") {
+        if (tab === "saved") {
           buttonIcon = (
             <Icon
-              name={tab}
+              name="ios-star"
               size={27.5}
               color={
                 activeTab === i ? colors.primaryColor : colors.textColor.light
@@ -50,11 +50,13 @@ export default function SwipableTabBar({ tabs, style, goToPage, activeTab }) {
           );
         } else {
           buttonIcon = (
-            <BaseText
-              style={[styles.text, activeTab === i && styles.textActive]}
-            >
-              {tab}
-            </BaseText>
+            <View style={styles.textContainer}>
+              <BaseText
+                style={[styles.text, activeTab === i && styles.textActive]}
+              >
+                {tab}
+              </BaseText>
+            </View>
           );
         }
 
@@ -104,6 +106,10 @@ const styles = StyleSheet.create({
   textActive: {
     color: colors.primaryColor,
     fontWeight: "bold",
+  },
+  textContainer: {
+    height: 27,
+    justifyContent: "center",
   },
   weekdays: {
     flex: 1,

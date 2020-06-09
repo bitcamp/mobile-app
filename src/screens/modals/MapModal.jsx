@@ -4,13 +4,16 @@ import { StyleSheet, Platform } from "react-native";
 import { WebView } from "react-native-webview";
 import PropTypes from "prop-types";
 import { Asset } from "expo-asset";
-import FullScreenModal from "./FullScreenModal";
-
-import AltModalHeader from "./AltModalHeader";
-import SwipableTabBar from "../SwipableTabBar";
-import colors from "../Colors";
+import FullScreenModal from "../../components/modals/FullScreenModal";
+import AltModalHeader from "../../components/modals/AltModalHeader";
+import SwipableTabBar from "../../components/SwipableTabBar";
+import colors from "../../components/Colors";
 import Images from "../../../assets/imgs/index";
 
+/* On android, web views can't handle local images, but they can handle
+ * HTML generated on-the-fly. So on ios, we just pass the image directly
+ * to the web view, but on android, we have to make a basic HTML page.
+ */
 const getImageSource = moduleId =>
   Platform.OS === "android"
     ? {
@@ -33,10 +36,10 @@ const floorSources = {
 };
 
 /**
- * Displays scalable event maps
+ * Displays maps of the event venue that can scaled using zoom/pinch gestures.
  */
 export default function MapModal(props) {
-  const { isModalVisible, toggleModal } = props;
+  const { navigation } = props;
   const renderedFloors = Object.entries(floorSources).map(
     ([floorName, imageSource]) =>
       imageSource && (
@@ -52,16 +55,13 @@ export default function MapModal(props) {
 
   return (
     <FullScreenModal
-      isVisible={isModalVisible}
-      backdropColor={colors.backgroundColor.dark}
-      onBackButtonPress={toggleModal}
       contentStyle={styles.modalContainer}
       shouldntScroll
       header={
         <AltModalHeader
           title="Map"
           rightText="Done"
-          rightAction={toggleModal}
+          rightAction={navigation.goBack}
         />
       }
     >
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
 });
 
 MapModal.propTypes = {
-  isModalVisible: PropTypes.bool.isRequired,
-  toggleModal: PropTypes.func.isRequired,
+  navigation: PropTypes.shape({
+    goBack: PropTypes.func.isRequired,
+  }).isRequired,
 };

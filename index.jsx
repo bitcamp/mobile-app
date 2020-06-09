@@ -1,29 +1,33 @@
 import React, { useState } from "react";
-import { Platform } from "react-native";
-import { Provider as PaperProvider } from "react-native-paper";
 import { registerRootComponent, AppLoading } from "expo";
+import { StatusBar } from "react-native";
 import App from "./src/App";
-import StatusBar from "./src/components/StatusBar";
-import EventManager from "./src/events/EventsManager";
 import loadAssets from "./src/utils/loadAssets";
 import ErrorBoundary from "./src/components/ErrorBoundary";
-
-const eventManager = new EventManager();
+import { EventsProvider } from "./src/events/EventsContext";
+import colors from "./src/components/Colors";
 
 const Main = () => {
   const [appIsReady, setAppIsReady] = useState(false);
-  // TODO: check the conflicting StatusBar use (also used in AppContainer)
+
   return appIsReady ? (
     <ErrorBoundary>
-      <PaperProvider>
-        {Platform.OS === "ios" ? null : (
-          <StatusBar backgroundColor="#000000" barStyle="light-content" />
-        )}
-        <App eventManager={eventManager} />
-      </PaperProvider>
+      <EventsProvider>
+        <StatusBar
+          barStyle="dark-content"
+          backgroundColor={colors.backgroundColor.light}
+        />
+        <App />
+      </EventsProvider>
     </ErrorBoundary>
   ) : (
-    <AppLoading startAsync={loadAssets} onFinish={() => setAppIsReady(true)} />
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.primary} />
+      <AppLoading
+        startAsync={loadAssets}
+        onFinish={() => setAppIsReady(true)}
+      />
+    </>
   );
 };
 

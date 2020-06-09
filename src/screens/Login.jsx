@@ -85,10 +85,6 @@ export default class Login extends Component {
     this.sendReceivedCode = this.sendReceivedCode.bind(this);
   }
 
-  static navigationOptions = {
-    header: null,
-  };
-
   async sendEmail() {
     const { fieldValue: email } = this.state;
     if (Login.isValidEmail(email)) {
@@ -163,7 +159,7 @@ export default class Login extends Component {
         ]);
 
         this.setState(Login.createInitialState());
-        navigation.navigate("AppContainer");
+        navigation.navigate("app");
       } else {
         this.setState({
           isError: true,

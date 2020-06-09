@@ -17,14 +17,14 @@ export default class AppLoadingScreen extends Component {
       const userInfo = await AsyncStorage.getItem("USER_DATA_STORE");
 
       if (userInfo != null) {
-        navigate("AppContainer");
+        navigate("app");
       } else {
-        navigate("Login");
+        navigate("login");
       }
     } catch (error) {
       // Delete the old storage and go to the login screen
       AsyncStorage.clear();
-      navigate("Login");
+      navigate("login");
     }
   }
 

@@ -1,66 +1,52 @@
-import React, { Component } from "react";
+import React, { useState, useContext } from "react";
 import { ScrollView, StyleSheet } from "react-native";
-import PropTypes from "prop-types";
 import { Button, PadContainer, SubHeading } from "../Base";
-import EventsManager from "../../events/EventsManager";
 import EventsList from "./EventsList";
+import { EventsContext } from "../../events/EventsContext";
 
-export default class Saved extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isShowingPastEvents: false,
-    };
-  }
+export default function Saved() {
+  const [arePastEventsVisible, setArePastEventsVisible] = useState(false);
+  const { eventsManager } = useContext(EventsContext);
+  const events = eventsManager.getSavedEventsArray();
 
-  render() {
-    const { eventManager } = this.props;
-    const { isShowingPastEvents } = this.state;
-    const events = eventManager.getSavedEventsArray();
+  const pastEvents = events.filter(event => event.hasPassed);
+  const upcomingEvents = events.filter(event => !event.hasPassed);
 
-    const pastEvents = events.filter(event => event.hasPassed);
-    const upcomingEvents = events.filter(event => !event.hasPassed);
+  // TODO: investigate why unfavoriting an event doesn't update the saved events
+  // list. This might be fixed in the eventsmanager refactoring task.
 
-    // TODO: investigate why unfavoriting an event doesn't update the saved events
-    // list. This might be fixed in the eventsmanager refactoring task.
+  return (
+    <ScrollView>
+      <PadContainer>
+        <SubHeading style={styles.subSectionHeading}>
+          {events.length} events saved
+        </SubHeading>
 
-    return (
-      <ScrollView>
-        <PadContainer>
-          <SubHeading style={styles.subSectionHeading}>
-            {events.length} events saved
-          </SubHeading>
-
-          {// Show the past events button if there are past events
-          pastEvents.length > 0 && (
-            <Button
-              text={`${isShowingPastEvents ? "Hide" : "Show"} ${
-                pastEvents.length
-              } past event${pastEvents.length > 1 ? "s" : ""}`}
-              style={styles.showPastEventsButton}
-              onPress={() =>
-                this.setState(({ isShowingPastEvents: showingPrevEvents }) => ({
-                  isShowingPastEvents: !showingPrevEvents,
-                }))
-              }
-              accessibilityLabel="Toggle Past Events"
-            />
-          )}
-          <EventsList
-            events={pastEvents}
-            eventManager={eventManager}
-            shouldDisplay={pastEvents.length > 0 && isShowingPastEvents}
+        {// Show the past events button if there are past events
+        pastEvents.length > 0 && (
+          <Button
+            text={`${arePastEventsVisible ? "Hide" : "Show"} ${
+              pastEvents.length
+            } past event${pastEvents.length > 1 ? "s" : ""}`}
+            style={styles.showPastEventsButton}
+            onPress={() => setArePastEventsVisible(!arePastEventsVisible)}
+            accessibilityLabel="Toggle Past Events"
           />
+        )}
+        <EventsList
+          events={pastEvents}
+          eventManager={eventsManager}
+          shouldDisplay={pastEvents.length > 0 && arePastEventsVisible}
+        />
 
-          <EventsList
-            events={upcomingEvents}
-            eventManager={eventManager}
-            shouldDisplay={upcomingEvents.length > 0}
-          />
-        </PadContainer>
-      </ScrollView>
-    );
-  }
+        <EventsList
+          events={upcomingEvents}
+          eventManager={eventsManager}
+          shouldDisplay={upcomingEvents.length > 0}
+        />
+      </PadContainer>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -74,7 +60,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-
-Saved.propTypes = {
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
-};
