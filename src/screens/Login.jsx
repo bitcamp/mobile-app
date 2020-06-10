@@ -9,6 +9,7 @@ import { BaseText } from "../components/Text";
 import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
+import mockUser from "../mockData/mockUser";
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
@@ -51,7 +52,7 @@ export default class Login extends Component {
       const token = await Notifications.getExpoPushTokenAsync();
 
       try {
-        mockFetch(EXPO_ENDPOINT, {
+        mockFetch(EXPO_ENDPOINT, null, {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -90,7 +91,7 @@ export default class Login extends Component {
     if (Login.isValidEmail(email)) {
       const url = "https://api.bit.camp/auth/login/requestCode";
       try {
-        const response = await mockFetch(url, {
+        const response = await mockFetch(url, null, {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -135,7 +136,7 @@ export default class Login extends Component {
     const url = "https://api.bit.camp/auth/login/code";
     try {
       const email = savedEmail;
-      const response = await mockFetch(url, {
+      const response = await mockFetch(url, mockUser, {
         method: "POST",
         headers: {
           Accept: "application/json",

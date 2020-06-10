@@ -86,7 +86,7 @@ export default class QuestionModal extends Component {
       }
 
       const questionString = JSON.stringify(questionObject);
-      mockFetch(`${serverURL}/question`, {
+      mockFetch(`${serverURL}/question`, null, {
         method: "POST",
         headers: {
           Accept: "application/json",
