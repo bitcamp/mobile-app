@@ -22,7 +22,6 @@ const Images = {
   floor2: require("./floor-maps/Floor_2.png"),
   floor3: require("./floor-maps/Floor_3.png"),
   parking: require("./floor-maps/Parking.png"),
-  not_found: require("./floor-maps/not_found.png"),
 };
 
 export default Images;

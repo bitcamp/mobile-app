@@ -6,8 +6,8 @@ import Images from "../../../assets/imgs/index";
 /**
  * A full-width banner for an event that can be clicked to reveal a modal
  */
-const EventBanner = ({ event, origin, eventManager }) => (
-  <ClickableEvent event={event} origin={origin} props={eventManager}>
+const EventBanner = ({ event, origin }) => (
+  <ClickableEvent event={event} origin={origin}>
     <Banner
       title={event.titleClipped}
       description="HAPPENING NOW"

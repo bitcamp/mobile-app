@@ -1,90 +1,65 @@
-import React, { Component } from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewPropTypes,
-} from "react-native";
+import React, { useRef, useEffect } from "react";
+import { StyleSheet, View, ViewPropTypes } from "react-native";
 import PropTypes from "prop-types";
 import colors from "../Colors";
-import EventModal from "../events/EventModal";
 import EventStar from "../events/EventStar";
 import PillBadge from "../PillBadge";
 import { H3, H4 } from "../Text";
 import Event from "../../events/Event";
 import EventsManager from "../../events/EventsManager";
+import ClickableEvent from "../events/ClickableEvent";
 
-export default class EventDescription extends Component {
-  constructor(props) {
-    super(props);
-    this.toggleModal = this.toggleModal.bind(this);
-    this.state = {
-      isModalVisible: false,
+export default function EventDescription({
+  event,
+  eventManager,
+  style,
+  origin,
+}) {
+  const myStarRef = useRef(null);
+  const myStar = myStarRef.current;
+
+  // TODO: remove this stupid heartlistener stuff :(
+  useEffect(() => {
+    if (myStar) {
+      eventManager.registerHeartListener(myStar);
+    }
+
+    return () => {
+      eventManager.removeHeartListener(myStar);
     };
-  }
+  }, [eventManager, myStar]);
 
-  componentWillUnmount() {
-    const { eventManager } = this.props;
-    eventManager.removeHeartListener(this.myStar);
-  }
-
-  toggleModal() {
-    this.setState(({ isModalVisible }) => ({
-      isModalVisible: !isModalVisible,
-    }));
-  }
-
-  renderModal() {
-    const { isModalVisible } = this.state;
-    const { origin, ...restOfProps } = this.props;
-    return (
-      <EventModal
-        isModalVisible={isModalVisible}
-        toggleModal={this.toggleModal}
-        origin={origin}
-        {...restOfProps}
-      />
-    );
-  }
-
-  render() {
-    const { event, eventManager, style } = this.props;
-    return (
-      <>
-        {this.renderModal()}
-        <TouchableOpacity style={style} onPress={() => this.toggleModal()}>
-          <View style={[styles.row, styles.eventcard]}>
-            <View style={styles.column}>
-              <H3 style={styles.title}>{event.title}</H3>
-              <H4 style={styles.location}>{event.location}</H4>
-              <View style={styles.badgeContainer}>
-                {event.category.map((category, index) => (
-                  <View
-                    style={styles.badge}
-                    key={event.title + index.toString()}
-                  >
-                    <PillBadge category={category} />
-                  </View>
-                ))}
+  return (
+    <ClickableEvent origin={origin} event={event} style={style}>
+      <View style={[styles.row, styles.eventcard]}>
+        <View style={styles.column}>
+          <H3 style={styles.title} numberOfLines={2}>
+            {event.title}
+          </H3>
+          <H4 style={styles.location}>{event.location}</H4>
+          <View style={styles.badgeContainer}>
+            {event.category.map((category, index) => (
+              <View style={styles.badge} key={event.title + index.toString()}>
+                <PillBadge category={category} />
               </View>
-            </View>
-            <View style={[styles.row, styles.favoriteButton]}>
-              <EventStar
-                ref={myStar => {
-                  this.myStar = myStar;
-                  eventManager.registerHeartListener(myStar);
-                }}
-                eventID={event.eventID.toString()}
-                eventManager={eventManager}
-                origin="Event Description"
-              />
-            </View>
+            ))}
           </View>
-        </TouchableOpacity>
-      </>
-    );
-  }
+        </View>
+        <View style={[styles.row, styles.favoriteButton]}>
+          <EventStar
+            ref={myStarRef}
+            eventID={event.eventID.toString()}
+            eventManager={eventManager}
+            origin="Event Description"
+          />
+        </View>
+      </View>
+    </ClickableEvent>
+  );
 }
+
+/** Height of the event description (used to precompute the height in section lists) */
+export const eventDescriptionHeight = 100;
 
 const styles = StyleSheet.create({
   badge: {
@@ -100,6 +75,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   eventcard: {
+    alignItems: "center",
+    height: eventDescriptionHeight,
     padding: 12.5,
   },
   favoriteButton: {

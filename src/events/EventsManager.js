@@ -5,6 +5,9 @@ import Toast from "react-native-tiny-toast";
 import * as Permissions from "expo-permissions";
 import moment from "moment";
 import _ from "lodash";
+import mockSchedule from "../mockData/mockSchedule";
+import mockFavoriteCounts from "../mockData/mockFavoriteCounts";
+import mockUser from "../mockData/mockUser";
 
 import { createEventDay } from "./utils";
 import mockFetch from "../mockData/mockFetch";
@@ -56,7 +59,7 @@ export default class EventsManager {
       // firebase.database().ref('/Schedule')
       //   .on('value', async (snapshot) => {
       // let data = snapshot.val();
-      mockFetch("schedule")
+      mockFetch("schedule", mockSchedule)
         .then(responseData => responseData.json())
         .then(data => {
           // store new schedule on phone
@@ -89,7 +92,7 @@ export default class EventsManager {
     const newCombinedEvents = _.flatten(
       _.flatten(
         _.map(newEventDays, eventDay =>
-          _.map(eventDay.eventGroups, eventGroup => eventGroup.events)
+          _.map(eventDay.eventGroups, eventGroup => eventGroup.data)
         )
       )
     );
@@ -152,7 +155,10 @@ export default class EventsManager {
   }
 
   fetchSavedCounts() {
-    mockFetch("https://api.bit.camp/api/firebaseEvents/favoriteCounts")
+    mockFetch(
+      "https://api.bit.camp/api/firebaseEvents/favoriteCounts",
+      mockFavoriteCounts
+    )
       .then(response => response.json())
       .then(responseJson => {
         const newSavedCount = responseJson;
@@ -189,6 +195,7 @@ export default class EventsManager {
         const { id } = resultObj;
         const response = await mockFetch(
           `https://api.bit.camp/api/users/${id}/`,
+          mockUser,
           {
             method: "GET",
             headers: {
@@ -217,6 +224,7 @@ export default class EventsManager {
   }
 
   getEventDays() {
+    console.log("GETTING EVENT DAYS", this.eventDays);
     return this.eventDays;
   }
 
@@ -274,6 +282,7 @@ export default class EventsManager {
         const { id } = JSON.parse(result);
         mockFetch(
           `https://api.bit.camp/api/users/${id}/favoriteFirebaseEvent/${eventID}`,
+          null,
           {
             method: "POST",
             headers: {
@@ -328,6 +337,7 @@ export default class EventsManager {
 
         mockFetch(
           `https://api.bit.camp/api/users/${id}/unfavoriteFirebaseEvent/${eventID}`,
+          null,
           {
             method: "POST",
             headers: {

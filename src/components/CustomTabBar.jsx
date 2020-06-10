@@ -1,66 +1,57 @@
 import React from "react";
-import {
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewPropTypes,
-} from "react-native";
-import { Ionicons, FontAwesome, EvilIcons } from "@expo/vector-icons";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import PropTypes from "prop-types";
 import colors from "./Colors";
 import { P } from "./Text";
 import { scale, verticalScale } from "../utils/scale";
-import { noop } from "../utils/PropTypeUtils";
 
-const LABELS = ["Home", "Schedule", "Mentors", "Profile"];
-
-export default function CustomTabBar({ style, tabs, activeTab, goToPage }) {
+export default function CustomTabBar({ state, descriptors, navigation }) {
   return (
-    <View style={[styles.tabs, style]}>
-      {tabs.map((tab, i) => {
-        const color =
-          activeTab === i ? colors.primaryColor : colors.textColor.light;
+    <View style={styles.tabs}>
+      {state.routes.map((route, index) => {
+        // Extract tab configuration data and navigator state
+        const { options } = descriptors[route.key];
+
+        const backupLabel =
+          options.title !== undefined ? options.title : route.name;
+
+        const label =
+          options.tabBarLabel !== undefined ? options.tabBarLabel : backupLabel;
+
+        const isFocused = state.index === index;
+
+        const color = isFocused ? colors.primaryColor : colors.textColor.light;
+
+        const onTabPress = () => {
+          const event = navigation.emit({
+            type: "tabPress",
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
+
         return (
           <TouchableOpacity
-            key={tab}
-            onPress={() => goToPage(i)}
+            accessibilityStates={isFocused ? ["selected"] : []}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
+            onPress={onTabPress}
             style={styles.tab}
+            key={route.key}
           >
-            {
-              {
-                home: (
-                  <FontAwesome name="home" size={scale(25)} color={color} />
-                ),
-                schedule: (
-                  <EvilIcons name="calendar" size={scale(32)} color={color} />
-                ),
-                expo: (
-                  <Ionicons name="md-code" size={scale(25)} color={color} />
-                ),
-                mentors: (
-                  <Ionicons
-                    name="ios-people"
-                    size={scale(32)}
-                    color={color}
-                    style={{
-                      marginTop: scale(-5),
-                      marginBottom: scale(-2.5),
-                    }}
-                  />
-                ),
-                profile: (
-                  <Ionicons name="ios-person" size={scale(25)} color={color} />
-                ),
-              }[tab]
-            }
+            {options.tabBarIcon({ color })}
             <P
               style={
-                activeTab === i
+                isFocused
                   ? [styles.tabText, styles.tabActiveText]
                   : styles.tabText
               }
             >
-              {LABELS[i]}
+              {label}
             </P>
           </TouchableOpacity>
         );
@@ -93,13 +84,24 @@ const styles = StyleSheet.create({
 });
 
 CustomTabBar.propTypes = {
-  style: ViewPropTypes.style,
-  tabs: PropTypes.arrayOf(PropTypes.string).isRequired,
-  activeTab: PropTypes.number.isRequired,
-  goToPage: PropTypes.func,
-};
-
-CustomTabBar.defaultProps = {
-  style: null,
-  goToPage: noop,
+  state: PropTypes.shape({
+    routes: PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        key: PropTypes.string.isRequired,
+      }).isRequired
+    ).isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
+  navigation: PropTypes.shape({
+    navigate: PropTypes.func.isRequired,
+    emit: PropTypes.func.isRequired,
+  }).isRequired,
+  descriptors: PropTypes.objectOf(
+    PropTypes.shape({
+      title: PropTypes.string,
+      tabBarLabel: PropTypes.string,
+      tabBarIcon: PropTypes.node,
+    }).isRequired
+  ).isRequired,
 };

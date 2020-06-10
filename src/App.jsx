@@ -1,34 +1,58 @@
 import React from "react";
-import { YellowBox } from "react-native";
-import { createAppContainer } from "react-navigation";
-import { createStackNavigator } from "react-navigation-stack";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { enableScreens } from "react-native-screens";
 import Login from "./screens/Login";
 import AppLoadingScreen from "./screens/AppLoadingScreen";
 import AppContainer from "./screens/AppContainer";
+import Header from "./components/Header";
+import MapModal from "./screens/modals/MapModal";
+import SearchModal from "./screens/modals/SearchModal";
+import EventModal from "./screens/modals/EventModal";
+import QuestionModal from "./screens/modals/QuestionModal";
 
-// TODO: add in react-native-screens optimization
+// React-native-screens optimization
+enableScreens();
 
-// NOTE dangerously ignore deprecated warning for now
-YellowBox.ignoreWarnings([
-  "Warning: isMounted(...) is deprecated",
-  "Module RCTImageLoader",
-  "Setting a timer",
-  "Warning: Can't",
-]);
+const RootStack = createStackNavigator();
+const MainStack = createStackNavigator();
 
-const AppNavigator = createStackNavigator(
-  {
-    Loading: { screen: AppLoadingScreen },
-    Login: { screen: Login },
-    AppContainer: { screen: AppContainer },
-  },
-  {
-    initialRouteName: "Loading",
-  }
-);
+function MainStackScreen() {
+  return (
+    <MainStack.Navigator
+      initialRouteName="loading"
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <MainStack.Screen name="loading" component={AppLoadingScreen} />
+      <MainStack.Screen name="login" component={Login} />
+      <MainStack.Screen
+        name="app"
+        component={AppContainer}
+        options={({ route, navigation }) => ({
+          headerShown: true,
+          header: () => <Header {...{ route, navigation }} />,
+        })}
+      />
+    </MainStack.Navigator>
+  );
+}
 
-const NavContainer = createAppContainer(AppNavigator);
-
-export default function App(props) {
-  return <NavContainer screenProps={props} />;
+export default function App() {
+  return (
+    <NavigationContainer>
+      <RootStack.Navigator
+        initialRouteName="main"
+        mode="modal"
+        screenOptions={{ headerShown: false }}
+      >
+        <RootStack.Screen name="main" component={MainStackScreen} />
+        <RootStack.Screen name="map modal" component={MapModal} />
+        <RootStack.Screen name="search modal" component={SearchModal} />
+        <RootStack.Screen name="event modal" component={EventModal} />
+        <RootStack.Screen name="question modal" component={QuestionModal} />
+      </RootStack.Navigator>
+    </NavigationContainer>
+  );
 }

@@ -41,7 +41,7 @@ export function createEventGroup(eventGroupLabel, rawEventArray) {
     );
   });
 
-  return new EventGroup(eventGroupLabel, eventArray);
+  return { title: eventGroupLabel, data: eventArray };
 }
 
 // creates an EventDay object from an array of event json entries

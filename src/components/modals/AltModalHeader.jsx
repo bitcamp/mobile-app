@@ -113,10 +113,10 @@ AltModalHeader.propTypes = {
 };
 
 AltModalHeader.defaultProps = {
-  leftText: null,
+  leftText: "",
   leftAction: noop,
   leftTextStyle: null,
-  rightText: null,
+  rightText: "",
   rightAction: noop,
   rightTextStyle: null,
   style: null,

@@ -1,5 +1,4 @@
 import React from "react";
-import Modal from "react-native-modal";
 import { ViewPropTypes, StyleSheet, View, ScrollView } from "react-native";
 import PropTypes from "prop-types";
 import colors from "../Colors";
@@ -9,23 +8,11 @@ import { scale } from "../../utils/scale";
 const FullScreenModal = ({
   header,
   shouldntScroll,
+  style,
   contentStyle,
   children,
-  ...props
 }) => (
-  <Modal
-    backdropColor={colors.backgroundColor.normal}
-    backdropOpacity={1}
-    animationIn="fadeInUp"
-    animationOut="fadeOutDown"
-    animationInTiming={250}
-    animationOutTiming={300}
-    backdropTransitionInTiming={250}
-    backdropTransitionOutTiming={300}
-    avoidKeyboard
-    style={styles.modal}
-    {...props}
-  >
+  <View style={[styles.modal, style]}>
     {header}
     {shouldntScroll ? (
       <View style={[styles.content, contentStyle]}>{children}</View>
@@ -34,28 +21,28 @@ const FullScreenModal = ({
         <View style={[styles.content, contentStyle]}>{children}</View>
       </ScrollView>
     )}
-  </Modal>
+  </View>
 );
 
 const styles = StyleSheet.create({
   content: {
-    backgroundColor: colors.backgroundColor.normal,
     flex: 1,
     padding: scale(15),
     paddingTop: 0,
   },
   modal: {
+    backgroundColor: colors.backgroundColor.normal,
+    flex: 1,
     margin: 0,
   },
 });
 
 FullScreenModal.propTypes = {
-  isVisible: PropTypes.bool.isRequired,
-  onBackButtonPress: PropTypes.func.isRequired,
   contentStyle: ViewPropTypes.style,
   header: PropTypes.element,
   shouldntScroll: PropTypes.bool,
   children: PropTypes.node,
+  style: ViewPropTypes.style,
 };
 
 FullScreenModal.defaultProps = {
@@ -63,6 +50,7 @@ FullScreenModal.defaultProps = {
   header: null,
   shouldntScroll: false,
   children: null,
+  style: null,
 };
 
 export default FullScreenModal;

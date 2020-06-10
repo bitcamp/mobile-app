@@ -45,7 +45,9 @@ export default class EventStar extends Component {
             }
           />
         </TouchableOpacity>
-        {!discludeArrow && (
+
+        {// TODO: remove this from this component and put it into the event description
+        !discludeArrow && (
           <Ionicons
             style={styles.arrow}
             name="ios-arrow-forward"

@@ -50,5 +50,16 @@ module.exports = {
     // TODO: add this in when we're ready to start stripping
     // out styles that should be placed in a config file
     // "react-native/no-color-literals": "error",
+
+    // Allows us to use static public properties (e.g. for `contextType`)
+    // However, we still want propTypes and defaultProps to be declared outside the class.
+    "react/static-property-placement": [
+      "error",
+      "static public field",
+      {
+        defaultProps: "property assignment",
+        propTypes: "property assignment",
+      },
+    ],
   },
 };

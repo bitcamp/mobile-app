@@ -11,6 +11,7 @@ import colors from "../components/Colors";
 // import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
 import validateUser from "../models/user";
+import mockUser from "../mockData/mockUser";
 
 const APP_ID = "@com.technica.technica18:";
 const USER_TOKEN = `${APP_ID}JWT`;
@@ -51,7 +52,7 @@ export default class Login extends Component {
       const token = await Notifications.getExpoPushTokenAsync();
 
       try {
-        mockFetch(EXPO_ENDPOINT, {
+        mockFetch(EXPO_ENDPOINT, null, {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -83,10 +84,6 @@ export default class Login extends Component {
     this.state = Login.createInitialState();
   }
 
-  static navigationOptions = {
-    header: null,
-  };
-
   async submitLogin() {
     const { emailField: email, passwordField: password } = this.state;
 
@@ -107,7 +104,7 @@ export default class Login extends Component {
     const { navigation } = this.props;
 
     try {
-      const response = await mockFetch(url, {
+      const response = await mockFetch(url, mockUser, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -135,7 +132,7 @@ export default class Login extends Component {
         ]);
 
         this.setState(Login.createInitialState());
-        navigation.navigate("AppContainer");
+        navigation.navigate("app");
       } else {
         this.setState({
           isError: true,
