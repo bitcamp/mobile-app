@@ -12,6 +12,7 @@ import QuestionCard from "../components/QuestionCard";
 import { H2, P } from "../components/Text";
 import { scale } from "../utils/scale";
 import mockFetch from "../mockData/mockFetch";
+import mockQuestions from "../mockData/mockQuestions";
 import { questionType } from "../utils/PropTypeUtils";
 
 // TODO: move to somewhere central
@@ -54,7 +55,7 @@ export default class Mentors extends Component {
   }
 
   async grabQuestionsFromDB(email) {
-    mockFetch(`${serverURL}/getquestions/${email}`, {
+    mockFetch(`${serverURL}/getquestions/${email}`, mockQuestions, {
       method: "GET",
       headers: {
         Accept: "application/json",
