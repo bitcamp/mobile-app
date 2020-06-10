@@ -2,7 +2,7 @@ import moment from "moment";
 
 // These functions were stripped from the standard utils file to avoid circular dependencies
 export function normalizeTimeLabel(t) {
-  return moment(t).format("h:mma");
+  return moment(t).format("h:mm A");
 }
 
 export function hasTimePassed(t) {

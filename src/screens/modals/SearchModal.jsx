@@ -14,6 +14,7 @@ import { scale } from "../../utils/scale";
 import { eventCategories } from "../../events/eventConfig";
 import { EventsContext } from "../../events/EventsContext";
 import TabbedEventDays from "../../components/TabbedEventDays";
+import EventDay from "../../events/EventDay";
 
 /**
  * Displays a searchable schedule containing all of the events.
@@ -40,28 +41,34 @@ export default class SearchModal extends Component {
       newSchedule = _.cloneDeep(eventDays);
 
       // Filter out any event that doesn't match the query
-      newSchedule = newSchedule.map(eventDay => ({
-        ...eventDay,
-        eventGroups: eventDay.eventGroups
-          .map(eventGroup => ({
-            ...eventGroup,
-            events: eventGroup.events.filter(event => {
-              // Checks if the event matches the category being searched
-              const categorySearch = Array.isArray(event.category)
-                ? event.category.some(
-                    category => category.toLowerCase().search(queryRegex) >= 0
-                  )
-                : event.category.toLowerCase().search(queryRegex) >= 0;
+      newSchedule = newSchedule
+        .map(
+          eventDay =>
+            new EventDay(
+              eventDay.label,
+              eventDay.eventGroups
+                .map(eventGroup => ({
+                  ...eventGroup,
+                  data: eventGroup.data.filter(event => {
+                    // Checks if the event matches the category being searched
+                    const categorySearch = Array.isArray(event.category)
+                      ? event.category.some(
+                          category =>
+                            category.toLowerCase().search(queryRegex) >= 0
+                        )
+                      : event.category.toLowerCase().search(queryRegex) >= 0;
 
-              // Also, check if the event's title matches the query
-              return (
-                event.title.toLowerCase().search(queryRegex) >= 0 ||
-                categorySearch
-              );
-            }),
-          }))
-          .filter(group => group.events.length > 0),
-      }));
+                    // Also, check if the event's title matches the query
+                    return (
+                      event.title.toLowerCase().search(queryRegex) >= 0 ||
+                      categorySearch
+                    );
+                  }),
+                }))
+                .filter(group => group.data.length > 0)
+            )
+        )
+        .filter(day => day.eventGroups.length > 0);
     }
 
     this.setState({
@@ -83,9 +90,7 @@ export default class SearchModal extends Component {
 
   render() {
     const { navigation } = this.props;
-    const { newSchedule: oldSchedule, search } = this.state;
-
-    const newSchedule = oldSchedule.filter(day => day.eventGroups.length > 0);
+    const { newSchedule, search } = this.state;
 
     return (
       <FullScreenModal
@@ -139,7 +144,7 @@ export default class SearchModal extends Component {
             />
           </View>
         </View>
-        <TabbedEventDays eventDays={newSchedule} />
+        <TabbedEventDays eventDays={newSchedule} origin="Search" />
       </FullScreenModal>
     );
   }

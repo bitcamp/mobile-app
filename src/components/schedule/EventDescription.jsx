@@ -33,7 +33,9 @@ export default function EventDescription({
     <ClickableEvent origin={origin} event={event} style={style}>
       <View style={[styles.row, styles.eventcard]}>
         <View style={styles.column}>
-          <H3 style={styles.title}>{event.title}</H3>
+          <H3 style={styles.title} numberOfLines={2}>
+            {event.title}
+          </H3>
           <H4 style={styles.location}>{event.location}</H4>
           <View style={styles.badgeContainer}>
             {event.category.map((category, index) => (
@@ -56,6 +58,9 @@ export default function EventDescription({
   );
 }
 
+/** Height of the event description (used to precompute the height in section lists) */
+export const eventDescriptionHeight = 100;
+
 const styles = StyleSheet.create({
   badge: {
     marginRight: 5,
@@ -70,6 +75,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   eventcard: {
+    alignItems: "center",
+    height: eventDescriptionHeight,
     padding: 12.5,
   },
   favoriteButton: {
