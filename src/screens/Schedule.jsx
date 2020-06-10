@@ -12,10 +12,12 @@ export default function Schedule() {
   if (eventDays.length === 0) {
     return <CenteredActivityIndicator />;
   }
+
   return (
     <TabbedEventDays
       eventDays={eventDays}
       extraTabs={[<Saved tabLabel="saved" key="saved" />]}
+      origin="Schedule"
     />
   );
 }

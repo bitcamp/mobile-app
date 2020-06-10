@@ -36,6 +36,7 @@
     "react-native-safe-area-context": "0.7.3",
     "react-native-screens": "~2.2.0",
     "react-native-scrollable-tab-view": "^1.0.0",
+    "react-native-section-list-get-item-layout": "^2.2.3",
     "react-native-svg": "11.0.1",
     "react-native-swiper": "^1.5.14",
     "react-native-tiny-toast": "^1.0.6",

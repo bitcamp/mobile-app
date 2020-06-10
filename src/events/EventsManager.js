@@ -89,7 +89,7 @@ export default class EventsManager {
     const newCombinedEvents = _.flatten(
       _.flatten(
         _.map(newEventDays, eventDay =>
-          _.map(eventDay.eventGroups, eventGroup => eventGroup.events)
+          _.map(eventDay.eventGroups, eventGroup => eventGroup.data)
         )
       )
     );
@@ -217,6 +217,7 @@ export default class EventsManager {
   }
 
   getEventDays() {
+    console.log("GETTING EVENT DAYS", this.eventDays);
     return this.eventDays;
   }
 
