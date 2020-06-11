@@ -7,7 +7,8 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "lint": "eslint --ext .js,.jsx .",
-    "lint:fix": "eslint --ext .js,.jsx . --fix"
+    "lint:fix": "eslint --ext .js,.jsx . --fix",
+    "test": "jest"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
@@ -46,6 +47,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@jest/globals": "^26.0.1",
     "babel-eslint": "^10.0.3",
     "babel-preset-expo": "^8.1.0",
     "eslint": "5.16.0",
@@ -57,7 +59,11 @@
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "1.7.0",
     "eslint-plugin-react-native": "^3.8.1",
+    "jest": "^26.0.1",
     "prettier": "^1.19.1"
+  },
+  "jest": {
+    "preset": "react-native"
   },
   "private": true
 }

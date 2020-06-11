@@ -4,7 +4,7 @@ import { StatusBar } from "react-native";
 import App from "./src/App";
 import loadAssets from "./src/utils/loadAssets";
 import ErrorBoundary from "./src/components/ErrorBoundary";
-import { EventsProvider } from "./src/events/EventsContext";
+import { EventsProvider } from "./src/contexts/EventsContext/EventsContext";
 import colors from "./src/components/Colors";
 
 const Main = () => {
