@@ -3,7 +3,7 @@ import _ from "lodash";
 import Event from "./Event";
 import EventGroup from "./EventGroup";
 import EventDay from "./EventDay";
-import { normalizeTimeLabel } from "./timeUtils";
+import { normalizeTimeLabel } from "../contexts/EventsContext/timeUtils";
 
 const bannerMap = {
   opening_ceremony: "ceremony",

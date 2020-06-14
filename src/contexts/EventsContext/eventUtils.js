@@ -1,23 +1,27 @@
 import _ from "lodash";
+import moment from "moment";
 import { FETCH_START, FETCH_FAILURE, FETCH_SUCCESS } from "./EventsReducer";
 import mockFetch from "../../mockData/mockFetch";
+import EventDay from "./EventDay";
+import { getDay } from "./timeUtils";
+import Event, { EVENT_SCHEMA } from "./Event";
+import { saveFieldState } from "./eventsSerialization";
 
 const returnSelf = data => data;
 const returnEmptyObj = () => ({});
 
 /**
  * Fetches a resource used by the event provider. Automatically handles the reducer state
- * handling during the fetch call.
+ * handling during the fetch call. Also saves the state for the given field in AsyncStorage.
  * @param {Function} dispatch The dispatch function for the reducer
  * @param {Object} options Additional options for the function (described below)
- * @param {string} options.field The field the reducer should be updating
- * @param {string} options.url The location of the data you want
- * @param {*} [options.desiredData = null] The data that you would like mockFetch to return
- * (TODO: delete in production)
- * @param {Object} options.fetchOptions Any options for the fetch call
- * @param {Function} [options.postProcess = (rawData) => rawData] Function to run on the processed data
- * @param {Function} [options.getComputedData = (rawData) => Object] Function to calculate any additional
- * values included in the field (e.g., events.sorted)
+ * @param {string} options.field The field the reducer should be updating (REQUIRED)
+ * @param {string} options.url The location of the data you want (REQUIRED)
+ * @param {*} [options.desiredData = null] The data that you would like mockFetch to return (TODO: delete in production)
+ * @param {Object} [options.fetchOptions] Any options for the fetch call
+ * @param {Function} [options.postProcess = (rawData) => data] Function to run on the processed data
+ * @param {Function} [options.getComputedData = () => ({})] Function to calculate any additional values included in the field
+ * (e.g., events.sorted)
  * @param {boolean} [options.shouldUpdateData = true] Whether the data from the fetch call should
  * replace the data for the specified field
  * @returns True if the fetch succeeded, false otherwise
@@ -32,8 +36,17 @@ export async function providerFetch(
     postProcess = returnSelf,
     shouldUpdateData = true,
     getComputedData = returnEmptyObj,
-  }
+  } = {}
 ) {
+  // Ensure required parameters are all present
+  if (!dispatch || !field || !url) {
+    throw new Error(
+      `Missing the required parameters:${!dispatch ? " dispatch" : ""}${
+        !url ? " url" : ""
+      }${!field ? " field" : ""}`
+    );
+  }
+
   dispatch({ type: FETCH_START });
 
   try {
@@ -49,20 +62,27 @@ export async function providerFetch(
     const data = postProcess(rawData);
 
     // Tell the reducer that the request succeeded (optionally updating the
-    // data field and )
+    // data field and computing additional field data)
     const action = { type: FETCH_SUCCESS, field };
     if (shouldUpdateData) {
-      action.data = data;
-      action.computedData = getComputedData(rawData);
+      action.payload = {
+        data,
+        ...getComputedData(data),
+      };
     }
+
     dispatch(action);
+
+    if (shouldUpdateData) {
+      saveFieldState(field, action.payload).catch();
+    }
 
     return true;
   } catch (e) {
     dispatch({
       type: FETCH_FAILURE,
       field,
-      errorMsg: e.message.includes("JSON.parse")
+      errorMessage: e.message.includes("JSON.parse")
         ? `Parsing error: ${url} doesn't return valid JSON data`
         : `Unable to fetch ${url}`,
     });
@@ -73,42 +93,96 @@ export async function providerFetch(
 
 /**
  * Turns a list of events into an object that maps event ids to event objects
- * @param {Event[]} rawEvents A list of events
- * @returns {Object} a processed object mapping of event ids to event objects
+ * @param {Object[]} rawEvents A list of raw event objects
+ * @throws if the event data for ALL events is malformed.
+ * @returns {Event[]} a list of Events, with all invalid events removed
  */
 export function processRawEvents(rawEvents) {
-  const newEventsObj = {};
+  const validationErrors = [];
 
-  rawEvents.forEach(event => {
-    newEventsObj[event.id] = event;
+  const processedEvents = rawEvents
+    .filter(rawEvent => {
+      // We use a try/catch block with `validateSync()` instead of a simple
+      // `isValidSync()` call so that we can get descriptive error messages (as opposed
+      // to a true/false answer)
+      try {
+        EVENT_SCHEMA.validateSync(rawEvent, { abortEarly: true, strict: true });
+        return true;
+      } catch (error) {
+        validationErrors.push(
+          `Invalid event (id: ${rawEvent ? rawEvent.id : "undefined"}): ${
+            error.message
+          }`
+        );
+        return false;
+      }
+    })
+    .map(event => new Event(EVENT_SCHEMA.cast(event)));
+
+  if (rawEvents.length > 0 && processedEvents.length === 0) {
+    throw new Error(
+      `No events passed validation. Encountered the following errors: ${validationErrors.toString()}`
+    );
+  }
+
+  return computeIdToEventMap(processedEvents);
+}
+
+/**
+ * Turns a list of events into an object that maps event ids to event objects
+ * PRECONDITION: the list of events must be VALID.
+ * @param {Event[]} events A list of valid events
+ * @returns {Object} a processed object mapping of event ids to event objects
+ */
+export function computeIdToEventMap(events) {
+  const idToEventsMap = {};
+
+  events.forEach(event => {
+    idToEventsMap[event.id] = event;
   });
 
-  return newEventsObj;
+  return idToEventsMap;
 }
 
 /**
  * Computes additional data that should be stored inside the `events` field.
- * @param {Event[]} rawEvents A list of raw events
+ * @param {Object} eventsObj An object mapping event ids to events
  */
-export function computeExtraEventData(rawEvents) {
-  const sortedEvents = computeSortedEvents(rawEvents);
-
+export function computeExtraEventData(eventsObj) {
   return {
-    days: computeEventDays(sortedEvents),
-    sorted: sortedEvents,
+    days: computeEventDays(Object.values(eventsObj)),
   };
 }
 
 /**
+ * Splits a list of events into a list of EventDays. Orders the EventDays by date.
  * @param {Event[]} events A list of events
- * @returns {Event[]} a list of events sorted by their start times
+ * @returns {EventDay[]} A list of event days, ordered by date
  */
-export function computeSortedEvents(events) {
-  return events.sort((event1, event2) => {
-    const startDiff = event1.startTime - event2.startTime;
+export function computeEventDays(events) {
+  const eventDayObj = _.groupBy(events, event => getDay(event.startTime));
 
-    return startDiff === 0 ? event1.endTime - event2.endTime : startDiff;
-  });
+  // Convert the grouped events object into a list of EventDays
+  const eventDays = Object.entries(eventDayObj).map(
+    ([date, dailyEvents]) => new EventDay(date, dailyEvents)
+  );
+
+  // Sort event days by their date
+  return _.sortBy(eventDays, ({ date }) => moment(date).toDate());
+}
+
+/**
+ * @param {Event[]} events A list of events
+ * @returns A list of all events that are currently underway
+ * TODO: potentially order the events by popularity? By end time?
+ */
+export function computeOngoingEvents(events) {
+  const now = moment();
+  const ongoingEvents = events.filter(event =>
+    now.isBetween(event.startTime, event.endTime, "minute", "[]")
+  );
+
+  return _.sortBy(ongoingEvents, "endTime");
 }
 
 /**
@@ -116,66 +190,14 @@ export function computeSortedEvents(events) {
  * @returns {Event[]} The events with the highest point values
  */
 export function computeFeaturedEvents(events) {
-  return events.sort((event1, event2) => event1.points - event2.points);
+  return _.orderBy(events, "pointValue", "desc");
 }
 
 /**
  * @param {Event[]} events A list of events
  * @param {Object} followCounts An object mapping event ids to the number of followers
- * @returns {Event[]} The sorted based on their follow counts
+ * @returns {Event[]} The sorted based on their follow counts in descending order
  */
 export function computePopularEvents(events, followCounts) {
-  return events.sort(
-    (event1, event2) => followCounts[event1.id] - followCounts[event2.id]
-  );
-}
-
-/**
- * Groups events by their start date and their start time.
- * @param {Event[]} events A list of events
- * @returns {Object} An object that maps a day of the week (e.g., "Friday") to a list of objects.
- * Each inner object has the shape
- * {
- *  time: string, // Ex: "5:00 PM"
- *  data: Event[]
- * }
- */
-export function computeEventDays(events) {
-  // Group all of the events based on their day
-  const eventDays = _.groupBy(events, getDay);
-
-  const days = Object.keys(eventDays);
-
-  // Group each event day based on the time of day
-  days.forEach(day => {
-    const dailyEvents = eventDays[day];
-    const eventsByTime = _.groupBy(dailyEvents, getTimeOfDay);
-
-    eventDays[day] = Object.entries(eventsByTime).map(
-      ([time, eventsAtThisTime]) => ({
-        time,
-        data: eventsAtThisTime,
-      })
-    );
-  });
-
-  return eventDays;
-}
-
-/**
- * @param {Event} event An event object
- * @param {moment} event.startTime The start time of the event, as a moment
- * @returns {string} which weekday the event starts (e.g., "Friday")
- */
-export function getDay(event) {
-  return event.startTime.format("dddd");
-}
-
-/**
- * @param {Event} event An event object
- * @param {moment} event.startTime The start time of the event, as a moment
- * @returns {string} The hour in which the the event starts (e.g., "5:00 PM")
- */
-export function getTimeOfDay(event) {
-  return event.startTime.format("h:mm A");
+  return _.orderBy(events, event => followCounts[event.id], "desc");
 }

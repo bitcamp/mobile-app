@@ -8,7 +8,8 @@
     "eject": "expo eject",
     "lint": "eslint --ext .js,.jsx .",
     "lint:fix": "eslint --ext .js,.jsx . --fix",
-    "test": "jest"
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
@@ -43,7 +44,8 @@
     "react-native-tiny-toast": "^1.0.6",
     "react-native-vector-icons": "^6.6.0",
     "react-native-web": "^0.11.7",
-    "react-native-webview": "8.1.1"
+    "react-native-webview": "8.1.1",
+    "yup": "^0.29.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -63,7 +65,10 @@
     "prettier": "^1.19.1"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ]
   },
   "private": true
 }

@@ -7,7 +7,7 @@
 export default function eventsReducer(prevState, action) {
   switch (action.type) {
     // Restoring a previous version of the reducer state
-    case RESTORE_EVENTS:
+    case RESTORE_STATE:
       return {
         ...prevState,
         ...action.restoredState,
@@ -20,7 +20,7 @@ export default function eventsReducer(prevState, action) {
         ...prevState,
         [action.field]: {
           isLoading: true,
-          error: null,
+          errorMessage: null,
         },
       };
 
@@ -30,9 +30,8 @@ export default function eventsReducer(prevState, action) {
         ...prevState,
         [action.field]: {
           ...prevState[action.field],
+          ...action.payload,
           isLoading: false,
-          data: action.data || prevState[action.field].data,
-          ...(action.computedData || {}),
         },
       };
 
@@ -43,7 +42,7 @@ export default function eventsReducer(prevState, action) {
         [action.field]: {
           ...prevState[action.field],
           isLoading: false,
-          errorMessage: action.error.message,
+          errorMessage: action.errorMessage,
         },
       };
 
@@ -76,7 +75,7 @@ export default function eventsReducer(prevState, action) {
   }
 }
 
-const initialFieldState = {
+export const initialFieldState = {
   // Whether a network request is currently underway
   isLoading: false,
 
@@ -98,8 +97,6 @@ export const initialState = {
   // An object mapping event ids to event objects
   events: {
     ...initialFieldState,
-    // Flattened list of events sorted by start time
-    sorted: [],
 
     // Object that maps days of the week (e.g., "Friday")
     // to an array of events, grouped by time of day (e.g., "5:00 PM")
@@ -114,7 +111,7 @@ export const initialState = {
 };
 
 /** Action Types */
-export const RESTORE_EVENTS = "RESTORE_EVENTS";
+export const RESTORE_STATE = "RESTORE_STATE";
 export const FETCH_START = "FETCH_START";
 export const FETCH_FAILURE = "FETCH_FAILURE";
 export const FETCH_SUCCESS = "FETCH_SUCCESS";

@@ -62,4 +62,14 @@ module.exports = {
       },
     ],
   },
+
+  overrides: [
+    {
+      files: ["*.test.js", "*.test.jsx", "jest.setup.js"],
+      rules: {
+        // Often times, it is useful to use or spy on console statements in test files
+        "no-console": "off",
+      },
+    },
+  ],
 };

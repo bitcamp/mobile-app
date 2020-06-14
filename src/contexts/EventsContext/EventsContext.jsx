@@ -5,19 +5,24 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import moment from "moment";
 import PropTypes from "prop-types";
-import { AsyncStorage } from "react-native";
 import eventsReducer, {
   initialState,
   FOLLOW_EVENT,
   UNFOLLOW_EVENT,
 } from "./EventsReducer";
-import { providerFetch } from "./eventUtils";
+import {
+  providerFetch,
+  processRawEvents,
+  computeExtraEventData,
+  computePopularEvents,
+  computeFeaturedEvents,
+  computeOngoingEvents,
+} from "./eventUtils";
 import mockSchedule from "../../mockData/mockSchedule";
 import mockFavoriteCounts from "../../mockData/mockFavoriteCounts";
+import { restoreState } from "./eventsSerialization";
 
-const EVENTS_STORAGE_KEY = "EVENTS_STATE";
 const EventsContext = createContext();
 const EventActionsContext = createContext();
 
@@ -39,6 +44,8 @@ function EventsProvider({ children }) {
         field: "events",
         url: "www.api.bitcamp.com/schedule",
         desiredData: mockSchedule,
+        postProcess: processRawEvents,
+        getComputedData: computeExtraEventData,
       }),
     []
   );
@@ -101,39 +108,50 @@ function EventsProvider({ children }) {
     [state.userFollowedEvents]
   );
 
+  // Returns an array with all of the events sorted by start times
+  const getEventsList = useCallback(() => Object.values(state.events.data), [
+    state.events.data,
+  ]);
+
   // Returns the event object corresponding to the given id
   const getEvent = useCallback(eventID => state.events.data[eventID], [
-    state.events,
+    state.events.data,
   ]);
 
-  // Returns an array with all of the events sorted by start times
-  const getSortedEvents = useCallback(() => state.events.sorted, [
-    state.events.sorted,
-  ]);
-
-  // Returns the events that are the most
+  // Returns the events, split into EventDays (e.g. all events on Friday)
   const getEventDays = useCallback(() => state.events.days, [
     state.events.days,
   ]);
 
   // Gets the events that are currently happening
-  const getHappeningNow = useCallback(() => {
-    const now = moment();
-    return getSortedEvents().filter(event =>
-      now.isBetween(event.startTime, event.endTime)
-    );
-  }, [getSortedEvents]);
+  // TODO: possibly adjust how these are ordered
+  const getOngoingEvents = useCallback(
+    () => computeOngoingEvents(getEventsList()),
+    [getEventsList]
+  );
+
+  // Gets a list of events ordered by popularity
+  const getPopularEvents = useCallback(
+    () => computePopularEvents(getEventsList(), state.followCounts.data),
+    [getEventsList, state.followCounts.data]
+  );
+
+  // Gets a list of events ordered by point value
+  const getFeaturedEvents = useCallback(
+    () => computeFeaturedEvents(getEventsList()),
+    [getEventsList]
+  );
 
   // Returns whether the user is currently following a given event
   const isUserFollowing = useCallback(
-    eventID => state.userFollowedEvents.has(eventID),
-    [state.userFollowedEvents]
+    eventID => state.userFollowedEvents.data.has(eventID),
+    [state.userFollowedEvents.data]
   );
 
   // Returns a list of all events that a user is following
   const getUserFollowedEvents = useCallback(
-    () => state.userFollowedEvents.map(getEvent),
-    [getEvent, state.userFollowedEvents]
+    () => state.userFollowedEvents.data.map(getEvent),
+    [getEvent, state.userFollowedEvents.data]
   );
 
   // Object containing the events api
@@ -143,9 +161,12 @@ function EventsProvider({ children }) {
       fetchFollowCounts,
       toggleFollowingStatus,
       fetchUserFollowedEvents,
+      getEventsList,
       getEventDays,
+      getFeaturedEvents,
       getEvent,
-      getHappeningNow,
+      getPopularEvents,
+      getOngoingEvents,
       isUserFollowing,
       getUserFollowedEvents,
     }),
@@ -155,7 +176,10 @@ function EventsProvider({ children }) {
       fetchUserFollowedEvents,
       getEvent,
       getEventDays,
-      getHappeningNow,
+      getEventsList,
+      getFeaturedEvents,
+      getOngoingEvents,
+      getPopularEvents,
       getUserFollowedEvents,
       isUserFollowing,
       toggleFollowingStatus,
@@ -170,23 +194,11 @@ function EventsProvider({ children }) {
   // When the provider mounts, try to restore the old events data
   // TODO: actually cache the data
   useEffect(() => {
-    const restoreEventsState = async () => {
-      let restoredState;
-
-      try {
-        restoredState = await AsyncStorage.getItem(EVENTS_STORAGE_KEY);
-      } catch (e) {
-        // Restoring state failed (i.e., because the user has never used the app before)
-        restoredState = {};
-      }
-
-      dispatch({ type: "RESTORE_STATE", restoredState });
-
-      // TODO: possibly fetch new schedule data here
-    };
-
-    restoreEventsState();
-  }, []);
+    restoreState(dispatch);
+    fetchSchedule();
+    fetchFollowCounts();
+    fetchUserFollowedEvents();
+  }, [fetchFollowCounts, fetchSchedule, fetchUserFollowedEvents]);
 
   return (
     <EventsContext.Provider value={state}>
