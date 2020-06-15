@@ -301,25 +301,20 @@ describe("processRawEvents", () => {
   });
 
   it("Return only the valid events when given a mix of valid and invalid events", () => {
-    const processedEventObj = processRawEvents(
+    const processedEvents = processRawEvents(
       _.shuffle([...invalidEvents, ...validEvents])
     );
 
-    expect(Object.keys(processedEventObj).length).toEqual(validEvents.length);
-    expect(processedEventObj).toEqual(
-      computeIdToEventMap(validEvents.map(eventObj => new Event(eventObj)))
-    );
+    expect(processedEvents.length).toEqual(validEvents.length);
+    expect(processedEvents).toEqual(expect.arrayContaining(validEvents));
   });
 
   it("Sets event.description = '' and event.caption = '' when those fields are ommitted", () => {
     const { description, ...noDescription } = validEvents[0];
     const { caption, ...noCaption } = validEvents[0];
 
-    expect(
-      processRawEvents([noDescription])[noDescription.id].description
-    ).toEqual("");
-
-    expect(processRawEvents([noCaption])[noCaption.id].caption).toEqual("");
+    expect(processRawEvents([noDescription])[0].description).toEqual("");
+    expect(processRawEvents([noCaption])[0].caption).toEqual("");
   });
 });
 
@@ -368,9 +363,7 @@ describe("computeEventDays", () => {
     // Make sure the dates are in order and preserve internal properties of the event objects
     Object.entries(orderedEventObj).forEach(([date, events], i) => {
       expect(moment(eventDays[i].date)).toEqual(moment(date));
-      expect(eventDays[i].eventGroups[0].data).toEqual(
-        events.map(event => event.id)
-      );
+      expect(eventDays[i].eventGroups[0].data).toEqual(events);
     });
   });
 });
@@ -381,6 +374,7 @@ describe("computeExtraEventData", () => {
     const eventObj = processRawEvents(testEvents);
     expect(computeExtraEventData(eventObj)).toEqual({
       days: computeEventDays(testEvents),
+      byId: computeIdToEventMap(testEvents),
     });
   });
 });

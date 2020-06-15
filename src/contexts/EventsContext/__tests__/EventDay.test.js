@@ -49,7 +49,7 @@ it("Splits the provided events based on time", () => {
     ...expectedEventDays,
     eventGroups: expectedEventDays.eventGroups.map(({ time, data }) => ({
       time,
-      data: data.map(event => event.id),
+      data,
     })),
   });
 });

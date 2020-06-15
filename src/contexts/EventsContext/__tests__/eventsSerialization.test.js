@@ -68,7 +68,7 @@ describe("saveFieldState", () => {
     });
   });
 
-  it("Warns when it is unable to save the field state due to a phone error", async () => {
+  it("Warns when there is an error saving the field state", async () => {
     console.warn.mockImplementationOnce(() => ({}));
     AsyncStorage.setItem.mockImplementationOnce(async () => {
       throw new Error("Phone error");

@@ -15,7 +15,7 @@ export default class EventDay {
       const eventDateStr = getDay(event.startTime);
       if (eventDateStr !== dateAsStr) {
         throw new Error(
-          `This event starts on ${eventDateStr}, not the EventDay's date (${eventDateStr})`
+          `${event.toString()} starts on ${eventDateStr}, not the EventDay's date (${eventDateStr})`
         );
       }
     });
@@ -40,7 +40,7 @@ export default class EventDay {
     // Map the list of object entries into objects with the shape {time: moment, data: event.id[]}
     this.eventGroups = this.eventGroups.map(([time, eventsAtThisTime]) => ({
       time,
-      data: eventsAtThisTime.map(event => event.id),
+      data: eventsAtThisTime,
     }));
   }
 

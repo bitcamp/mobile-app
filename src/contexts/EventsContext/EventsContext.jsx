@@ -88,7 +88,7 @@ function EventsProvider({ children }) {
         );
       }
 
-      const didSucceed = providerFetch(dispatch, {
+      const didSucceed = await providerFetch(dispatch, {
         field: "userFollowedEvents",
         url: `www.api.bitcamp.com/${action}/${eventID}`,
         fetchParams: {
@@ -109,13 +109,13 @@ function EventsProvider({ children }) {
   );
 
   // Returns an array with all of the events sorted by start times
-  const getEventsList = useCallback(() => Object.values(state.events.data), [
+  const getEventsList = useCallback(() => state.events.data, [
     state.events.data,
   ]);
 
   // Returns the event object corresponding to the given id
-  const getEvent = useCallback(eventID => state.events.data[eventID], [
-    state.events.data,
+  const getEvent = useCallback(eventId => state.events.byId[eventId], [
+    state.events.byId,
   ]);
 
   // Returns the events, split into EventDays (e.g. all events on Friday)
@@ -188,16 +188,21 @@ function EventsProvider({ children }) {
 
   /**
    * Events Effects
-   * All state-changing effects
+   * All effects that change the provider's state
    */
 
   // When the provider mounts, try to restore the old events data
-  // TODO: actually cache the data
   useEffect(() => {
-    restoreState(dispatch);
-    fetchSchedule();
-    fetchFollowCounts();
-    fetchUserFollowedEvents();
+    const initProvider = async () => {
+      // Ensure that there are no conflicts setting state
+      await restoreState(dispatch);
+
+      fetchSchedule();
+      fetchFollowCounts();
+      fetchUserFollowedEvents();
+    };
+
+    initProvider();
   }, [fetchFollowCounts, fetchSchedule, fetchUserFollowedEvents]);
 
   return (

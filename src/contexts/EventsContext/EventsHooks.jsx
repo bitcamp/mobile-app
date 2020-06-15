@@ -49,9 +49,13 @@ function useEventDays() {
     "useEventDays"
   );
 
+  const {
+    events: { isLoading, error },
+  } = useContextSafely(EventsContext, "EventsContext", useEventDays);
+
   const eventDays = getEventDays();
 
-  return eventDays;
+  return { eventDays, isLoading, error };
 }
 
 /**

@@ -74,7 +74,7 @@ export async function providerFetch(
     dispatch(action);
 
     if (shouldUpdateData) {
-      saveFieldState(field, action.payload).catch();
+      saveFieldState(field, action.payload);
     }
 
     return true;
@@ -125,7 +125,7 @@ export function processRawEvents(rawEvents) {
     );
   }
 
-  return computeIdToEventMap(processedEvents);
+  return processedEvents;
 }
 
 /**
@@ -146,11 +146,12 @@ export function computeIdToEventMap(events) {
 
 /**
  * Computes additional data that should be stored inside the `events` field.
- * @param {Object} eventsObj An object mapping event ids to events
+ * @param {Event[]} processedEvents A list of event objects
  */
-export function computeExtraEventData(eventsObj) {
+export function computeExtraEventData(processedEvents) {
   return {
-    days: computeEventDays(Object.values(eventsObj)),
+    byId: computeIdToEventMap(processedEvents),
+    days: computeEventDays(processedEvents),
   };
 }
 

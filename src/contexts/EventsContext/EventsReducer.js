@@ -94,13 +94,22 @@ export const initialFieldState = {
 export const initialState = {
   isRestoring: false,
 
-  // An object mapping event ids to event objects
+  // A list of event ids
   events: {
     ...initialFieldState,
 
-    // Object that maps days of the week (e.g., "Friday")
-    // to an array of events, grouped by time of day (e.g., "5:00 PM")
-    days: {},
+    /*
+     * While both `byId` and `days` contain redundant event objects,
+     * we mostly use them to improve performance because they are
+     * all commonly used options
+     */
+
+    // An object mapping event ids to event objects
+    byId: {},
+
+    // List of EventDay objects, which map a given date (e.g., "2020-06-21")
+    // to an array of events that are grouped by time of day (e.g., "5:00 PM")
+    days: [],
   },
 
   // Object that maps event ids to follow counts

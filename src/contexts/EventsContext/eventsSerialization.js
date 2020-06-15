@@ -2,9 +2,9 @@
  * Stores all logic related to saving and retreiving the state of the events context into memory
  */
 import { AsyncStorage } from "react-native";
-import EventDay from "./EventDay";
 import { RESTORE_STATE, initialFieldState } from "./EventsReducer";
 import Event from "./Event";
+import { computeExtraEventData } from "./eventUtils";
 
 /**
  * Serialization constants
@@ -14,23 +14,15 @@ const EVENTS_STORAGE_KEY = "@events_context";
 export const serializationInfo = {
   events: {
     key: `${EVENTS_STORAGE_KEY}_event_list`,
-    serialize: JSON.stringify,
+    serialize: eventState => JSON.stringify(eventState.data),
     deserialize: fieldStateStr => {
-      const { data: rawData, days: rawDays } = JSON.parse(fieldStateStr);
-
-      const events = Object.values(rawData);
-      const data = {};
-      events.forEach(event => {
-        data[event.id] = new Event(event);
-      });
-
-      const days = rawDays.map(day =>
-        Object.assign(new EventDay(day.date, []), day)
+      const eventsList = JSON.parse(fieldStateStr).map(
+        rawEventObj => new Event(rawEventObj)
       );
 
       return {
-        data,
-        days,
+        data: eventsList,
+        ...computeExtraEventData(eventsList),
       };
     },
   },

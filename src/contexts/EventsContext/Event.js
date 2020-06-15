@@ -70,6 +70,10 @@ export default class Event {
       ? this.startTimeFormatted
       : `${this.startTimeFormatted} - ${this.endTimeFormatted}`;
   }
+
+  toString() {
+    return `Event(${this.title})`;
+  }
 }
 
 const DATE_STRING_TEST_ARGS = [
