@@ -1,75 +1,47 @@
 import PropTypes from "prop-types";
 import React from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { H3 } from "../Text";
 import EventCard from "./EventCard";
-import Event from "../../events/Event";
-import EventsManager from "../../events/EventsManager";
+import Event from "../../contexts/EventsContext/Event";
 
-export default function EventColumns({ origin, eventManager, eventsArr }) {
-  const getCardCol = (event, index) =>
-    event && (
-      <View
-        style={[
-          styles.halfColumn,
-          index === 0 ? styles.firstCol : styles.otherCol,
-        ]}
-        key={index}
-      >
-        <EventCard event={event} eventManager={eventManager} origin={origin} />
-      </View>
-    );
-
-  const getRowOfEvents = () => {
-    const rowEventsList = eventsArr.map(getCardCol);
-
-    if (rowEventsList.length === 0) {
-      return <H3 style={styles.noEvents}>No events at this time.</H3>;
-    }
-
-    return (
-      <ScrollView
+export default function EventColumns({ origin, eventsArr }) {
+  return (
+    <View style={styles.eventRowContainer}>
+      <FlatList
         horizontal
         style={styles.eventRowScroller}
         showsHorizontalScrollIndicator={false}
-      >
-        {rowEventsList}
-      </ScrollView>
-    );
-  };
-
-  return <View style={styles.eventRowContainer}>{getRowOfEvents()}</View>;
+        keyExtractor={event => event.id.toString()}
+        initialNumToRender={3}
+        ListEmptyComponent={<H3>No events at this time.</H3>}
+        data={eventsArr}
+        renderItem={({ item: event }) => (
+          <View style={styles.column}>
+            <EventCard event={event} origin={origin} />
+          </View>
+        )}
+      />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  eventRowContainer: {
-    flex: 1,
-  },
-  eventRowScroller: {
-    paddingRight: 10,
-  },
-  firstCol: {
-    marginLeft: 20,
-  },
-  halfColumn: {
+  column: {
     flex: 5,
     flexDirection: "column",
     marginRight: 20,
   },
-  noEvents: {
-    marginLeft: 20,
-    opacity: 0.8,
-    textAlign: "left",
-  },
-  otherCol: {
-    marginLeft: 0,
+  eventRowContainer: {
+    flex: 1,
+    paddingHorizontal: 15,
   },
 });
 
 EventColumns.propTypes = {
   eventsArr: PropTypes.arrayOf(PropTypes.instanceOf(Event)),
   origin: PropTypes.string.isRequired,
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
 };
 
 EventColumns.defaultProps = {

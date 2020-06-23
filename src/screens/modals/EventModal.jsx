@@ -1,8 +1,7 @@
 import moment from "moment";
-import React, { useContext } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { Image, ScrollView, StyleSheet, View } from "react-native";
-import Images from "../../../assets/imgs/index";
 import { scale } from "../../utils/scale";
 import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
 import ModalHeader from "../../components/modals/ModalHeader";
@@ -10,34 +9,29 @@ import colors from "../../components/Colors";
 import FullScreenModal from "../../components/modals/FullScreenModal";
 import PillBadge from "../../components/PillBadge";
 import { H2, H3, H4, P } from "../../components/Text";
-import Event from "../../events/Event";
-import { EventsContext } from "../../events/EventsContext";
+import Event from "../../contexts/EventsContext/Event";
 
 /**
  * Displays all information about an event (e.g., title, categories,
  * full description). You can follow/unfollow events in this screen.
  */
 const EventModal = ({ navigation, route }) => {
-  const { eventsManager } = useContext(EventsContext);
-
   const { event, origin } = route.params;
 
   return (
     <FullScreenModal
-      onModalHide={() => eventsManager.updateEventComponents()}
       style={styles.modal}
       header={
         <ModalHeader
           onBackButtonPress={navigation.goBack}
-          eventID={event.eventID.toString()}
-          eventManager={eventsManager}
+          eventID={event.id}
           origin={origin}
           heart
           noArrow
         />
       }
     >
-      <Image style={styles.banner} source={Images[event.img]} />
+      <Image style={styles.banner} source={event.image} />
       <ScrollView>
         <View style={styles.viewWithSpacing}>
           <View>
@@ -46,7 +40,7 @@ const EventModal = ({ navigation, route }) => {
 
             <View style={styles.badges}>
               {// Handle events with single and multiple categories
-              [].concat(event.category).map((category, index) => (
+              event.categories.map((category, index) => (
                 <View style={styles.badge} key={event.title + index.toString()}>
                   <PillBadge category={category} isBigger />
                 </View>
@@ -60,7 +54,7 @@ const EventModal = ({ navigation, route }) => {
             <H3 style={styles.date}>
               {moment(event.startTime).format("dddd, MMMM D, YYYY")}
             </H3>
-            <H3 style={styles.date}>{event.timeRangeString}</H3>
+            <H3 style={styles.date}>{event.timeRange}</H3>
           </View>
         </View>
 

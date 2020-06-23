@@ -23,7 +23,7 @@ const expectInvalidFieldValuesDontValidate = (fieldsToCheck, invalidValues) => {
       if (isValid) {
         // We're only using the console to improve the error reporting (this isn't production)
         // eslint-disable-next-line no-console
-        console.log(
+        console.error(
           `Expected an event with { ${field}: ${badFieldVal} } to be invalid, but it was valid`
         );
       }

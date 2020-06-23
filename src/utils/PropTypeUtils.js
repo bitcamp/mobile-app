@@ -58,7 +58,3 @@ export const questionType = PropTypes.shape({
   name: PropTypes.string,
   email: PropTypes.string,
 });
-
-// A function that does nothing (should be used for any empty functions
-// (e.g. the defaultProp for a function)
-export const noop = () => {};

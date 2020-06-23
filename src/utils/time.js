@@ -1,4 +1,5 @@
 import moment from "moment";
+import { HACKING_END_TIME, HACKING_START_TIME } from "../hackathon.config";
 
 /**
  * @param {string|moment} time A valid time string or moment
@@ -44,4 +45,22 @@ function checkValidTime(time) {
   if (!isValidTime(time)) {
     throw new Error(`${time} isn't a valid time`);
   }
+}
+
+/**
+ * Whether hacking has begun
+ * @param {string|moment} [currTime = moment()] A valid time string or moment object
+ */
+export function hackingHasStarted(currTime = moment()) {
+  checkValidTime(currTime);
+  return moment(currTime).isAfter(HACKING_START_TIME);
+}
+
+/**
+ * Whether hacking has ended
+ * @param {string|moment} [currTime = moment()] A valid time string or moment object
+ */
+export function hackingHasEnded(currTime = moment()) {
+  checkValidTime(currTime);
+  return moment(currTime).isAfter(HACKING_END_TIME);
 }

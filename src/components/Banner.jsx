@@ -18,8 +18,12 @@ const Banner = ({ imageSource, description, title }) => (
       locations={[0.3, 1]}
     >
       <PadContainer style={styles.textGroup}>
-        <H3 style={styles.description}>{description}</H3>
-        <H2 style={styles.title}>{title}</H2>
+        <H3 style={styles.description} numberOfLines={1}>
+          {description}
+        </H3>
+        <H2 style={styles.title} numberOfLines={2}>
+          {title}
+        </H2>
       </PadContainer>
     </LinearGradient>
   </ImageBackground>
@@ -47,7 +51,7 @@ const styles = StyleSheet.create({
   textGroup: {
     flex: 1,
     justifyContent: "flex-end",
-    marginBottom: 40,
+    marginBottom: 30,
   },
   title: {
     color: colors.textColor.primary,

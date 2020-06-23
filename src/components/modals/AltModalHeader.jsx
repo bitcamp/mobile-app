@@ -12,7 +12,8 @@ import PropTypes from "prop-types";
 import { H3, P } from "../Text";
 import colors from "../Colors";
 import { scale } from "../../utils/scale";
-import { requiredIf, noop } from "../../utils/PropTypeUtils";
+import { noOp } from "../../utils/simpleFunctions";
+import { requiredIf } from "../../utils/PropTypeUtils";
 
 /* An alternative modal header desgin with a centered title and 
    configurable action text on the left and right */
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
 });
 
 const propIsAFunction = (props, propName) =>
-  typeof props[propName] === "function" && props[propName] !== noop;
+  typeof props[propName] === "function" && props[propName] !== noOp;
 
 AltModalHeader.propTypes = {
   title: PropTypes.string.isRequired,
@@ -114,10 +115,10 @@ AltModalHeader.propTypes = {
 
 AltModalHeader.defaultProps = {
   leftText: "",
-  leftAction: noop,
+  leftAction: noOp,
   leftTextStyle: null,
   rightText: "",
-  rightAction: noop,
+  rightAction: noOp,
   rightTextStyle: null,
   style: null,
 };

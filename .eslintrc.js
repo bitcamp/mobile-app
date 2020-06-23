@@ -61,6 +61,9 @@ module.exports = {
         propTypes: "property assignment",
       },
     ],
+
+    // Allow the use of dangling underscores to indicate private variables/functions
+    "no-underscore-dangle": "off",
   },
 
   overrides: [
@@ -72,4 +75,14 @@ module.exports = {
       },
     },
   ],
+
+  settings: {
+    "import/resolver": {
+      node: {
+        // ".native.js" is in this list so the `react-native-screens` dependency is
+        // recognized by ESLint (see https://github.com/software-mansion/react-native-screens/issues/62)
+        extensions: [".js", ".jsx", ".json", ".native.js"],
+      },
+    },
+  },
 };

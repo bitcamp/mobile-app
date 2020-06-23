@@ -1,6 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
 import moment from "moment";
-import { getTimeOfDay, getDay, getWeekDay } from "../timeUtils";
+import { getTimeOfDay, getDay, getWeekDay } from "../time";
 
 describe("getTimeOfDay", () => {
   it("Works with arbitrary times of day", () => {

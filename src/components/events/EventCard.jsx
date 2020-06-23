@@ -1,90 +1,51 @@
-import React, { Component } from "react";
+import React from "react";
 import { ImageBackground, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
-import Images from "../../../assets/imgs/index";
 import { scale } from "../../utils/scale";
 import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
 import colors from "../Colors";
 import { BaseText } from "../Text";
 import ClickableEvent from "./ClickableEvent";
-import Event from "../../events/Event";
-import EventsManager from "../../events/EventsManager";
+import Event from "../../contexts/EventsContext/Event";
+import { useFollowingActions } from "../../contexts/FollowingContext/FollowingHooks";
 
-export default class EventCard extends Component {
-  getColor() {
-    const overlayColor = {
-      Main: "#5996B3",
-      Food: "#AB622A",
-      Workshop: "#A53C32",
-      Mini: "#496B7D",
-      Sponsor: "#544941",
-      Mentor: "#595049",
-      Demo: "#645D54",
-      Ceremony: "#BBB35D",
-      Colorwar: "#405962",
-      Campfire: "#81581F",
-    };
-    const { event } = this.props;
+export default function EventCard({ event, origin }) {
+  const { getFollowCount } = useFollowingActions();
 
-    let color = overlayColor[event.category[0]];
-    if (
-      event.title === "Opening Ceremony" ||
-      event.title === "Closing Ceremony"
-    ) {
-      color = overlayColor.Ceremony;
-    } else if (event.title === "Expo A" || event.title === "Expo B") {
-      color = overlayColor.Demo;
-    } else if (event.title === "COLORWAR") {
-      color = overlayColor.Colorwar;
-    }
-
-    return color;
-  }
-
-  render() {
-    const { event, eventManager, origin } = this.props;
-
-    return (
-      <ClickableEvent event={event} origin={origin}>
-        <View>
-          <ImageBackground
-            style={styles.imgBg}
-            source={Images[event.img]}
-            imageStyle={styles.roundedImg}
-          >
-            <View style={styles.favoriteBar}>
-              <View
-                style={[
-                  { backgroundColor: this.getColor() },
-                  styles.favoriteInfo,
-                ]}
-              >
-                <Ionicons name="ios-star" size={scale(15)} color="white" />
-                <BaseText style={styles.favoriteCount}>
-                  {eventManager.getSavedCount(event.eventID)}
-                </BaseText>
-              </View>
-            </View>
-
+  return (
+    <ClickableEvent event={event} origin={origin}>
+      <View>
+        <ImageBackground
+          style={styles.imgBg}
+          source={event.image}
+          imageStyle={styles.roundedImg}
+        >
+          <View style={styles.favoriteBar}>
             <View
-              style={[
-                { backgroundColor: this.getColor() },
-                styles.titleContainer,
-              ]}
+              style={[{ backgroundColor: event.color }, styles.favoriteInfo]}
             >
-              <BaseText numberOfLines={1} style={styles.eventTitle}>
-                {event.title}
+              <Ionicons name="ios-star" size={scale(15)} color="white" />
+              <BaseText style={styles.favoriteCount}>
+                {getFollowCount(event.id)}
               </BaseText>
             </View>
-          </ImageBackground>
-          <BaseText style={styles.caption} numberOfLines={1}>
-            {event.caption}
-          </BaseText>
-        </View>
-      </ClickableEvent>
-    );
-  }
+          </View>
+
+          <View
+            style={[{ backgroundColor: event.color }, styles.titleContainer]}
+          >
+            <BaseText numberOfLines={1} style={styles.eventTitle}>
+              {event.title}
+            </BaseText>
+          </View>
+        </ImageBackground>
+        <BaseText style={styles.caption} numberOfLines={1}>
+          {event.caption}
+        </BaseText>
+      </View>
+    </ClickableEvent>
+  );
 }
 
 const imageWidth = getDeviceWidth() / 2 + 10;
@@ -140,6 +101,5 @@ const styles = StyleSheet.create({
 
 EventCard.propTypes = {
   event: PropTypes.instanceOf(Event).isRequired,
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
   origin: PropTypes.string.isRequired,
 };

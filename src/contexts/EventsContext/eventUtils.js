@@ -1,101 +1,15 @@
 import _ from "lodash";
 import moment from "moment";
-import { FETCH_START, FETCH_FAILURE, FETCH_SUCCESS } from "./EventsReducer";
-import mockFetch from "../../mockData/mockFetch";
 import EventDay from "./EventDay";
-import { getDay } from "./timeUtils";
+import { getDay } from "../../utils/time";
 import Event, { EVENT_SCHEMA } from "./Event";
-import { saveFieldState } from "./eventsSerialization";
-
-const returnSelf = data => data;
-const returnEmptyObj = () => ({});
-
-/**
- * Fetches a resource used by the event provider. Automatically handles the reducer state
- * handling during the fetch call. Also saves the state for the given field in AsyncStorage.
- * @param {Function} dispatch The dispatch function for the reducer
- * @param {Object} options Additional options for the function (described below)
- * @param {string} options.field The field the reducer should be updating (REQUIRED)
- * @param {string} options.url The location of the data you want (REQUIRED)
- * @param {*} [options.desiredData = null] The data that you would like mockFetch to return (TODO: delete in production)
- * @param {Object} [options.fetchOptions] Any options for the fetch call
- * @param {Function} [options.postProcess = (rawData) => data] Function to run on the processed data
- * @param {Function} [options.getComputedData = () => ({})] Function to calculate any additional values included in the field
- * (e.g., events.sorted)
- * @param {boolean} [options.shouldUpdateData = true] Whether the data from the fetch call should
- * replace the data for the specified field
- * @returns True if the fetch succeeded, false otherwise
- */
-export async function providerFetch(
-  dispatch,
-  {
-    field,
-    url,
-    desiredData = null,
-    fetchOptions,
-    postProcess = returnSelf,
-    shouldUpdateData = true,
-    getComputedData = returnEmptyObj,
-  } = {}
-) {
-  // Ensure required parameters are all present
-  if (!dispatch || !field || !url) {
-    throw new Error(
-      `Missing the required parameters:${!dispatch ? " dispatch" : ""}${
-        !url ? " url" : ""
-      }${!field ? " field" : ""}`
-    );
-  }
-
-  dispatch({ type: FETCH_START });
-
-  try {
-    const response = await mockFetch(url, desiredData, fetchOptions);
-
-    // Handle errors that fetch doesn't typically catch
-    if (!response.ok) {
-      throw new Error(`Received HTTP code ${response.status}`);
-    }
-
-    // Process data
-    const rawData = await response.json();
-    const data = postProcess(rawData);
-
-    // Tell the reducer that the request succeeded (optionally updating the
-    // data field and computing additional field data)
-    const action = { type: FETCH_SUCCESS, field };
-    if (shouldUpdateData) {
-      action.payload = {
-        data,
-        ...getComputedData(data),
-      };
-    }
-
-    dispatch(action);
-
-    if (shouldUpdateData) {
-      saveFieldState(field, action.payload);
-    }
-
-    return true;
-  } catch (e) {
-    dispatch({
-      type: FETCH_FAILURE,
-      field,
-      errorMessage: e.message.includes("JSON.parse")
-        ? `Parsing error: ${url} doesn't return valid JSON data`
-        : `Unable to fetch ${url}`,
-    });
-
-    return false;
-  }
-}
 
 /**
  * Turns a list of events into an object that maps event ids to event objects
- * @param {Object[]} rawEvents A list of raw event objects
+ * @param {object[]} rawEvents A list of raw event objects
  * @throws if the event data for ALL events is malformed.
- * @returns {Event[]} a list of Events, with all invalid events removed
+ * @returns {object} an object with the shape `{ list, byId, days }` which all contain
+ * Event objects with any invalid events removed
  */
 export function processRawEvents(rawEvents) {
   const validationErrors = [];
@@ -125,7 +39,11 @@ export function processRawEvents(rawEvents) {
     );
   }
 
-  return processedEvents;
+  return {
+    list: processedEvents,
+    byId: computeIdToEventMap(processedEvents),
+    days: computeEventDays(processedEvents),
+  };
 }
 
 /**
@@ -142,17 +60,6 @@ export function computeIdToEventMap(events) {
   });
 
   return idToEventsMap;
-}
-
-/**
- * Computes additional data that should be stored inside the `events` field.
- * @param {Event[]} processedEvents A list of event objects
- */
-export function computeExtraEventData(processedEvents) {
-  return {
-    byId: computeIdToEventMap(processedEvents),
-    days: computeEventDays(processedEvents),
-  };
 }
 
 /**

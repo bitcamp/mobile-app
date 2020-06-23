@@ -1,209 +1,96 @@
-import React, {
-  createContext,
-  useReducer,
-  useMemo,
-  useCallback,
-  useEffect,
-} from "react";
+import React, { createContext, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
-import eventsReducer, {
-  initialState,
-  FOLLOW_EVENT,
-  UNFOLLOW_EVENT,
-} from "./EventsReducer";
 import {
-  providerFetch,
   processRawEvents,
-  computeExtraEventData,
+  computeOngoingEvents,
   computePopularEvents,
   computeFeaturedEvents,
-  computeOngoingEvents,
 } from "./eventUtils";
-import mockSchedule from "../../mockData/mockSchedule";
-import mockFavoriteCounts from "../../mockData/mockFavoriteCounts";
-import { restoreState } from "./eventsSerialization";
+import useCachedGetRequest from "../../hooks/requests/useCachedGetRequest";
+import { BASE_URL } from "../../api.config";
+import mockFlattenedSchedule from "../../mockData/mockFlattenedSchedule";
 
 const EventsContext = createContext();
 const EventActionsContext = createContext();
 
 /**
- * Provides a single EventsManager instance for the entire app to interact with
+ * Provides all information about the hackathon events
  */
 function EventsProvider({ children }) {
-  const [state, dispatch] = useReducer(eventsReducer, initialState);
+  // Gets a list of all the events (either from AsyncStorage or the server) on mount
+  // The events object has the shape `{
+  //    list: Event[],
+  //    byId: Object {[eventIds] : Event}
+  //    days: EventDay[]
+  // }`
+  const {
+    data: events,
+    status,
+    error,
+    refetch: fetchEvents,
+  } = useCachedGetRequest(`${BASE_URL}/events`, {
+    variables: [{ responseData: mockFlattenedSchedule }],
+    postProcess: processRawEvents,
+  });
 
   /**
    * Events API
    * All publicly available functions
    */
 
-  // Gets a list of all the events
-  const fetchSchedule = useCallback(
-    async () =>
-      providerFetch(dispatch, {
-        field: "events",
-        url: "www.api.bitcamp.com/schedule",
-        desiredData: mockSchedule,
-        postProcess: processRawEvents,
-        getComputedData: computeExtraEventData,
-      }),
-    []
-  );
-
-  // Gets an object mapping event ids to their favorite counts
-  const fetchFollowCounts = useCallback(
-    async () =>
-      providerFetch(dispatch, {
-        field: "followCounts",
-        url: "www.api.bitcamp.com/followCounts",
-        desiredData: mockFavoriteCounts,
-      }),
-    []
-  );
-
-  // Fetch all of the events that a user follows, placing them in a set
-  const fetchUserFollowedEvents = useCallback(
-    async () =>
-      providerFetch(dispatch, {
-        field: "userFollowedEvents",
-        url: `www.api.bitcamp.com/userFollowedEvents}`,
-        desiredData: [],
-        postProcess: followedEvents => new Set(followedEvents),
-      }),
-    []
-  );
-
-  // Toggles the following status for a particular event
-  // Throws an error if a network request is currently underway
-  const toggleFollowingStatus = useCallback(
-    async eventID => {
-      const isCurrentlyFollowing = state.userFollowedEvents.has(eventID);
-      const action = isCurrentlyFollowing ? "unfollow" : "follow";
-
-      // You shouldn't be able to toggle your following status while another
-      // network request is underway
-      if (state.userFollowedEvents.isLoading) {
-        throw new Error(
-          `Can't ${action} ${eventID} during another network request`
-        );
-      }
-
-      const didSucceed = await providerFetch(dispatch, {
-        field: "userFollowedEvents",
-        url: `www.api.bitcamp.com/${action}/${eventID}`,
-        fetchParams: {
-          method: "POST",
-        },
-        shouldUpdateData: false,
-      });
-
-      // Follow or unfollow the event in state
-      if (didSucceed) {
-        dispatch({
-          type: action === "follow" ? FOLLOW_EVENT : UNFOLLOW_EVENT,
-          eventID,
-        });
-      }
-    },
-    [state.userFollowedEvents]
-  );
-
-  // Returns an array with all of the events sorted by start times
-  const getEventsList = useCallback(() => state.events.data, [
-    state.events.data,
-  ]);
-
   // Returns the event object corresponding to the given id
-  const getEvent = useCallback(eventId => state.events.byId[eventId], [
-    state.events.byId,
-  ]);
-
-  // Returns the events, split into EventDays (e.g. all events on Friday)
-  const getEventDays = useCallback(() => state.events.days, [
-    state.events.days,
+  const getEvent = useCallback(eventId => events && events.byId[eventId], [
+    events,
   ]);
 
   // Gets the events that are currently happening
   // TODO: possibly adjust how these are ordered
   const getOngoingEvents = useCallback(
-    () => computeOngoingEvents(getEventsList()),
-    [getEventsList]
+    () => events && computeOngoingEvents(events.list),
+    [events]
   );
 
   // Gets a list of events ordered by popularity
   const getPopularEvents = useCallback(
-    () => computePopularEvents(getEventsList(), state.followCounts.data),
-    [getEventsList, state.followCounts.data]
+    followCounts => events && computePopularEvents(events.list, followCounts),
+    [events]
   );
 
   // Gets a list of events ordered by point value
   const getFeaturedEvents = useCallback(
-    () => computeFeaturedEvents(getEventsList()),
-    [getEventsList]
-  );
-
-  // Returns whether the user is currently following a given event
-  const isUserFollowing = useCallback(
-    eventID => state.userFollowedEvents.data.has(eventID),
-    [state.userFollowedEvents.data]
-  );
-
-  // Returns a list of all events that a user is following
-  const getUserFollowedEvents = useCallback(
-    () => state.userFollowedEvents.data.map(getEvent),
-    [getEvent, state.userFollowedEvents.data]
+    () => events && computeFeaturedEvents(events.list),
+    [events]
   );
 
   // Object containing the events api
   const actions = useMemo(
     () => ({
-      fetchSchedule,
-      fetchFollowCounts,
-      toggleFollowingStatus,
-      fetchUserFollowedEvents,
-      getEventsList,
-      getEventDays,
-      getFeaturedEvents,
+      fetchEvents,
       getEvent,
       getPopularEvents,
       getOngoingEvents,
-      isUserFollowing,
-      getUserFollowedEvents,
+      getFeaturedEvents,
     }),
     [
-      fetchFollowCounts,
-      fetchSchedule,
-      fetchUserFollowedEvents,
+      fetchEvents,
       getEvent,
-      getEventDays,
-      getEventsList,
       getFeaturedEvents,
       getOngoingEvents,
       getPopularEvents,
-      getUserFollowedEvents,
-      isUserFollowing,
-      toggleFollowingStatus,
     ]
   );
 
-  /**
-   * Events Effects
-   * All effects that change the provider's state
-   */
-
-  // When the provider mounts, try to restore the old events data
-  useEffect(() => {
-    const initProvider = async () => {
-      // Ensure that there are no conflicts setting state
-      await restoreState(dispatch);
-
-      fetchSchedule();
-      fetchFollowCounts();
-      fetchUserFollowedEvents();
-    };
-
-    initProvider();
-  }, [fetchFollowCounts, fetchSchedule, fetchUserFollowedEvents]);
+  // Value provided by the context
+  const state = useMemo(
+    () => ({
+      eventsList: events && events.list,
+      eventsById: events && events.byId,
+      eventDays: events && events.days,
+      status,
+      error,
+    }),
+    [error, events, status]
+  );
 
   return (
     <EventsContext.Provider value={state}>

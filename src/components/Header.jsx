@@ -7,13 +7,14 @@ import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import colors from "./Colors";
 import { H1 } from "./Text";
 import Images from "../../assets/imgs";
+import { HACKATHON_NAME } from "../hackathon.config";
 
 const iconProps = { size: 30, color: colors.primaryColor };
 
 // What the header should look like for
 const tabs = {
   home: {
-    title: "bitcamp",
+    title: HACKATHON_NAME.toLowerCase(),
     modal: {
       icon: <FontAwesome name="map" {...iconProps} />,
       route: "map modal",
@@ -49,7 +50,7 @@ export default function Header({ route, navigation }) {
   return (
     <View style={styles.header}>
       <View style={styles.leftHeader}>
-        <Image source={Images.bitcamp_logo} style={styles.logo} />
+        <Image source={Images["hackathon-logo"]} style={styles.logo} />
         <H1 style={styles.title}>{currentTab.title}</H1>
       </View>
       <View>

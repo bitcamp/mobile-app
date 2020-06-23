@@ -9,6 +9,7 @@ export default {
   firstSubmitted: 32503680000000.0,
   verified: true,
   salt: "123abc",
+  notificationToken: null,
 
   /**
    * User Profile.

@@ -4,18 +4,16 @@ import PropTypes from "prop-types";
 import ClickableEvent from "./ClickableEvent";
 import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
 import EventDescription from "../schedule/EventDescription";
-import Images from "../../../assets/imgs/index";
-import EventsManager from "../../events/EventsManager";
-import Event from "../../events/Event";
+import Event from "../../contexts/EventsContext/Event";
 
-const LargeEventCard = ({ eventManager, event, origin, ...props }) => (
+const LargeEventCard = ({ event, origin, ...props }) => (
   <ClickableEvent event={event} origin={origin} style={styles.event}>
     <Image
       style={[styles.image, styles.roundedCorners]}
-      source={Images[event.img]}
+      source={event.image}
       imageStyle={styles.roundedCorners}
     />
-    <EventDescription {...{ eventManager, event, origin, ...props }} />
+    <EventDescription {...{ event, origin, ...props }} />
   </ClickableEvent>
 );
 
@@ -35,7 +33,6 @@ const styles = StyleSheet.create({
 });
 
 LargeEventCard.propTypes = {
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
   event: PropTypes.instanceOf(Event).isRequired,
   origin: PropTypes.string.isRequired,
 };

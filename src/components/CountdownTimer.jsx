@@ -1,60 +1,64 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
 import { StyleSheet } from "react-native";
-import { H3, BaseText } from "./Text";
-import EventsManager from "../events/EventsManager";
+import { H3 } from "./Text";
+import {
+  HACKING_END_TIME,
+  HACKATHON_NAME,
+  HACKATHON_YEAR,
+  HACKING_START_TIME,
+} from "../hackathon.config";
+import { hackingHasStarted, hackingHasEnded } from "../utils/time";
 
-export default class CountdownTimer extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currTime: moment(),
-    };
-  }
+export default function CountdownTimer() {
+  const [currTime, setCurrTime] = useState(moment());
 
-  componentDidMount() {
-    this.timer = setInterval(() => {
-      this.setState({
-        currTime: moment(),
-      });
-    }, 1000);
-  }
+  // Don't need consistent return here because `useEffect` arrow functions
+  // should only return a cleanup method.
+  // eslint-disable-next-line consistent-return
+  useEffect(() => {
+    if (!hackingHasEnded()) {
+      const timer = setInterval(() => {
+        setCurrTime(moment());
+      }, 1000);
 
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
-
-  render() {
-    const { currTime } = this.state;
-
-    if (!EventsManager.hackingHasStarted(currTime)) {
-      return <H3 style={styles.countdownText}>Bitcamp is April 12-14</H3>;
+      return () => {
+        clearInterval(timer);
+      };
     }
+  }, []);
 
-    if (!EventsManager.hackingHasEnded(currTime)) {
-      const remain = moment.duration(
-        moment(EventsManager.getHackingEndTime()).diff(moment(currTime))
-      );
-      const days = remain.days();
-      const hours = remain.hours();
-      const minutes = remain.minutes();
-      const seconds = remain.seconds();
+  let timeDiff;
+  let eventDescription;
 
-      const daysText = days > 0 ? `${days}d ` : ``;
-      const hoursText = `${hours}h `;
-      const minutesText = `${minutes}m `;
-      const secondsText = `${seconds}s `;
-
-      return (
-        <H3 style={styles.countdownText}>
-          {daysText + hoursText + minutesText + secondsText}
-          <BaseText>left to hack</BaseText>
-        </H3>
-      );
-    }
-
-    return null;
+  if (!hackingHasStarted(currTime)) {
+    // Before the hackathon
+    timeDiff = moment(HACKING_START_TIME).diff(currTime);
+    eventDescription = `until ${HACKATHON_NAME} ${HACKATHON_YEAR}`;
+  } else if (!hackingHasEnded(currTime)) {
+    // During the hackathon
+    timeDiff = moment(HACKING_END_TIME).diff(currTime);
+    eventDescription = "left to hack";
   }
+
+  if (timeDiff && eventDescription) {
+    timeDiff = moment.duration(timeDiff);
+
+    const daysText = timeDiff.days() !== 0 ? `${timeDiff.days()}d ` : "";
+    const hoursText = `${timeDiff.hours()}h `;
+    const minutesText = `${timeDiff.minutes()}m `;
+    const secondsText = `${timeDiff.seconds()}s `;
+
+    return (
+      <H3 style={styles.countdownText}>
+        {daysText + hoursText + minutesText + secondsText}
+        <H3>{eventDescription}</H3>
+      </H3>
+    );
+  }
+
+  // After the hackathon
+  return null;
 }
 
 const styles = StyleSheet.create({

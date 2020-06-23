@@ -1,42 +1,21 @@
-import React, { Component } from "react";
-import { View } from "react-native";
+import React from "react";
 import PropTypes from "prop-types";
 import LargeEventCard from "./LargeEventCard";
-import EventsManager from "../../events/EventsManager";
-import Event from "../../events/Event";
+import Event from "../../contexts/EventsContext/Event";
 
-export default class EventsList extends Component {
-  componentWillUnmount() {
-    const { eventManager } = this.props;
-    eventManager.removeUpdatesListener(this.myEventsList);
-  }
-
-  render() {
-    const { events, eventManager, shouldDisplay } = this.props;
-    return (
-      shouldDisplay && (
-        <View
-          ref={myEventsList => {
-            this.myEventsList = myEventsList;
-            eventManager.registerUpdatesListener(myEventsList);
-          }}
-        >
-          {events.map(event => (
-            <LargeEventCard
-              key={event.eventID}
-              event={event}
-              eventManager={eventManager}
-              origin="Saved"
-            />
-          ))}
-        </View>
-      )
-    );
-  }
+export default function EventsList({ events, shouldDisplay }) {
+  return (
+    shouldDisplay && (
+      <>
+        {events.map(event => (
+          <LargeEventCard key={event.id} event={event} origin="Saved" />
+        ))}
+      </>
+    )
+  );
 }
 
 EventsList.propTypes = {
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
   events: PropTypes.arrayOf(PropTypes.instanceOf(Event).isRequired).isRequired,
   shouldDisplay: PropTypes.bool,
 };

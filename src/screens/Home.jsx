@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 import PropTypes from "prop-types";
 import { PadContainer, ViewContainer } from "../components/Base";
@@ -6,44 +6,29 @@ import CountdownTimer from "../components/CountdownTimer";
 import EventColumns from "../components/events/EventColumns";
 import { H2 } from "../components/Text";
 import HappeningNowSlideshow from "../components/HappeningNowSlideshow";
-import { EventsContext } from "../events/EventsContext";
+import { useEventsContext } from "../contexts/EventsContext/EventsHooks";
+import { useFollowingState } from "../contexts/FollowingContext/FollowingHooks";
 
 export default function Home() {
-  const [happeningNow, setHappeningNow] = useState([]);
-  const { eventsManager } = useContext(EventsContext);
+  const [
+    { eventsList },
+    { getFeaturedEvents, getPopularEvents },
+  ] = useEventsContext();
 
-  // Continually grap the
-  useEffect(() => {
-    let didCancel = false;
-
-    const timer = setInterval(() => {
-      if (!didCancel) {
-        setHappeningNow(eventsManager.getHappeningNow());
-      }
-    }, 1000 * 60);
-
-    return () => {
-      clearInterval(timer);
-      didCancel = true;
-    };
-  });
+  const { followCounts } = useFollowingState();
 
   // TODO: create a common component for this
   const renderPopularEventsSection = () => {
     const heading = "Popular Events";
-    const events = eventsManager.getTopEvents();
+    const events = getPopularEvents(followCounts).slice(0, 10);
+
     return (
       <View style={styles.subSection}>
         <PadContainer style={styles.subSectionHeading}>
           <H2>{heading}</H2>
         </PadContainer>
         <View>
-          <EventColumns
-            heading={heading}
-            eventsArr={events}
-            eventManager={eventsManager}
-            origin="Home"
-          />
+          <EventColumns heading={heading} eventsArr={events} origin="Home" />
         </View>
       </View>
     );
@@ -52,34 +37,22 @@ export default function Home() {
   // TODO: create a common component for this (same as above)
   const renderBestForBeginnersSection = () => {
     const heading = "Featured Events";
-    const events = eventsManager.getFeaturedEvents();
+    const events = getFeaturedEvents().slice(0, 10);
+
     return (
       <View style={styles.subSection}>
         <PadContainer style={styles.subSectionHeading}>
           <H2>{heading}</H2>
         </PadContainer>
-        <EventColumns
-          heading={heading}
-          eventsArr={events}
-          eventManager={eventsManager}
-          origin="Home"
-        />
+        <EventColumns heading={heading} eventsArr={events} origin="Home" />
       </View>
     );
   };
 
   const renderHappeningNow = () => {
-    const events =
-      happeningNow.length === 0
-        ? eventsManager.getHappeningNow()
-        : happeningNow;
-
     return (
       <View style={styles.subSection}>
-        <HappeningNowSlideshow
-          dataSource={events}
-          eventManager={eventsManager}
-        />
+        <HappeningNowSlideshow />
       </View>
     );
   };
@@ -87,9 +60,15 @@ export default function Home() {
   return (
     <ViewContainer>
       <CountdownTimer />
-      {renderHappeningNow()}
-      {renderPopularEventsSection()}
-      {renderBestForBeginnersSection()}
+      {eventsList ? (
+        <>
+          {renderHappeningNow()}
+          {renderPopularEventsSection()}
+          {renderBestForBeginnersSection()}
+        </>
+      ) : (
+        <H2>No events</H2>
+      )}
     </ViewContainer>
   );
 }

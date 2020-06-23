@@ -1,6 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
-import { getDay, getTimeOfDay, getWeekDay } from "./timeUtils";
+import { getDay, getTimeOfDay, getWeekDay } from "../../utils/time";
 
 /**
  * Holds onto all events for a particular day (e.g. 3/14/1592), grouping them based on start time

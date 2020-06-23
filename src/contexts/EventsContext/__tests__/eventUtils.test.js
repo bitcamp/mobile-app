@@ -1,48 +1,29 @@
 import { describe, expect, it, jest } from "@jest/globals";
 import moment from "moment";
 import _ from "lodash";
-import * as ReactNative from "react-native";
-import mockFetch from "../../../mockData/mockFetch";
 import {
   computeEventDays,
-  computeExtraEventData,
   computePopularEvents,
   computeIdToEventMap,
   processRawEvents,
   computeOngoingEvents,
   computeFeaturedEvents,
-  providerFetch,
 } from "../eventUtils";
 import {
   fridayTestEvents,
   saturdayTestEvents,
   sundayTestEvents,
 } from "../../../mockData/mockFlattenedSchedule";
-import mockFavoriteCounts from "../../../mockData/mockFavoriteCounts";
-import Event from "../Event";
-import { FETCH_START, FETCH_SUCCESS, FETCH_FAILURE } from "../EventsReducer";
+import mockFollowCounts from "../../../mockData/mockFollowCounts";
 
 // Test data
-const jsonData = { someData: "blah" };
-const successfulFetch = {
-  ok: true,
-  json: async () => jsonData,
-};
 const testEvents = [
   ...fridayTestEvents.slice(0, 3),
   ...saturdayTestEvents.slice(0, 2),
 ];
 
 // Mocks
-jest.mock("../../../mockData/mockFetch");
-mockFetch.mockResolvedValue(successfulFetch);
 Date.now = jest.fn(); // Used to adjust the date returned by `moment()`
-const dispatch = jest.fn();
-const postProcess = jest.fn();
-const getComputedData = jest.fn();
-const { AsyncStorage } = ReactNative;
-jest.spyOn(AsyncStorage, "setItem");
-jest.spyOn(console, "warn");
 
 /**
  * Checks if the given function properly handles empty lists and doesn't modify the input list
@@ -64,206 +45,6 @@ const commonEventFunctionTests = (
     expect(testEvents).toEqual(testEvents);
   });
 };
-
-describe("providerFetch", () => {
-  const url = "abc.com";
-  const field = "events";
-
-  it("Throws an error if the `dispatch`, `url`, or `field` arguments are missing", async () => {
-    const errorStr = "Missing the required parameters";
-
-    await expect(providerFetch()).rejects.toThrow(errorStr);
-    await expect(providerFetch(dispatch, { url })).rejects.toThrow(errorStr);
-    await expect(providerFetch(dispatch, { field })).rejects.toThrow(errorStr);
-  });
-
-  it("Returns true on success, false on failure/error", async () => {
-    // Fetch succeeded
-    mockFetch.mockResolvedValueOnce(successfulFetch);
-    await expect(providerFetch(dispatch, { url, field })).resolves.toBe(true);
-
-    // Fetch failed
-    mockFetch.mockResolvedValueOnce({ ...successfulFetch, ok: false });
-    await expect(providerFetch(dispatch, { url, field })).resolves.toBe(false);
-
-    // Fetch errored
-    mockFetch.mockImplementationOnce(async () => {
-      throw new Error();
-    });
-    await expect(providerFetch(dispatch, { url, field })).resolves.toBe(false);
-  });
-
-  it("Calls fetch with the correct parameters", () => {
-    const fetchParams = [url, "someDesiredData", { someFetchOption: "value" }];
-    providerFetch(dispatch, {
-      field,
-      url,
-      desiredData: fetchParams[1],
-      fetchOptions: fetchParams[2],
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(...fetchParams);
-  });
-
-  it("Dispatches a FETCH_START before fetching", async () => {
-    dispatch.mockClear();
-    mockFetch.mockClear();
-
-    await providerFetch(dispatch, { url, field });
-
-    expect(dispatch).toHaveBeenNthCalledWith(1, { type: FETCH_START });
-
-    const firstDispatchCall = dispatch.mock.invocationCallOrder[0];
-    const firstFetchCall = mockFetch.mock.invocationCallOrder[0];
-
-    expect(firstDispatchCall).toBeLessThan(firstFetchCall);
-  });
-
-  it("Dispatches a valid FETCH_SUCCESS action if fetching is successful", async () => {
-    await providerFetch(dispatch, { url, field });
-
-    expect(dispatch).toHaveBeenLastCalledWith({
-      type: FETCH_SUCCESS,
-      field,
-      payload: {
-        data: jsonData,
-      },
-    });
-  });
-
-  it("Dispatches a FETCH_FAILURE with the proper payload if response.ok is false", async () => {
-    mockFetch.mockResolvedValueOnce({ ...successfulFetch, ok: false });
-    await providerFetch(dispatch, { url, field });
-
-    expect(dispatch).toHaveBeenLastCalledWith({
-      type: FETCH_FAILURE,
-      field,
-      errorMessage: expect.stringContaining("Unable to fetch"),
-    });
-  });
-
-  it("Dispatches a FETCH_FAILURE if JSON parsing fails", async () => {
-    // Simulate a json parsing error
-    mockFetch.mockResolvedValueOnce({
-      ...successfulFetch,
-      json: async () => {
-        throw new Error("JSON.parse");
-      },
-    });
-
-    await providerFetch(dispatch, { url, field });
-
-    expect(dispatch).toHaveBeenLastCalledWith({
-      type: FETCH_FAILURE,
-      field,
-      errorMessage: expect.stringContaining("Parsing error"),
-    });
-  });
-
-  it("Postprocesses data when given a `postProcess()` callback", async () => {
-    const processedData = Math.random();
-    postProcess.mockReturnValueOnce(processedData);
-
-    await providerFetch(dispatch, { url, field, postProcess });
-
-    expect(postProcess).toHaveBeenLastCalledWith(jsonData);
-    expect(dispatch).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        payload: {
-          data: processedData,
-        },
-      })
-    );
-  });
-
-  it("Adds extra data to the action when given a `getComputedData()` callback", async () => {
-    const extraData = { someKey: Math.random() };
-    getComputedData.mockReturnValueOnce(extraData);
-
-    await providerFetch(dispatch, {
-      url,
-      field,
-      getComputedData,
-    });
-
-    expect(dispatch).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        payload: {
-          data: expect.anything(),
-          ...extraData,
-        },
-      })
-    );
-  });
-
-  it("Passes the post processed data to the `getComputedData()` callback ", async () => {
-    const processedData = Math.random();
-    const extraData = Math.random();
-    postProcess.mockReturnValueOnce(processedData);
-    getComputedData.mockReturnValueOnce(extraData);
-
-    await providerFetch(dispatch, {
-      url,
-      field,
-      postProcess,
-      getComputedData,
-    });
-
-    expect(getComputedData).toHaveBeenLastCalledWith(processedData);
-  });
-
-  it("Only adds a payload to the FETCH_SUCCESS action when `shouldUpdateData` is true", async () => {
-    // Returns a payload when shouldUpdateData is true
-    await providerFetch(dispatch, { url, field, shouldUpdateData: true });
-    expect(dispatch).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        payload: expect.anything(),
-      })
-    );
-
-    // Returns a minimal action when shouldUpdateData is false
-    await providerFetch(dispatch, {
-      url,
-      field,
-      shouldUpdateData: false,
-      getComputedData,
-    });
-    expect(dispatch).toHaveBeenLastCalledWith(
-      expect.not.objectContaining({
-        payload: expect.anything(),
-      })
-    );
-  });
-
-  it("Only saves the field state in async storage if `shouldUpdateData` is true", async () => {
-    AsyncStorage.setItem.mockClear();
-    await providerFetch(dispatch, { url, field, shouldUpdateData: true });
-
-    expect(AsyncStorage.setItem).toHaveBeenCalled();
-
-    AsyncStorage.setItem.mockClear();
-    await providerFetch(dispatch, { url, field, shouldUpdateData: false });
-
-    expect(AsyncStorage.setItem).not.toHaveBeenCalled();
-  });
-
-  it("Still throws a fetch success if the AsyncStorage call fails", async () => {
-    AsyncStorage.setItem.mockImplementationOnce(async () => {
-      throw new Error("Whoopsies :(");
-    });
-
-    // Ignore any console warnings when setItem fails is called
-    console.warn.mockImplementationOnce(() => {});
-
-    await providerFetch(dispatch, { url, field });
-
-    expect(dispatch).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        type: FETCH_SUCCESS,
-      })
-    );
-  });
-});
 
 describe("processRawEvents", () => {
   const invalidEvents = [
@@ -368,21 +149,10 @@ describe("computeEventDays", () => {
   });
 });
 
-describe("computeExtraEventData", () => {
-  it("Computes the appropriate event data object without any extra keys", () => {
-    // If `computeEventDays()` are both functional, so is this funciton
-    const eventObj = processRawEvents(testEvents);
-    expect(computeExtraEventData(eventObj)).toEqual({
-      days: computeEventDays(testEvents),
-      byId: computeIdToEventMap(testEvents),
-    });
-  });
-});
-
 describe("computePopularEvents", () => {
   // Try the default test using a dummy version of the follow
   commonEventFunctionTests(computePopularEvents, {
-    extraParams: [mockFavoriteCounts],
+    extraParams: [mockFollowCounts],
   });
 
   it("Sorts a list of events in ascending order by follow count", () => {

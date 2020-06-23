@@ -1,5 +1,8 @@
 import * as yup from "yup";
-import { getTimeOfDay, isValidTime } from "./timeUtils";
+import moment from "moment";
+import { getTimeOfDay, isValidTime } from "../../utils/time";
+import { EVENT_CATEGORIES } from "../../hackathon.config";
+import { getImage, getColor } from "../../style.config";
 
 /**
  * A hackathon event
@@ -37,11 +40,11 @@ export default class Event {
 
     /**
      * List of categories ordered by decreasing relevance. The possible categories are listed below:
-     * "main"      = main events (e.g., Bitcamp check-in, Hacker Expo)
-     * "food"      = food event (e.g., breakfast, dinner, late-night snack)
-     * "mini"      = smaller event, usually not hacking related (e.g., smash tourney, robot fights)
-     * "workshop"  = programming/design workshop (e.g. intro to web dev, designing your app)
-     * "sponsored" = sponsored event (e.g., Firebase demo with Google)
+     * "main-event" = main events (e.g., Event check-in, Hacker Expo)
+     * "food"       = food event (e.g., breakfast, dinner, late-night snack)
+     * "mini-event" = smaller event, usually not hacking related (e.g., smash tourney, robot fights)
+     * "workshop"   = programming/design workshop (e.g. intro to web dev, designing your app)
+     * "sponsored"  = sponsored event (e.g., Firebase demo with Google)
      *
      * Ex: ["food", "sponsored"]
      */
@@ -65,10 +68,26 @@ export default class Event {
     return getTimeOfDay(this.endTime);
   }
 
+  get hasPassed() {
+    return moment().isAfter(this.endTime);
+  }
+
   get timeRange() {
     return this.startTimeFormatted === this.endTimeFormatted
       ? this.startTimeFormatted
       : `${this.startTimeFormatted} - ${this.endTimeFormatted}`;
+  }
+
+  get primaryCategory() {
+    return this.categories[0];
+  }
+
+  get color() {
+    return getColor(this);
+  }
+
+  get image() {
+    return getImage(this);
   }
 
   toString() {
@@ -76,7 +95,7 @@ export default class Event {
   }
 }
 
-const DATE_STRING_TEST_ARGS = [
+const DATE_STRING_VALIDATION_ARGS = [
   "is-date-string",
   // We disable this eslint rule because of how yup handles the second argument of `mixed.test()`
   // eslint-disable-next-line no-template-curly-in-string
@@ -104,17 +123,17 @@ export const EVENT_SCHEMA = yup
       .of(
         yup
           .mixed()
-          .oneOf(["main", "food", "mini", "workshop", "sponsored"])
+          .oneOf(EVENT_CATEGORIES)
           .required()
       )
       .required(),
     startTime: yup
       .string()
-      .test(...DATE_STRING_TEST_ARGS)
+      .test(...DATE_STRING_VALIDATION_ARGS)
       .required(),
     endTime: yup
       .string()
-      .test(...DATE_STRING_TEST_ARGS)
+      .test(...DATE_STRING_VALIDATION_ARGS)
       .required(),
     pointValue: yup
       .number()

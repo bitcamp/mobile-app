@@ -1,13 +1,11 @@
-import React, { useContext } from "react";
+import React from "react";
 import { CenteredActivityIndicator } from "../components/Base";
 import Saved from "../components/events/Saved";
-import { EventsContext } from "../events/EventsContext";
 import TabbedEventDays from "../components/TabbedEventDays";
+import { useEventsState } from "../contexts/EventsContext/EventsHooks";
 
 export default function Schedule() {
-  const { eventsManager } = useContext(EventsContext);
-
-  const eventDays = eventsManager.getEventDays();
+  const { eventDays } = useEventsState();
 
   if (eventDays.length === 0) {
     return <CenteredActivityIndicator />;

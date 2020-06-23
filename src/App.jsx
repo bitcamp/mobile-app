@@ -1,7 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { enableScreens } from "react-native-screens";
 import Login from "./screens/Login";
 import AppLoadingScreen from "./screens/AppLoadingScreen";
 import AppContainer from "./screens/AppContainer";
@@ -10,9 +9,6 @@ import MapModal from "./screens/modals/MapModal";
 import SearchModal from "./screens/modals/SearchModal";
 import EventModal from "./screens/modals/EventModal";
 import QuestionModal from "./screens/modals/QuestionModal";
-
-// React-native-screens optimization
-enableScreens();
 
 const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();

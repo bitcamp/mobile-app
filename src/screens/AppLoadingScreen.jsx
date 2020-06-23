@@ -16,7 +16,7 @@ export default class AppLoadingScreen extends Component {
     try {
       const userInfo = await AsyncStorage.getItem("USER_DATA_STORE");
 
-      if (userInfo != null) {
+      if (userInfo !== null) {
         navigate("app");
       } else {
         navigate("login");
