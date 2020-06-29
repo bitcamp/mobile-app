@@ -16,7 +16,7 @@ export default function EventColumns({ origin, eventsArr }) {
         keyExtractor={event => event.id.toString()}
         initialNumToRender={3}
         ListEmptyComponent={<H3>No events at this time.</H3>}
-        data={eventsArr}
+        data={eventsArr ? eventsArr.slice(0, 10) : []}
         renderItem={({ item: event }) => (
           <View style={styles.column}>
             <EventCard event={event} origin={origin} />

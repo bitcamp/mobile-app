@@ -26,7 +26,7 @@ function FollowingProvider({ children }) {
   // `followCounts` is an object that maps event ids to follow counts
   const {
     data: followCounts,
-    status: followCountStatus,
+    isFetching: followCountsFetching,
     error: followCountError,
     refetch: fetchFollowCounts,
   } = useCachedGetRequest(followCountKey, {
@@ -38,7 +38,7 @@ function FollowingProvider({ children }) {
   // `userFollowedEvents` is a Set() of event ids that the user follows
   const {
     data: userFollowedEvents,
-    status: userFollowedStatus,
+    isFetching: userFollowedEventsFetching,
     error: userFollowedError,
     refetch: fetchUserFollowedEvents,
   } = useCachedGetRequest(userFollowedEventsKey, {
@@ -138,32 +138,21 @@ function FollowingProvider({ children }) {
     ]
   );
 
-  const mergedStatus = useMemo(() => {
-    if (followCountStatus === "error" || userFollowedStatus === "error") {
-      return "error";
-    }
-
-    if (followCountStatus === "loading" || userFollowedStatus === "loading") {
-      return "loading";
-    }
-
-    return "success";
-  }, [followCountStatus, userFollowedStatus]);
-
   // Value provided by the context
   const state = useMemo(
     () => ({
       userFollowedEvents,
       followCounts,
       error: followCountError || userFollowedError,
-      status: mergedStatus,
+      isFetching: followCountsFetching || userFollowedEventsFetching,
     }),
     [
       followCountError,
       followCounts,
-      mergedStatus,
+      followCountsFetching,
       userFollowedError,
       userFollowedEvents,
+      userFollowedEventsFetching,
     ]
   );
 

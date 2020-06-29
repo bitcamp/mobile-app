@@ -25,10 +25,3 @@ export function useEventActions() {
 
   return actions;
 }
-
-/**
- * Returns an array containing the state and actions for the events context
- */
-export function useEventsContext() {
-  return [useEventsState(), useEventActions()];
-}

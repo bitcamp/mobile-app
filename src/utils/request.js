@@ -47,7 +47,7 @@ export default async function request(routeOrURL, options = {}) {
   }
 
   try {
-    return await response.json();
+    return response.json();
   } catch (e) {
     throw new Error(`Unable to parse JSON for ${url}: ${e.message}`);
   }

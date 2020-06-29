@@ -6,21 +6,19 @@ import CountdownTimer from "../components/CountdownTimer";
 import EventColumns from "../components/events/EventColumns";
 import { H2 } from "../components/Text";
 import HappeningNowSlideshow from "../components/HappeningNowSlideshow";
-import { useEventsContext } from "../contexts/EventsContext/EventsHooks";
+import { useEventActions } from "../contexts/EventsContext/EventsHooks";
 import { useFollowingState } from "../contexts/FollowingContext/FollowingHooks";
+import EventsErrorHandler from "../components/events/EventsErrorHandler";
 
 export default function Home() {
-  const [
-    { eventsList },
-    { getFeaturedEvents, getPopularEvents },
-  ] = useEventsContext();
+  const { getFeaturedEvents, getPopularEvents } = useEventActions();
 
   const { followCounts } = useFollowingState();
 
   // TODO: create a common component for this
   const renderPopularEventsSection = () => {
     const heading = "Popular Events";
-    const events = getPopularEvents(followCounts).slice(0, 10);
+    const events = followCounts && getPopularEvents(followCounts);
 
     return (
       <View style={styles.subSection}>
@@ -37,7 +35,7 @@ export default function Home() {
   // TODO: create a common component for this (same as above)
   const renderBestForBeginnersSection = () => {
     const heading = "Featured Events";
-    const events = getFeaturedEvents().slice(0, 10);
+    const events = getFeaturedEvents();
 
     return (
       <View style={styles.subSection}>
@@ -49,27 +47,21 @@ export default function Home() {
     );
   };
 
-  const renderHappeningNow = () => {
-    return (
-      <View style={styles.subSection}>
-        <HappeningNowSlideshow />
-      </View>
-    );
-  };
+  const renderHappeningNow = () => (
+    <View style={styles.subSection}>
+      <HappeningNowSlideshow />
+    </View>
+  );
 
   return (
-    <ViewContainer>
-      <CountdownTimer />
-      {eventsList ? (
-        <>
-          {renderHappeningNow()}
-          {renderPopularEventsSection()}
-          {renderBestForBeginnersSection()}
-        </>
-      ) : (
-        <H2>No events</H2>
-      )}
-    </ViewContainer>
+    <EventsErrorHandler>
+      <ViewContainer>
+        <CountdownTimer />
+        {renderHappeningNow()}
+        {renderPopularEventsSection()}
+        {renderBestForBeginnersSection()}
+      </ViewContainer>
+    </EventsErrorHandler>
   );
 }
 

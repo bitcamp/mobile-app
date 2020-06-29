@@ -15,6 +15,7 @@ import TabbedEventDays from "../../components/TabbedEventDays";
 import { useEventsState } from "../../contexts/EventsContext/EventsHooks";
 import { EVENT_CATEGORIES } from "../../hackathon.config";
 import EventDay from "../../contexts/EventsContext/EventDay";
+import EventsErrorHandler from "../../components/events/EventsErrorHandler";
 
 /**
  * Displays a searchable schedule containing all of the events.
@@ -30,7 +31,7 @@ export default function SearchModal() {
     const escapedQuery = escapeRegExp(searchQuery.toLowerCase());
     let newSchedule = [];
 
-    if (searchQuery !== "") {
+    if (searchQuery !== "" && eventDays) {
       // Filter out any event that doesn't match the query
       newSchedule = eventDays
         .map(({ date, eventGroups }) => {
@@ -129,7 +130,9 @@ export default function SearchModal() {
           />
         </View>
       </View>
-      <TabbedEventDays eventDays={filteredSchedule} origin="Search" />
+      <EventsErrorHandler>
+        <TabbedEventDays eventDays={filteredSchedule} origin="Search" />
+      </EventsErrorHandler>
     </FullScreenModal>
   );
 }

@@ -5,7 +5,7 @@ import request from "../../utils/request";
 import { returnSelf } from "../../utils/simpleFunctions";
 
 const defaultGetConfig = {
-  retry: true,
+  retry: 1, // TODO: tweak this values
   refetchInterval: 60 * 1000,
 };
 
@@ -33,6 +33,7 @@ export default function useCachedGetRequest(
   const cacheKey = JSON.stringify(queryKey);
 
   // Cached data (will be immediately overwritten by any valid data)
+  const [cacheWasAccessed, setCacheWasAccessed] = useState(false);
   const [restoredData, setRestoredData] = useState(null);
 
   // Performs a standard GET reqeust and caches the result using AsyncStorage. Any errors
@@ -42,12 +43,16 @@ export default function useCachedGetRequest(
       const data = await request(...args);
 
       AsyncStorage.setItem(cacheKey, JSON.stringify(data)).catch(e =>
-        console.warn(`Error caching response for ${queryKey}: ${e.message}`)
+        console.warn(`Error caching response for ${cacheKey}: ${e.message}`)
       );
 
-      return postProcess(data);
+      try {
+        return postProcess(data);
+      } catch (e) {
+        throw new Error(`Error processing data from ${cacheKey}: ${e.message}`);
+      }
     },
-    [cacheKey, postProcess, queryKey]
+    [cacheKey, postProcess]
   );
 
   // Raw query hook
@@ -66,19 +71,18 @@ export default function useCachedGetRequest(
     let didUnmount = false;
 
     // Only try to restore the cache once when the component using this hook mounts
-    if (!restoredData) {
+    if (!cacheWasAccessed) {
+      setCacheWasAccessed(true);
+
       const restoreDataFromCache = async () => {
         // Get cached response from AsyncStorage
         let dataFromCache = null;
         try {
-          dataFromCache = JSON.parse(await AsyncStorage.getItem(cacheKey));
-
-          if (dataFromCache) {
-            dataFromCache = postProcess(dataFromCache);
-          }
+          const rawData = JSON.parse(await AsyncStorage.getItem(cacheKey));
+          dataFromCache = rawData && postProcess(rawData);
         } catch (e) {
-          console.warn(
-            `Error restoring cached response for ${cacheKey}: ${e.message}`
+          console.log(
+            `Error restoring cached response for ${cacheKey}, fetching data from backend...`
           );
         }
 
@@ -94,7 +98,7 @@ export default function useCachedGetRequest(
     return () => {
       didUnmount = true;
     };
-  }, [cacheKey, postProcess, restoredData]);
+  }, [cacheKey, cacheWasAccessed, postProcess, restoredData]);
 
   return {
     ...queryResults,

@@ -7,7 +7,6 @@ import {
   computeFeaturedEvents,
 } from "./eventUtils";
 import useCachedGetRequest from "../../hooks/requests/useCachedGetRequest";
-import { BASE_URL } from "../../api.config";
 import mockFlattenedSchedule from "../../mockData/mockFlattenedSchedule";
 
 const EventsContext = createContext();
@@ -25,10 +24,10 @@ function EventsProvider({ children }) {
   // }`
   const {
     data: events,
-    status,
     error,
+    isFetching,
     refetch: fetchEvents,
-  } = useCachedGetRequest(`${BASE_URL}/events`, {
+  } = useCachedGetRequest(`/events`, {
     variables: [{ responseData: mockFlattenedSchedule }],
     postProcess: processRawEvents,
   });
@@ -86,10 +85,10 @@ function EventsProvider({ children }) {
       eventsList: events && events.list,
       eventsById: events && events.byId,
       eventDays: events && events.days,
-      status,
+      isFetching,
       error,
     }),
-    [error, events, status]
+    [error, events, isFetching]
   );
 
   return (

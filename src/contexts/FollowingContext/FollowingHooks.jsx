@@ -26,10 +26,3 @@ export function useFollowingActions() {
 
   return actions;
 }
-
-/**
- * Returns an array containing the state and actions for the following context
- */
-export function useFollowingContext() {
-  return [useFollowingState(), useFollowingActions()];
-}

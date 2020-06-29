@@ -86,16 +86,16 @@ describe("processRawEvents", () => {
       _.shuffle([...invalidEvents, ...validEvents])
     );
 
-    expect(processedEvents.length).toEqual(validEvents.length);
-    expect(processedEvents).toEqual(expect.arrayContaining(validEvents));
+    expect(processedEvents.list.length).toEqual(validEvents.length);
+    expect(processedEvents.list).toEqual(expect.arrayContaining(validEvents));
   });
 
   it("Sets event.description = '' and event.caption = '' when those fields are ommitted", () => {
     const { description, ...noDescription } = validEvents[0];
     const { caption, ...noCaption } = validEvents[0];
 
-    expect(processRawEvents([noDescription])[0].description).toEqual("");
-    expect(processRawEvents([noCaption])[0].caption).toEqual("");
+    expect(processRawEvents([noDescription]).list[0].description).toEqual("");
+    expect(processRawEvents([noCaption]).list[0].caption).toEqual("");
   });
 });
 

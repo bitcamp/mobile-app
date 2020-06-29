@@ -12,7 +12,7 @@ const successfulFetch = {
 };
 
 // Mocks
-jest.mock("../mockData/mockFetch");
+jest.mock("../../mockData/mockFetch");
 mockFetch.mockResolvedValue(successfulFetch);
 
 describe("request()", () => {
@@ -117,6 +117,9 @@ describe("request()", () => {
     const route = "/some/random/route";
     await request(route);
 
-    expect(mockFetch).toHaveBeenLastCalledWith(`${BASE_URL}${route}`);
+    expect(mockFetch).toHaveBeenLastCalledWith(
+      `${BASE_URL}${route}`,
+      expect.anything()
+    );
   });
 });

@@ -205,7 +205,9 @@ describe("new Event()", () => {
     expect(new Event(eventObj)).toEqual(eventObj);
   });
 
-  it("event.startTimeFormatted returns a time in the form hh:mm a", () => {
+  // TODO: eventually remove these in place of UI-centered tests for the components
+  // that use these fields.
+  it("has a field `startTimeFormatted` that returns a time in the form hh:mm a", () => {
     const eventObj = {
       ...mockFlattenedSchedule[0],
       startTime: "2020-06-21 13:00:12",
