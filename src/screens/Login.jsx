@@ -10,10 +10,11 @@ import colors from "../components/Colors";
 import KeyboardShift from "../components/KeyboardShift";
 import mockFetch from "../mockData/mockFetch";
 import mockUser from "../mockData/mockUser";
+import { HACKATHON_NAME, HACKATHON_YEAR } from "../hackathon.config";
 
-const APP_ID = "@com.technica.technica18:";
-const USER_TOKEN = `${APP_ID}JWT`;
-const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
+// const APP_ID = "@com.technica.technica18:";
+// const USER_TOKEN = `${APP_ID}JWT`;
+// const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
 const USER_DATA_STORE = "USER_DATA_STORE";
 const EXPO_ENDPOINT = "https://api.bit.camp/api/firebaseEvents/favoriteCounts/";
 
@@ -27,8 +28,8 @@ export default class Login extends Component {
       savedEmail: "",
       fieldValue: "",
       placeholder: "",
-      greeting: "Welcome to \nBitcamp 2019",
-      instruction: "Enter the email you used to sign up for Bitcamp.",
+      greeting: `Welcome to \n${HACKATHON_NAME} ${HACKATHON_YEAR}`,
+      instruction: `Enter the email you used to sign up for ${HACKATHON_NAME}.`,
       isOnEmailPage: true,
       isError: false,
       errorMsg: "",
@@ -49,10 +50,10 @@ export default class Login extends Component {
     const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
     if (status === "granted") {
-      const token = await Notifications.getExpoPushTokenAsync();
-
       try {
-        mockFetch(EXPO_ENDPOINT, null, {
+        const token = await Notifications.getExpoPushTokenAsync();
+
+        mockFetch(EXPO_ENDPOINT, {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -91,7 +92,7 @@ export default class Login extends Component {
     if (Login.isValidEmail(email)) {
       const url = "https://api.bit.camp/auth/login/requestCode";
       try {
-        const response = await mockFetch(url, null, {
+        const response = await mockFetch(url, {
           method: "POST",
           headers: {
             Accept: "application/json",
@@ -112,8 +113,7 @@ export default class Login extends Component {
         } else {
           this.setState({
             isError: true,
-            errorMsg:
-              "Your email was not found. If you recently registered for Bitcamp, please try again in 24 hrs.",
+            errorMsg: `Your email was not found. If you recently registered for ${HACKATHON_NAME}, please try again in 24 hrs.`,
           });
         }
       } catch (error) {
@@ -136,7 +136,8 @@ export default class Login extends Component {
     const url = "https://api.bit.camp/auth/login/code";
     try {
       const email = savedEmail;
-      const response = await mockFetch(url, mockUser, {
+      const response = await mockFetch(url, {
+        responseData: mockUser,
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -146,17 +147,11 @@ export default class Login extends Component {
       });
       const responseJson = await response.json();
       if (response.status === 200) {
-        /* call mockFetch with parameters */
         Login.registerForPushNotificationsAsync();
-
-        const userFavoritedEvents = Login.processUserEvents(
-          responseJson.user.favoritedFirebaseEvents
-        );
         // Store data in AsyncStorage, then reset state
         await AsyncStorage.multiSet([
-          [USER_DATA_STORE, JSON.stringify(responseJson.user)],
-          [USER_TOKEN, responseJson.token],
-          [EVENT_FAVORITED_STORE, JSON.stringify(userFavoritedEvents)],
+          [USER_DATA_STORE, JSON.stringify(responseJson)],
+          // [USER_TOKEN, responseJson.token], TODO: fix
         ]);
 
         this.setState(Login.createInitialState());

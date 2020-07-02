@@ -19,6 +19,7 @@ import ExternalLink from "../../components/ExternalLink";
 import { scale, verticalScale } from "../../utils/scale";
 import mockFetch from "../../mockData/mockFetch";
 import { questionType } from "../../utils/PropTypeUtils";
+import { HACKATHON_NAME } from "../../hackathon.config";
 
 const serverURL = "https://guarded-brook-59345.herokuapp.com";
 
@@ -86,7 +87,7 @@ export default class QuestionModal extends Component {
       }
 
       const questionString = JSON.stringify(questionObject);
-      mockFetch(`${serverURL}/question`, null, {
+      mockFetch(`${serverURL}/question`, {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -211,14 +212,14 @@ export default class QuestionModal extends Component {
               onChangeText={text => this.setState({ slackUsername: text })}
               value={slackUsername}
               underlineColorAndroid="transparent"
-              placeholder="Slack Username (bitcamper)"
+              placeholder="Slack Username (hacker1337)"
               placeholderTextColor={colors.textColor.light}
               autoCapitalize="none"
             />
             <View style={styles.inputDescriptionContainer}>
               {// In order for the link and the rest of the paragraph to display on one block,
               // we split the message into words and make each word its own text element
-              "A Bitcamp mentor will respond to your message over Slack and may approach your table to assist if needed. Make sure that you"
+              `A ${HACKATHON_NAME} mentor will respond to your message over Slack and may approach your table to assist if needed. Make sure that you`
                 .split(" ")
                 .map((word, index) => (
                   // Since we are using a constant string whose words will not be rearranged,
@@ -229,7 +230,7 @@ export default class QuestionModal extends Component {
                   </P>
                 ))}
               <ExternalLink
-                text="join Bitcamp's Slack workspace."
+                text={`join ${HACKATHON_NAME}'s Slack workspace.`}
                 url="https://bit.camp/slack"
               />
             </View>

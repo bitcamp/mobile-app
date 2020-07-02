@@ -4,15 +4,17 @@
  *
  * TODO: phase this function out once the app's backend is setup
  *
- * @param {*} url The fetch location (currently unused)
- * @param {*} resData The data you want the code to respond with
- * @param {*} options The options (currently unused)
+ * @param {string} url The fetch location (currently unused)
+ * @param {any} options.responseData The data you want the code to respond with
+ * @param {...object} options.fetchOptions The options for fetch (currently unused)
  * @returns a promise that returns a Response object with a 200 status.
- * To access the response data, call the object's .json() method
+ * To access the response data, call the `.json()` method
  */
-export default async function mockFetch(url, respData) {
+export default async function mockFetch(url, options) {
+  const { responseData = null } = options;
+
   return {
-    json: async () => respData,
+    json: async () => responseData,
     status: 200,
     statusText: "OK",
     ok: true,

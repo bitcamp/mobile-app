@@ -1,7 +1,6 @@
 import React from "react";
 import ClickableEvent from "./ClickableEvent";
 import Banner from "../Banner";
-import Images from "../../../assets/imgs/index";
 
 /**
  * A full-width banner for an event that can be clicked to reveal a modal
@@ -9,9 +8,9 @@ import Images from "../../../assets/imgs/index";
 const EventBanner = ({ event, origin }) => (
   <ClickableEvent event={event} origin={origin}>
     <Banner
-      title={event.titleClipped}
+      title={event.title}
       description="HAPPENING NOW"
-      imageSource={Images[event.img]}
+      imageSource={event.image}
     />
   </ClickableEvent>
 );

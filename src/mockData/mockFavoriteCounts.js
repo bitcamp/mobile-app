@@ -1,3 +1,4 @@
+// Old format for storing favorite counts
 export default {
   20051: 100,
   20052: 100,

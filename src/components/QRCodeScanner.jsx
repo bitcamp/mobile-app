@@ -4,6 +4,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import { Ionicons } from "@expo/vector-icons";
 import PropTypes from "prop-types";
 import { H3 } from "./Text";
+import { HACKATHON_NAME } from "../hackathon.config";
 
 // TODO: rework the props and displays on error
 // This example was adapted from the expo website:
@@ -22,8 +23,8 @@ export default function QRCodeScanner({ scannerIsOn, onScan }) {
     return (
       <View style={styles.container}>
         <H3 style={styles.centeredText}>
-          To enable the scanner, give Bitcamp access to your device&apos;s
-          camera.
+          {`To enable the scanner, give ${HACKATHON_NAME} access to your device&apos;s
+          camera.`}
         </H3>
       </View>
     );

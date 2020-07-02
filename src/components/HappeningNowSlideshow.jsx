@@ -1,50 +1,51 @@
-import PropTypes from "prop-types";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Swiper from "react-native-swiper";
 import { StyleSheet } from "react-native";
 import colors from "./Colors";
 import Images from "../../assets/imgs/index";
-import EventsManager from "../events/EventsManager";
 import EventBanner from "./events/EventBanner";
 import Banner from "./Banner";
 import { getImageHeight } from "../utils/sizing";
-import Event from "../events/Event";
+import { hackingHasEnded } from "../utils/time";
+import { useEventActions } from "../contexts/EventsContext/EventsHooks";
+import { HACKATHON_NAME, HACKATHON_YEAR } from "../hackathon.config";
 
 /**
  * A slideshow that displays the events that are currently happening
  */
-const HappeningNowSlideshow = ({ dataSource, eventManager }) => {
+const HappeningNowSlideshow = () => {
+  const { getOngoingEvents } = useEventActions();
+  const [happeningNow, setHappeningNow] = useState([]);
+
+  // Update the events that are happening now every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHappeningNow(getOngoingEvents());
+    }, 1000 * 60);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [getOngoingEvents]);
+
   // If there are now events happening now, display a default banner
-  if (dataSource.length === 0) {
+  if (happeningNow.length === 0) {
     return (
       <Banner
-        imageSource={Images.banner_campfire}
+        imageSource={Images["banner-campfire"]}
         title={
-          EventsManager.hackingHasEnded()
-            ? "Thanks for Hacking!"
-            : "No events at this time"
+          hackingHasEnded() ? "Thanks for Hacking!" : "No events at this time"
         }
         description={
-          EventsManager.hackingHasEnded() ? "Bitcamp 2019" : "HAPPENING NOW"
+          hackingHasEnded()
+            ? `${HACKATHON_NAME} ${HACKATHON_YEAR}`
+            : "HAPPENING NOW"
         }
       />
     );
   }
 
-  const slideshowContent = dataSource.map(event => (
-    <EventBanner
-      key={event.eventID}
-      event={event}
-      eventManager={eventManager}
-    />
-  ));
-
   return (
-    // <EventBanner
-    //   key="Cool Event Banner"
-    //   event={dataSource[0]}
-    //   eventManager={eventManager}
-    // />
     <Swiper
       height={getImageHeight()}
       dotColor="rgba(255,255,255,.6)"
@@ -54,7 +55,9 @@ const HappeningNowSlideshow = ({ dataSource, eventManager }) => {
       autoplayTimeout={5}
       loop
     >
-      {slideshowContent}
+      {happeningNow.map(event => (
+        <EventBanner key={event.id} event={event} />
+      ))}
     </Swiper>
   );
 };
@@ -62,10 +65,5 @@ const HappeningNowSlideshow = ({ dataSource, eventManager }) => {
 const styles = StyleSheet.create({
   swiper: { bottom: 18 },
 });
-
-HappeningNowSlideshow.propTypes = {
-  dataSource: PropTypes.arrayOf(PropTypes.instanceOf(Event)).isRequired,
-  eventManager: PropTypes.instanceOf(EventsManager).isRequired,
-};
 
 export default HappeningNowSlideshow;

@@ -3,14 +3,9 @@ import { StyleSheet, View, ViewPropTypes } from "react-native";
 import PropTypes from "prop-types";
 import { scale } from "../utils/scale";
 import { BaseText } from "./Text";
-import { eventCategories } from "../events/eventConfig";
+import { EVENT_CATEGORIES } from "../hackathon.config";
 
 export default function PillBadge({ category, isBigger, style }) {
-  // TODO: change event categories in the backend so this isn't necessary
-  const text = ["Main", "Mini"].includes(category)
-    ? `${category}-Event`
-    : category;
-
   return (
     <View
       style={[
@@ -31,14 +26,14 @@ export default function PillBadge({ category, isBigger, style }) {
           isBigger && styles.largeText,
         ]}
       >
-        {text.toUpperCase()}
+        {category.toUpperCase()}
       </BaseText>
     </View>
   );
 }
 
 PillBadge.propTypes = {
-  category: PropTypes.oneOf(eventCategories).isRequired,
+  category: PropTypes.oneOf(EVENT_CATEGORIES).isRequired,
   style: ViewPropTypes.style,
   isBigger: PropTypes.bool,
 };
@@ -60,29 +55,25 @@ const badgeColors = {
 const bgTransparencyInHex = "40";
 
 const badgeStyles = {
-  Main: {
+  "main-event": {
     textColor: badgeColors.green,
     backgroundColor: `${badgeColors.green}${bgTransparencyInHex}`,
   },
-  Food: {
-    textColor: badgeColors.red,
-    backgroundColor: `${badgeColors.red}${bgTransparencyInHex}`,
-  },
-  Mini: {
+  "mini-event": {
     textColor: badgeColors.yellow,
     backgroundColor: `${badgeColors.yellow}${bgTransparencyInHex}`,
   },
-  Workshop: {
+  food: {
+    textColor: badgeColors.red,
+    backgroundColor: `${badgeColors.red}${bgTransparencyInHex}`,
+  },
+  workshop: {
     textColor: badgeColors.purple,
     backgroundColor: `${badgeColors.purple}${bgTransparencyInHex}`,
   },
-  Sponsor: {
+  sponsored: {
     textColor: badgeColors.blue,
     backgroundColor: `${badgeColors.blue}${bgTransparencyInHex}`,
-  },
-  Mentor: {
-    textColor: badgeColors.turquoise,
-    backgroundColor: `${badgeColors.turquoise}${bgTransparencyInHex}`,
   },
 };
 

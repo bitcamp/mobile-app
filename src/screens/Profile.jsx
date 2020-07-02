@@ -57,7 +57,7 @@ export default class Profile extends Component {
       // work with expo
       const keys = [USER_DATA_STORE, USER_TOKEN];
       AsyncStorage.multiRemove(keys).then(() => {
-        navigate("Login");
+        navigate("login");
       });
     }
 

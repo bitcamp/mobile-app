@@ -14,6 +14,7 @@ import { scale } from "../utils/scale";
 import mockFetch from "../mockData/mockFetch";
 import mockQuestions from "../mockData/mockQuestions";
 import { questionType } from "../utils/PropTypeUtils";
+import { HACKATHON_NAME } from "../hackathon.config";
 
 // TODO: move to somewhere central
 const serverURL = "https://guarded-brook-59345.herokuapp.com";
@@ -55,7 +56,8 @@ export default class Mentors extends Component {
   }
 
   async grabQuestionsFromDB(email) {
-    mockFetch(`${serverURL}/getquestions/${email}`, mockQuestions, {
+    mockFetch(`${serverURL}/getquestions/${email}`, {
+      responseData: mockQuestions,
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -123,8 +125,7 @@ export default class Mentors extends Component {
           Get help from a mentor
         </H2>
         <P style={styles.helpDescription}>
-          Bitcamp mentors are experts in helping you with your hack or answering
-          any additional questions you might have.
+          {`${HACKATHON_NAME} mentors are experts in helping you with your hack or answering any additional questions you might have.`}
         </P>
       </View>
     );

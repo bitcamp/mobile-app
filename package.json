@@ -7,7 +7,9 @@
     "web": "expo start --web",
     "eject": "expo eject",
     "lint": "eslint --ext .js,.jsx .",
-    "lint:fix": "eslint --ext .js,.jsx . --fix"
+    "lint:fix": "eslint --ext .js,.jsx . --fix",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
   "dependencies": {
     "@expo/vector-icons": "^10.0.0",
@@ -42,10 +44,15 @@
     "react-native-tiny-toast": "^1.0.6",
     "react-native-vector-icons": "^6.6.0",
     "react-native-web": "^0.11.7",
-    "react-native-webview": "8.1.1"
+    "react-native-webview": "8.1.1",
+    "react-query": "^1.5.8",
+    "yup": "^0.29.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@jest/globals": "^26.0.1",
+    "@testing-library/react-hooks": "^3.3.0",
+    "@testing-library/react-native": "^5.0.3",
     "babel-eslint": "^10.0.3",
     "babel-preset-expo": "^8.1.0",
     "eslint": "5.16.0",
@@ -57,7 +64,16 @@
     "eslint-plugin-react": "^7.17.0",
     "eslint-plugin-react-hooks": "1.7.0",
     "eslint-plugin-react-native": "^3.8.1",
-    "prettier": "^1.19.1"
+    "jest": "^26.0.1",
+    "miragejs": "^0.1.40",
+    "prettier": "^1.19.1",
+    "react-test-renderer": "^16.13.1"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "./jest.setup.js"
+    ]
   },
   "private": true
 }

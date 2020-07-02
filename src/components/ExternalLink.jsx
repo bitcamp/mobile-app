@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { Linking } from "expo";
 import { BaseText } from "./Text";
 import colors from "./Colors";
-import { noop } from "../utils/PropTypeUtils";
+import { noOp } from "../utils/simpleFunctions";
 
 export default class ExternalLink extends React.Component {
   openURL() {
@@ -19,7 +19,7 @@ export default class ExternalLink extends React.Component {
     Alert.alert(
       "Sorry, something went wrong",
       `Unable to open ${url}`,
-      [{ text: "OK", onPress: noop }],
+      [{ text: "OK", onPress: noOp }],
       { cancelable: false }
     );
   }

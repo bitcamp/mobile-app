@@ -1,38 +1,35 @@
 import ScrollableTabView from "react-native-scrollable-tab-view";
-import React, { useContext } from "react";
+import React from "react";
 import { StyleSheet, SectionList, View } from "react-native";
 import PropTypes from "prop-types";
 import sectionListGetItemLayout from "react-native-section-list-get-item-layout";
+import moment from "moment";
 import SwipableTabBar from "./SwipableTabBar";
-import EventDay from "../events/EventDay";
-import { EventsContext } from "../events/EventsContext";
 import colors from "./Colors";
 import { BaseText } from "./Text";
 import EventDescription, {
   eventDescriptionHeight,
 } from "./schedule/EventDescription";
+import EventDay from "../contexts/EventsContext/EventDay";
+import Event from "../contexts/EventsContext/Event";
+
+// Simple components for the section list
+const EventDescriptionWrapper = ({ item: event, origin }) => (
+  <EventDescription event={event} origin={origin} />
+);
+
+const TimeHeader = ({ section: { time } }) => (
+  <View style={styles.headerContainer}>
+    <BaseText style={styles.header}>{time}</BaseText>
+  </View>
+);
+
 /**
  * Lists all of the events in through props, split into tabs based on their start date.
  * Optionally takes in a list of additional tabs to render (e.g., a saved events tab).
  * Each tab in this list must have its own tabLabel.
  */
 export default function TabbedEventDays({ eventDays, extraTabs, origin }) {
-  const { eventsManager } = useContext(EventsContext);
-
-  const renderEventCard = ({ item: event }) => (
-    <EventDescription
-      event={event}
-      eventManager={eventsManager}
-      origin={origin}
-    />
-  );
-
-  const renderTimeHeader = ({ section: { title } }) => (
-    <View style={styles.headerContainer}>
-      <BaseText style={styles.header}>{title}</BaseText>
-    </View>
-  );
-
   const getItemLayout = sectionListGetItemLayout({
     getItemHeight: () => eventDescriptionHeight,
     getSeparatorHeight: () => itemSeperatorHeight,
@@ -43,13 +40,15 @@ export default function TabbedEventDays({ eventDays, extraTabs, origin }) {
     return (
       <SectionList
         sections={eventDay.eventGroups}
-        renderItem={renderEventCard}
-        keyExtractor={event => event.eventID}
-        key={eventDay.label}
-        tabLabel={eventDay.label}
+        renderItem={({ item }) => (
+          <EventDescriptionWrapper item={item} origin={origin} />
+        )}
+        keyExtractor={event => event.id}
+        key={eventDay.date}
+        tabLabel={eventDay.weekDay}
         style={styles.tabView}
         ItemSeparatorComponent={() => <View style={styles.seperator} />}
-        renderSectionHeader={renderTimeHeader}
+        renderSectionHeader={({ section }) => <TimeHeader section={section} />}
         getItemLayout={getItemLayout}
       />
     );
@@ -104,4 +103,15 @@ TabbedEventDays.propTypes = {
 
 TabbedEventDays.defaultProps = {
   extraTabs: null,
+};
+
+EventDescriptionWrapper.propTypes = {
+  item: PropTypes.instanceOf(Event).isRequired,
+  origin: PropTypes.string.isRequired,
+};
+
+TimeHeader.propTypes = {
+  section: PropTypes.shape({
+    time: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(moment)]),
+  }).isRequired,
 };

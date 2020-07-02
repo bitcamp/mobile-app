@@ -1,8 +1,9 @@
 import React from "react";
-import { View, TouchableOpacity, ViewPropTypes } from "react-native";
+import { ViewPropTypes } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import PropTypes from "prop-types";
 import { useNavigation } from "@react-navigation/native";
-import Event from "../../events/Event";
+import Event from "../../contexts/EventsContext/Event";
 
 /**
  * A card that will reveal a modal with extra info about an event when clicked
@@ -13,11 +14,9 @@ export default function ClickableEvent({ style, event, origin, children }) {
   const openModal = () => navigation.navigate("event modal", { event, origin });
 
   return (
-    <View style={style}>
-      <TouchableOpacity onPress={openModal} activeOpacity={0.7}>
-        {children}
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity onPress={openModal} activeOpacity={0.7} style={style}>
+      {children}
+    </TouchableOpacity>
   );
 }
 
