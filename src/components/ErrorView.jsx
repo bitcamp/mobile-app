@@ -14,17 +14,24 @@ import colors from "./Colors";
  * @param {Error|null} props.error The error object that is being monitored
  * @param {string} props.actionDescription The action that would be causing the error (e.g., fetching the events,
  * processing your _ request)
+ * @param {boolean} props.fullScreen Whether the component will take up the whole screen (determines the
+ * size of the error image)
  */
-export default function ErrorView({ error, actionDescription }) {
+export default function ErrorView({ error, actionDescription, fullScreen }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     error && (
       <View style={styles.container}>
-        <Image source={Images["error-logo"]} style={styles.errorImg} />
+        <Image
+          source={Images["error-logo"]}
+          style={[styles.errorImg, !fullScreen && styles.smallerImg]}
+        />
         <View>
-          <H2 style={styles.title}>Oops...</H2>
-          <H3 style={styles.description}>
+          <H2 style={[styles.title, !fullScreen && styles.smallerTitle]}>
+            Oops...
+          </H2>
+          <H3 style={[styles.description, !fullScreen && styles.smallerText]}>
             {`Looks like we encountered an error while ${actionDescription ||
               "loading the app"}. Sorry!`}
           </H3>
@@ -33,7 +40,9 @@ export default function ErrorView({ error, actionDescription }) {
           onPress={() => setIsExpanded(oldIsExpanded => !oldIsExpanded)}
           style={styles.row}
         >
-          <H3 style={styles.expandText}>See More</H3>
+          <H3 style={[styles.expandText, !fullScreen && styles.smallerText]}>
+            See More
+          </H3>
           <Ionicons
             name="ios-arrow-forward"
             size={20}
@@ -85,6 +94,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 15,
   },
+  smallerImg: {
+    height: 125,
+  },
+  smallerText: {
+    fontSize: 16,
+  },
+  smallerTitle: {
+    fontSize: 30,
+  },
   title: {
     fontSize: 40,
     paddingVertical: 15,
@@ -98,9 +116,11 @@ const styles = StyleSheet.create({
 ErrorView.propTypes = {
   error: PropTypes.instanceOf(Error),
   actionDescription: PropTypes.string,
+  fullScreen: PropTypes.bool,
 };
 
 ErrorView.defaultProps = {
   error: null,
   actionDescription: null,
+  fullScreen: false,
 };

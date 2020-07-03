@@ -24,7 +24,13 @@ export default class ErrorBoundary extends Component {
     const { children } = this.props;
     const { error } = this.state;
     if (error) {
-      return <ErrorView error={error} actionDescription="loading the app" />;
+      return (
+        <ErrorView
+          error={error}
+          actionDescription="loading the app"
+          fullScreen
+        />
+      );
     }
 
     return children;

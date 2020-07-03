@@ -7,7 +7,12 @@ import {
   View,
 } from "react-native";
 import PropTypes from "prop-types";
-import { Button, PadContainer, ViewContainer } from "../components/Base";
+import {
+  Button,
+  PadContainer,
+  ViewContainer,
+  CenteredActivityIndicator,
+} from "../components/Base";
 import QuestionCard from "../components/QuestionCard";
 import { H2, P } from "../components/Text";
 import { scale } from "../utils/scale";
@@ -15,6 +20,8 @@ import mockFetch from "../mockData/mockFetch";
 import mockQuestions from "../mockData/mockQuestions";
 import { questionType } from "../utils/PropTypeUtils";
 import { HACKATHON_NAME } from "../hackathon.config";
+import request from "../utils/request";
+import ErrorView from "../components/ErrorView";
 
 // TODO: move to somewhere central
 const serverURL = "https://guarded-brook-59345.herokuapp.com";
@@ -26,16 +33,18 @@ export default class Mentors extends Component {
     this.state = {
       appState: AppState.currentState,
       listData: [],
+      isLoading: true,
+      error: null,
     };
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
 
   // initially loads question data from server
-  async componentDidMount() {
+  componentDidMount() {
     AppState.addEventListener("change", this.handleAppStateChange);
-    const userData = await AsyncStorage.getItem("USER_DATA_STORE");
-    const userDataJSON = JSON.parse(userData);
-    this.grabQuestionsFromDB(userDataJSON.email);
+    AsyncStorage.getItem("USER_DATA_STORE")
+      .then(userDataStr => JSON.parse(userDataStr))
+      .then(user => this.grabQuestionsFromDB(user.email));
 
     const { navigation } = this.props;
 
@@ -56,18 +65,19 @@ export default class Mentors extends Component {
   }
 
   async grabQuestionsFromDB(email) {
-    mockFetch(`${serverURL}/getquestions/${email}`, {
-      responseData: mockQuestions,
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
-      .then(response => response.json())
-      .then(async responseJson => {
-        this.setState({ listData: responseJson });
+    try {
+      const listData = await request(`${serverURL}/getquestions/${email}`, {
+        responseData: mockQuestions,
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
       });
+      this.setState({ listData, isLoading: false });
+    } catch (error) {
+      this.setState({ error, isLoading: false });
+    }
 
     // TODO: add error handling
   }
@@ -131,10 +141,35 @@ export default class Mentors extends Component {
     );
   }
 
+  renderQuestions() {
+    const { listData, error } = this.state;
+
+    if (error) {
+      return (
+        <ErrorView error={error} actionDescription="loading your questions" />
+      );
+    }
+
+    return (
+      listData.length > 0 && (
+        <>
+          <H2 style={styles.bigTitle}>Your Questions</H2>
+          {listData.map(question => (
+            <QuestionCard
+              question={question.question}
+              status={question.status}
+              key={question.key}
+            />
+          ))}
+        </>
+      )
+    );
+  }
+
   render() {
     // this.createNotificationListener();
     const { navigation } = this.props;
-    const { listData } = this.state;
+    const { listData, isLoading } = this.state;
 
     return (
       <ViewContainer>
@@ -151,17 +186,7 @@ export default class Mentors extends Component {
           />
         </TouchableOpacity>
         <PadContainer>
-          {listData &&
-            listData.length > 0 && (
-              <H2 style={styles.bigTitle}>Your Questions</H2>
-            ) &&
-            listData.map(question => (
-              <QuestionCard
-                question={question.question}
-                status={question.status}
-                key={question.key}
-              />
-            ))}
+          {isLoading ? <CenteredActivityIndicator /> : this.renderQuestions()}
         </PadContainer>
       </ViewContainer>
     );

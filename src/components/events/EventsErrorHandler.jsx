@@ -56,7 +56,11 @@ export default function EventsErrorHandler({ children }) {
 
   return (
     <View style={styles.container}>
-      <ErrorView error={error} actionDescription="fetching event data" />
+      <ErrorView
+        error={error}
+        actionDescription="fetching event data"
+        fullScreen
+      />
       {myScreen}
     </View>
   );
