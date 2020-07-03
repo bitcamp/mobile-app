@@ -16,6 +16,7 @@ import { useEventsState } from "../../contexts/EventsContext/EventsHooks";
 import { EVENT_CATEGORIES } from "../../hackathon.config";
 import EventDay from "../../contexts/EventsContext/EventDay";
 import EventsErrorHandler from "../../components/events/EventsErrorHandler";
+import { useFollowingState } from "../../contexts/FollowingContext/FollowingHooks";
 
 /**
  * Displays a searchable schedule containing all of the events.
@@ -25,7 +26,8 @@ export default function SearchModal() {
   const [filteredSchedule, setFilteredSchedule] = useState([]);
   const navigation = useNavigation();
 
-  const { eventDays } = useEventsState();
+  const { eventDays, error: eventsError } = useEventsState();
+  const { error: followInfoError } = useFollowingState();
 
   const filterEvents = searchQuery => {
     const escapedQuery = escapeRegExp(searchQuery.toLowerCase());
@@ -93,7 +95,7 @@ export default function SearchModal() {
           onChangeText={searchQuery => filterEvents(searchQuery)}
           onClear={() => filterEvents("")}
           value={query}
-          autoFocus
+          autoFocus={!(eventsError || followInfoError)}
           autoCapitalize="none"
           containerStyle={styles.flexible}
           inputContainerStyle={styles.inputContainerStyle}

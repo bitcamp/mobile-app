@@ -15,6 +15,7 @@ const Images = {
 
   // Logos
   "hackathon-logo": require("./bitcamp-logo.png"),
+  "error-logo": require("./error-logo.png"),
 
   // Floor Maps
   floor1: require("./floor-maps/Floor_1.png"),

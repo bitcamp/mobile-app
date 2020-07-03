@@ -20,7 +20,9 @@ export default async function request(routeOrURL, options = {}) {
   const { accessToken, ...fetchOptions } = options;
 
   if (!routeOrURL) {
-    throw new Error(`The URL must be a string, received ${routeOrURL}`);
+    throw new Error(
+      `The URL to fetch must be a string, received ${routeOrURL}`
+    );
   }
 
   const url = routeOrURL[0] === "/" ? `${BASE_URL}${routeOrURL}` : routeOrURL;
@@ -47,7 +49,7 @@ export default async function request(routeOrURL, options = {}) {
   }
 
   try {
-    return response.json();
+    return await response.json();
   } catch (e) {
     throw new Error(`Unable to parse JSON for ${url}: ${e.message}`);
   }

@@ -1,18 +1,16 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import { StyleSheet, View } from "react-native";
-import { H1 } from "./Text";
-import { scale } from "../utils/scale";
+import ErrorView from "./ErrorView";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { error: false };
   }
 
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true };
+    return { error };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -24,32 +22,14 @@ export default class ErrorBoundary extends Component {
 
   render() {
     const { children } = this.props;
-    const { hasError } = this.state;
-    if (hasError) {
-      return (
-        <View style={styles.fullScreen}>
-          <H1 style={styles.errorMessage}>Encountered a fatal error.</H1>
-          <H1 style={styles.errorMessage}> Please reload the app.</H1>
-        </View>
-      );
+    const { error } = this.state;
+    if (error) {
+      return <ErrorView error={error} actionDescription="loading the app" />;
     }
 
     return children;
   }
 }
-
-const styles = StyleSheet.create({
-  errorMessage: {
-    fontSize: scale(25),
-    textAlign: "center",
-  },
-  fullScreen: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 10,
-  },
-});
 
 ErrorBoundary.propTypes = {
   children: PropTypes.node,

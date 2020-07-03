@@ -5,6 +5,7 @@ import { useEventsState } from "../../contexts/EventsContext/EventsHooks";
 import { useFollowingState } from "../../contexts/FollowingContext/FollowingHooks";
 import { H2 } from "../Text";
 import { CenteredActivityIndicator } from "../Base";
+import ErrorView from "../ErrorView";
 
 /**
  * Only displays its children if all of the data from the events/following contexts are loaded.
@@ -55,7 +56,7 @@ export default function EventsErrorHandler({ children }) {
 
   return (
     <View style={styles.container}>
-      {error && <H2 style={styles.errorText}>{error.message}</H2>}
+      <ErrorView error={error} actionDescription="fetching event data" />
       {myScreen}
     </View>
   );
@@ -64,9 +65,6 @@ export default function EventsErrorHandler({ children }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  errorText: {
-    padding: 10,
   },
 });
 

@@ -55,17 +55,19 @@ export default function TabbedEventDays({ eventDays, extraTabs, origin }) {
   };
 
   return (
-    <ScrollableTabView
-      style={styles.tabView}
-      initialPage={0}
-      prerenderingSiblingsNumber={1}
-      renderTabBar={({ goToPage, tabs, activeTab }) => (
-        <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
-      )}
-    >
-      {eventDays.map(renderTabForDay)}
-      {extraTabs}
-    </ScrollableTabView>
+    eventDays && (
+      <ScrollableTabView
+        style={styles.tabView}
+        initialPage={0}
+        prerenderingSiblingsNumber={1}
+        renderTabBar={({ goToPage, tabs, activeTab }) => (
+          <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
+        )}
+      >
+        {eventDays.map(renderTabForDay)}
+        {extraTabs}
+      </ScrollableTabView>
+    )
   );
 }
 
@@ -96,13 +98,14 @@ const styles = StyleSheet.create({
 });
 
 TabbedEventDays.propTypes = {
-  eventDays: PropTypes.arrayOf(PropTypes.instanceOf(EventDay)).isRequired,
+  eventDays: PropTypes.arrayOf(PropTypes.instanceOf(EventDay)),
   extraTabs: PropTypes.arrayOf(PropTypes.element.isRequired),
   origin: PropTypes.string.isRequired,
 };
 
 TabbedEventDays.defaultProps = {
   extraTabs: null,
+  eventDays: null,
 };
 
 EventDescriptionWrapper.propTypes = {
