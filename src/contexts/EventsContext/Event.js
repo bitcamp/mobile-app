@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import moment from "moment";
-import { getTimeOfDay, isValidTime } from "../../utils/time";
+import { getTimeOfDay, isValidTime } from "../../common/utils/time";
 import { EVENT_CATEGORIES } from "../../hackathon.config";
 import { getImage, getColor } from "../../style.config";
 

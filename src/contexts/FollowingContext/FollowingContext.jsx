@@ -1,10 +1,10 @@
 import React, { createContext, useMemo, useCallback, useState } from "react";
 import PropTypes from "prop-types";
 import { queryCache } from "react-query";
-import useCachedGetRequest from "../../hooks/requests/useCachedGetRequest";
+import useCachedGetRequest from "../../common/hooks/useCachedGetRequest";
 import { BASE_URL } from "../../api.config";
-import mockFollowCounts from "../../mockData/mockFollowCounts";
-import request from "../../utils/request";
+import mockFollowCounts from "../../common/mockData/mockFollowCounts";
+import request from "../../common/utils/request";
 import {
   computeFollowingCountObj,
   computeUserFollowedEventsSet,

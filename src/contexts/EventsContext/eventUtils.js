@@ -1,7 +1,7 @@
 import _ from "lodash";
 import moment from "moment";
 import EventDay from "./EventDay";
-import { getDay } from "../../utils/time";
+import { getDay } from "../../common/utils/time";
 import Event, { EVENT_SCHEMA } from "./Event";
 
 /**

@@ -3,11 +3,11 @@ import { registerRootComponent, AppLoading } from "expo";
 import { StatusBar } from "react-native";
 import { enableScreens } from "react-native-screens";
 import { ReactQueryConfigProvider } from "react-query";
-import App from "./App";
-import loadAssets from "./utils/loadAssets";
-import ErrorBoundary from "./components/ErrorBoundary";
+import RootStackScreen from "./navigation/RootStackScreen";
+import loadAssets from "./common/utils/loadAssets";
+import ErrorBoundary from "./common/components/ErrorBoundary";
 import { EventsProvider } from "./contexts/EventsContext/EventsContext";
-import colors from "./components/Colors";
+import colors from "./Colors";
 import { FollowingProvider } from "./contexts/FollowingContext/FollowingContext";
 
 // All app-wide configuration should go here
@@ -30,7 +30,7 @@ const Main = () => {
       <ReactQueryConfigProvider config={queryConfig}>
         <EventsProvider>
           <FollowingProvider>
-            <App />
+            <RootStackScreen />
           </FollowingProvider>
         </EventsProvider>
       </ReactQueryConfigProvider>
