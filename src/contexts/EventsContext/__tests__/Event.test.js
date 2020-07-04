@@ -1,6 +1,6 @@
 import { describe, it, expect } from "@jest/globals";
 import Event, { EVENT_SCHEMA } from "../Event";
-import mockFlattenedSchedule from "../../../mockData/mockFlattenedSchedule";
+import mockFlattenedSchedule from "../../../common/mockData/mockFlattenedSchedule";
 
 const validationOptions = { strict: true, abortEarly: true };
 

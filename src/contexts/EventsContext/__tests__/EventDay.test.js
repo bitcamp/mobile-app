@@ -5,8 +5,8 @@ import EventDay from "../EventDay";
 import {
   fridayTestEvents,
   saturdayTestEvents,
-} from "../../../mockData/mockFlattenedSchedule";
-import { getDay } from "../../../utils/time";
+} from "../../../common/mockData/mockFlattenedSchedule";
+import { getDay } from "../../../common/utils/time";
 
 it("Splits the provided events based on time", () => {
   const friday = moment("2020-06-12");

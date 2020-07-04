@@ -6,8 +6,8 @@ import {
   computePopularEvents,
   computeFeaturedEvents,
 } from "./eventUtils";
-import useCachedGetRequest from "../../hooks/requests/useCachedGetRequest";
-import mockFlattenedSchedule from "../../mockData/mockFlattenedSchedule";
+import useCachedGetRequest from "../../common/hooks/useCachedGetRequest";
+import mockFlattenedSchedule from "../../common/mockData/mockFlattenedSchedule";
 
 const EventsContext = createContext();
 const EventActionsContext = createContext();

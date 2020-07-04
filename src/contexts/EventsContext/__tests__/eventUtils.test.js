@@ -13,8 +13,8 @@ import {
   fridayTestEvents,
   saturdayTestEvents,
   sundayTestEvents,
-} from "../../../mockData/mockFlattenedSchedule";
-import mockFollowCounts from "../../../mockData/mockFollowCounts";
+} from "../../../common/mockData/mockFlattenedSchedule";
+import mockFollowCounts from "../../../common/mockData/mockFollowCounts";
 
 // Test data
 const testEvents = [
