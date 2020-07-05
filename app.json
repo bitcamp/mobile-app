@@ -3,14 +3,10 @@
     "name": "Bitcamp",
     "slug": "bitcamp",
     "version": "1.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "orientation": "portrait",
     "icon": "./assets/imgs/app-icon.png",
-    "entryPoint": "./index.jsx",
+    "entryPoint": "./src/index.jsx",
     "splash": {
       "image": "./assets/imgs/splash-screen.png",
       "resizeMode": "cover",
@@ -22,9 +18,7 @@
     "notification": {
       "iosDisplayInForeground": true
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.Bitcamp.Bitcamp",
       "buildNumber": "1.0.0"

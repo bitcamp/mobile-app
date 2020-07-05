@@ -3,19 +3,19 @@
 
 const Images = {
   // Banners
-  banner_food: require("./event-banners/food.jpg"),
-  banner_demo: require("./event-banners/demo.jpg"),
-  banner_main: require("./event-banners/main.jpg"),
-  banner_campfire: require("./event-banners/campfire.jpg"),
-  banner_sponsor: require("./event-banners/sponsor.jpg"),
-  banner_mentor: require("./event-banners/mentors.jpg"),
-  banner_mini: require("./event-banners/minievent.jpg"),
-  banner_workshop: require("./event-banners/workshop.jpg"),
-  banner_ceremony: require("./event-banners/ceremony.jpg"),
-  banner_colorwar: require("./event-banners/colorwar.jpg"),
+  "banner-food": require("./event-banners/food.jpg"),
+  "banner-demo": require("./event-banners/demo.jpg"),
+  "banner-main-event": require("./event-banners/main.jpg"),
+  "banner-campfire": require("./event-banners/campfire.jpg"),
+  "banner-sponsored": require("./event-banners/sponsor.jpg"),
+  "banner-mini-event": require("./event-banners/minievent.jpg"),
+  "banner-workshop": require("./event-banners/workshop.jpg"),
+  "banner-ceremony": require("./event-banners/ceremony.jpg"),
+  "banner-colorwar": require("./event-banners/colorwar.jpg"),
 
   // Logos
-  bitcamp_logo: require("./bitcamp-logo.png"),
+  "hackathon-logo": require("./bitcamp-logo.png"),
+  "error-logo": require("./error-logo.png"),
 
   // Floor Maps
   floor1: require("./floor-maps/Floor_1.png"),
