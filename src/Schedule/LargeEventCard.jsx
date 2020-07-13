@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import ClickableEvent from "../common/components/events/ClickableEvent";
 import { getDeviceWidth, getImageHeight } from "../common/utils/sizing";
 import EventDescription from "./EventDescription";
-import Event from "../contexts/EventsContext/Event";
+import Event from "../common/models/Event";
 
 const LargeEventCard = ({ event, origin, ...props }) => (
   <ClickableEvent event={event} origin={origin} style={styles.event}>

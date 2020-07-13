@@ -20,11 +20,14 @@ import { scale, verticalScale } from "../common/utils/scale";
 import mockFetch from "../common/mockData/mockFetch";
 import { questionType } from "../common/utils/PropTypeUtils";
 import { HACKATHON_NAME } from "../hackathon.config";
+import { AuthContext } from "../contexts/AuthContext/AuthContext";
 
 const serverURL = "https://guarded-brook-59345.herokuapp.com";
 
 // TODO: move to somewhere central
 export default class QuestionModal extends Component {
+  static contextType = AuthContext;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -46,6 +49,8 @@ export default class QuestionModal extends Component {
       slackUsername,
     } = this.state;
 
+    const { user } = this.context;
+
     const hasNoQuestion = question === "";
     const hasNoLocation = location === "" && needsInPersonAssistance;
     const hasNoUsername = slackUsername === "" && !needsInPersonAssistance;
@@ -65,9 +70,7 @@ export default class QuestionModal extends Component {
       });
     } else {
       const fcmToken = await AsyncStorage.getItem("FCMToken");
-      const userData = await AsyncStorage.getItem("USER_DATA_STORE");
-      const userDataJSON = JSON.parse(userData);
-      const name = `${userDataJSON.profile.firstName} ${userDataJSON.profile.lastName}`;
+      const name = `${user.firstName} ${user.lastName}`;
       const questionObject = {
         question,
         location,
@@ -76,7 +79,7 @@ export default class QuestionModal extends Component {
         needsDesignMentor,
         status: "Awaiting available mentors",
         name,
-        email: userDataJSON.email,
+        email: user.email,
 
         // Serves as a temporary key so we can display the question immediately
         // without waiting for the question id from the backend
@@ -87,7 +90,7 @@ export default class QuestionModal extends Component {
       }
 
       const questionString = JSON.stringify(questionObject);
-      mockFetch(`${serverURL}/question`, {
+      await mockFetch(`${serverURL}/question`, {
         method: "POST",
         headers: {
           Accept: "application/json",

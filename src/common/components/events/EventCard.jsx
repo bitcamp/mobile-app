@@ -7,7 +7,7 @@ import { getDeviceWidth, getImageHeight } from "../../utils/sizing";
 import colors from "../../../Colors";
 import { BaseText } from "../Text";
 import ClickableEvent from "./ClickableEvent";
-import Event from "../../../contexts/EventsContext/Event";
+import Event from "../../models/Event";
 import { useFollowingActions } from "../../../contexts/FollowingContext/FollowingHooks";
 
 export default function EventCard({ event, origin }) {

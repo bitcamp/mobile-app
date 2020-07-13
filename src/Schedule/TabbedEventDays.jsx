@@ -8,8 +8,8 @@ import SwipableTabBar from "../common/components/SwipableTabBar";
 import colors from "../Colors";
 import { BaseText } from "../common/components/Text";
 import EventDescription, { eventDescriptionHeight } from "./EventDescription";
-import EventDay from "../contexts/EventsContext/EventDay";
-import Event from "../contexts/EventsContext/Event";
+import EventDay from "../common/models/EventDay";
+import Event from "../common/models/Event";
 
 // Simple components for the section list
 const EventDescriptionWrapper = ({ item: event, origin }) => (
@@ -57,7 +57,6 @@ export default function TabbedEventDays({ eventDays, extraTabs, origin }) {
       <ScrollableTabView
         style={styles.tabView}
         initialPage={0}
-        prerenderingSiblingsNumber={1}
         renderTabBar={({ goToPage, tabs, activeTab }) => (
           <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
         )}

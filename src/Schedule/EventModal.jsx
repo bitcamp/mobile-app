@@ -9,7 +9,7 @@ import colors from "../Colors";
 import FullScreenModal from "../common/components/modals/FullScreenModal";
 import PillBadge from "./PillBadge";
 import { H2, H3, H4, P } from "../common/components/Text";
-import Event from "../contexts/EventsContext/Event";
+import Event from "../common/models/Event";
 
 /**
  * Displays all information about an event (e.g., title, categories,

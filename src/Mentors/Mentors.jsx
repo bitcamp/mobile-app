@@ -1,11 +1,5 @@
 import React, { Component } from "react";
-import {
-  AppState,
-  AsyncStorage,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { AsyncStorage, StyleSheet, TouchableOpacity, View } from "react-native";
 import PropTypes from "prop-types";
 import {
   Button,
@@ -21,31 +15,31 @@ import { questionType } from "../common/utils/PropTypeUtils";
 import { HACKATHON_NAME } from "../hackathon.config";
 import request from "../common/utils/request";
 import ErrorView from "../common/components/ErrorView";
+import { AuthContext } from "../contexts/AuthContext/AuthContext";
 
 // TODO: move to somewhere central
 const serverURL = "https://guarded-brook-59345.herokuapp.com";
 
 export default class Mentors extends Component {
+  static contextType = AuthContext;
+
   constructor(props) {
     super(props);
 
+    // TODO: refactor to use `react-query`
     this.state = {
-      appState: AppState.currentState,
       listData: [],
       isLoading: true,
       error: null,
     };
-    this.handleAppStateChange = this.handleAppStateChange.bind(this);
   }
 
   // initially loads question data from server
   componentDidMount() {
-    AppState.addEventListener("change", this.handleAppStateChange);
-    AsyncStorage.getItem("USER_DATA_STORE")
-      .then(userDataStr => JSON.parse(userDataStr))
-      .then(user => this.grabQuestionsFromDB(user.email));
-
+    const { user } = this.context;
     const { navigation } = this.props;
+
+    this.grabQuestionsFromDB(user.email);
 
     // When you navigate the mentors page and there are questions in the route params,
     // update the questions state immdediately (before fetching)
@@ -59,7 +53,6 @@ export default class Mentors extends Component {
   }
 
   componentWillUnmount() {
-    AppState.removeEventListener("change", this.handleAppStateChange);
     this.unsubscribeFromNavigator();
   }
 
@@ -77,36 +70,7 @@ export default class Mentors extends Component {
     } catch (error) {
       this.setState({ error, isLoading: false });
     }
-
-    // TODO: add error handling
   }
-
-  // TODO: Investigate the purpose of this function
-  async handleAppStateChange(nextAppState) {
-    const { appState } = this.state;
-    if (appState.match(/inactive|background/) && nextAppState === "active") {
-      const userData = await AsyncStorage.getItem("USER_DATA_STORE");
-      const userDataJSON = JSON.parse(userData);
-      this.grabQuestionsFromDB(userDataJSON.email);
-    }
-    this.setState({ appState: nextAppState });
-  }
-
-  // TODO: reimplement when firebase is setup
-  // async createNotificationListener() {
-  // // updates when app is in foreground
-  // this.notificationListener = firebase
-  //   .notifications()
-  //   .onNotification(notification => {
-  //     this.grabQuestionsFromDB(notification.data.email);
-  //   });
-  // // updates when app is in the background
-  // this.notificationOpenedListener = firebase
-  //   .notifications()
-  //   .onNotificationOpened(notificationOpen => {
-  //     this.grabQuestionsFromDB(notificationOpen.notification.data.email);
-  //   });
-  // }
 
   async updateQuestionStatus(notification) {
     const { key } = notification.data;

@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { H3 } from "../common/components/Text";
 import EventCard from "../common/components/events/EventCard";
-import Event from "../contexts/EventsContext/Event";
+import Event from "../common/models/Event";
 
 export default function EventColumns({ origin, eventsArr }) {
   return (

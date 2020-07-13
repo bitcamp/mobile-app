@@ -85,15 +85,14 @@ NavigationHeader.propTypes = {
 
 const styles = StyleSheet.create({
   header: {
-    flex: 1,
+    alignItems: "center",
+    backgroundColor: colors.backgroundColor.light,
+    borderBottomWidth: 0.5,
+    borderColor: colors.borderColor.normal,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
     padding: 10,
     paddingTop: Platform.OS === "ios" ? 10 + getStatusBarHeight() : 10,
-    borderBottomWidth: 0.5,
-    backgroundColor: colors.backgroundColor.light,
-    borderColor: colors.borderColor.normal,
   },
   leftHeader: {
     alignItems: "center",

@@ -3,7 +3,7 @@ import { ViewPropTypes } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import PropTypes from "prop-types";
 import { useNavigation } from "@react-navigation/native";
-import Event from "../../../contexts/EventsContext/Event";
+import Event from "../../models/Event";
 
 /**
  * A card that will reveal a modal with extra info about an event when clicked

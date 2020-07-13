@@ -1,8 +1,8 @@
 import _ from "lodash";
 import moment from "moment";
-import EventDay from "./EventDay";
+import EventDay from "../../common/models/EventDay";
 import { getDay } from "../../common/utils/time";
-import Event, { EVENT_SCHEMA } from "./Event";
+import Event, { EVENT_SCHEMA } from "../../common/models/Event";
 
 /**
  * Turns a list of events into an object that maps event ids to event objects

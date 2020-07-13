@@ -9,28 +9,43 @@ import MapModal from "../Home/MapModal";
 import SearchModal from "../Schedule/SearchModal";
 import EventModal from "../Schedule/EventModal";
 import QuestionModal from "../Mentors/QuestionModal";
+import { useAuthState } from "../contexts/AuthContext/AuthHooks";
 
 const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();
 
+/**
+ * Displays the login, loading, or main app screen based on the current
+ * auth state
+ */
 function MainStackScreen() {
+  const { isLoadingToken, user } = useAuthState();
+
+  // Display the main app screen when the user is loaded
+  const mainScreen = user ? (
+    <MainStack.Screen
+      name="app"
+      component={AppContainer}
+      options={({ route, navigation }) => ({
+        headerShown: true,
+        header: () => <NavigationHeader {...{ route, navigation }} />,
+      })}
+    />
+  ) : (
+    <MainStack.Screen name="login" component={Login} />
+  );
+
   return (
     <MainStack.Navigator
-      initialRouteName="loading"
       screenOptions={{
         headerShown: false,
       }}
     >
-      <MainStack.Screen name="loading" component={AppLoadingScreen} />
-      <MainStack.Screen name="login" component={Login} />
-      <MainStack.Screen
-        name="app"
-        component={AppContainer}
-        options={({ route, navigation }) => ({
-          headerShown: true,
-          header: () => <NavigationHeader {...{ route, navigation }} />,
-        })}
-      />
+      {isLoadingToken ? (
+        <MainStack.Screen name="loading" component={AppLoadingScreen} />
+      ) : (
+        mainScreen
+      )}
     </MainStack.Navigator>
   );
 }

@@ -1,261 +1,171 @@
-import React, { Component } from "react";
-import { AsyncStorage, StyleSheet, TextInput } from "react-native";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  KeyboardAvoidingView,
+} from "react-native";
 import PropTypes from "prop-types";
 import { Notifications } from "expo";
 import * as Permissions from "expo-permissions";
 import Toast from "react-native-tiny-toast";
-import {
-  Button,
-  Heading,
-  PadContainer,
-  SubHeading,
-} from "../common/components/Base";
+import { Button, Heading, PadContainer } from "../common/components/Base";
 import { BaseText } from "../common/components/Text";
 import colors from "../Colors";
-import KeyboardShift from "../common/components/KeyboardShift";
-import mockFetch from "../common/mockData/mockFetch";
-import mockUser from "../common/mockData/mockUser";
 import { HACKATHON_NAME, HACKATHON_YEAR } from "../hackathon.config";
+import request from "../common/utils/request";
+import { useAuthActions } from "../contexts/AuthContext/AuthHooks";
+import { validateEmail } from "../common/utils/dataValidation";
+import { BASE_URL } from "../api.config";
 
-// const APP_ID = "@com.technica.technica18:";
-// const USER_TOKEN = `${APP_ID}JWT`;
-// const EVENT_FAVORITED_STORE = `${APP_ID}EVENT_FAVORITED_STORE`;
-const USER_DATA_STORE = "USER_DATA_STORE";
-const EXPO_ENDPOINT = "https://api.bit.camp/api/firebaseEvents/favoriteCounts/";
+/**
+ * The app's login screen for hackers and event organizers.
+ */
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const { signIn } = useAuthActions();
 
-// TODO: There is an issue with expo when there is an alert is dismissed when a keyboard is currently in focus
-// Right now the workaround is to just display a plain-text error below the text field,
-// however we'd probably want to have a more elegant solution.
-
-export default class Login extends Component {
-  static createInitialState() {
-    return {
-      savedEmail: "",
-      fieldValue: "",
-      placeholder: "",
-      greeting: `Welcome to \n${HACKATHON_NAME} ${HACKATHON_YEAR}`,
-      instruction: `Enter the email you used to sign up for ${HACKATHON_NAME}.`,
-      isOnEmailPage: true,
-      isError: false,
-      errorMsg: "",
-    };
-  }
-
-  // TODO: remove
-  static processUserEvents(events) {
-    return events.reduce(
-      (favoriteEventsMap, currEvent) => ({
-        ...favoriteEventsMap,
-        [currEvent]: true,
-      }),
-      {}
-    );
-  }
-
-  static async registerForPushNotificationsAsync() {
+  // Registers a new user for push notifications
+  const registerForPushNotificationsAsync = async () => {
     const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
 
     if (status === "granted") {
       try {
         const token = await Notifications.getExpoPushTokenAsync();
 
-        mockFetch(EXPO_ENDPOINT, {
+        await request(`${BASE_URL}/announce/subscribe`, {
           method: "POST",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            token: {
-              value: token,
-            },
-          }),
+          body: JSON.stringify({ token }),
         });
       } catch (e) {
         Toast.show("Error registering for push notifications", Toast.SHORT);
       }
     }
-  }
+  };
 
-  // TODO: This regex is not entirely accurate for emails.
-  // Need to find a better way to validating emails.
+  // Submits the user login requests
+  const submitLogin = async () => {
+    setErrorMessage("");
 
-  static isValidEmail(email) {
-    const emailRegex = /^.+@.+..+$/;
-    return emailRegex.test(email);
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = Login.createInitialState();
-    this.sendEmail = this.sendEmail.bind(this);
-    this.sendReceivedCode = this.sendReceivedCode.bind(this);
-  }
-
-  async sendEmail() {
-    const { fieldValue: email } = this.state;
-    if (Login.isValidEmail(email)) {
-      const url = "https://api.bit.camp/auth/login/requestCode";
-      try {
-        const response = await mockFetch(url, {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        });
-        if (response.status === 200) {
-          this.setState({
-            greeting: "Great!",
-            instruction:
-              "We've sent a verification code to your email. Please enter that code below to login.",
-            isOnEmailPage: false,
-            savedEmail: email,
-            fieldValue: "",
-            placeholder: "xxxxxx",
-          });
-        } else {
-          this.setState({
-            isError: true,
-            errorMsg: `Your email was not found. If you recently registered for ${HACKATHON_NAME}, please try again in 24 hrs.`,
-          });
-        }
-      } catch (error) {
-        this.setState({
-          isError: true,
-          errorMsg: "There was an error requesting a code. Try again.",
-        });
-      }
-    } else {
-      this.setState({
-        isError: true,
-        errorMsg: "Invalid Email. Please enter a valid email.",
-      });
+    // Validate email and password
+    if (email === "" || !validateEmail(email)) {
+      setErrorMessage("Please enter a valid email");
+      return;
     }
-  }
 
-  async sendReceivedCode() {
-    const { fieldValue: code, savedEmail } = this.state;
-    const { navigation } = this.props;
-    const url = "https://api.bit.camp/auth/login/code";
+    if (password === "") {
+      setErrorMessage("Please enter a password");
+      return;
+    }
+
+    // Try signing the user in and registering them for push notifications
     try {
-      const email = savedEmail;
-      const response = await mockFetch(url, {
-        responseData: mockUser,
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, code }),
-      });
-      const responseJson = await response.json();
-      if (response.status === 200) {
-        Login.registerForPushNotificationsAsync();
-        // Store data in AsyncStorage, then reset state
-        await AsyncStorage.multiSet([
-          [USER_DATA_STORE, JSON.stringify(responseJson)],
-          // [USER_TOKEN, responseJson.token], TODO: fix
-        ]);
-
-        this.setState(Login.createInitialState());
-        navigation.navigate("app");
-      } else {
-        this.setState({
-          isError: true,
-          errorMsg: "Failed to confirm pin. Please try again.",
-        });
-      }
+      await signIn(email, password);
+      registerForPushNotificationsAsync();
     } catch (error) {
-      this.setState({
-        isError: true,
-        errorMsg: "There was an error confirming the pin. Try again.",
-      });
+      setErrorMessage(error.message);
     }
-  }
+  };
 
-  handleButtonPress() {
-    const { isOnEmailPage } = this.state;
-    // Reset error
-    this.setState({
-      isError: false,
-      errorMsg: "",
-    });
-    if (isOnEmailPage) {
-      this.sendEmail();
-    } else {
-      this.sendReceivedCode();
-    }
-  }
-
-  render() {
-    const {
-      keyboardShown,
-      instruction,
-      placeholder,
-      fieldValue,
-      greeting,
-      isOnEmailPage,
-      isError,
-      errorMsg,
-    } = this.state;
-
-    return (
-      <KeyboardShift>
-        <PadContainer
-          style={keyboardShown ? styles.subSection2 : styles.subSection}
-        >
-          <Heading style={styles.heading}>{greeting}</Heading>
-          <SubHeading>{instruction}</SubHeading>
+  return (
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
+      <PadContainer style={styles.subSection}>
+        <Heading style={styles.heading}>
+          {`Welcome to \n${HACKATHON_NAME} ${HACKATHON_YEAR}`}
+        </Heading>
+        <View style={styles.buttonContainer}>
+          <Ionicons
+            name="md-mail"
+            size={24}
+            color={colors.primaryColor}
+            style={styles.icon}
+          />
           <TextInput
-            placeholder={placeholder}
-            value={fieldValue}
+            placeholder="Email"
+            value={email}
             underlineColorAndroid="rgba(0,0,0,0)"
-            onChangeText={field => this.setState({ fieldValue: field })}
+            onChangeText={setEmail}
             placeholderTextColor={colors.textColor.light}
             keyboardType="email-address"
             autoCapitalize="none"
             style={styles.input}
           />
-          <BaseText style={styles.error}>{isError ? errorMsg : " "}</BaseText>
-          <Button
-            text={isOnEmailPage ? "Next" : "Submit"}
-            style={styles.button}
-            onPress={() => this.handleButtonPress()}
+        </View>
+        <View style={styles.buttonContainer}>
+          <Ionicons
+            name="md-lock"
+            size={24}
+            color={colors.primaryColor}
+            style={styles.icon}
           />
-        </PadContainer>
-      </KeyboardShift>
-    );
-  }
+          <TextInput
+            placeholder="Password"
+            value={password}
+            autoCompleteType="password"
+            secureTextEntry
+            underlineColorAndroid="rgba(0,0,0,0)"
+            onChangeText={setPassword}
+            placeholderTextColor={colors.textColor.light}
+            autoCapitalize="none"
+            style={styles.input}
+          />
+        </View>
+        <BaseText style={styles.error}>{errorMessage}</BaseText>
+        <Button text="Submit" style={styles.button} onPress={submitLogin} />
+      </PadContainer>
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.primaryColor,
-    marginTop: 10,
+    marginTop: 8,
+    padding: 12,
+  },
+  buttonContainer: {
+    alignContent: "center",
+    display: "flex",
+    flexDirection: "row",
+    paddingBottom: 5,
+    paddingTop: 5,
+    width: "80%",
+  },
+  container: {
+    flex: 1,
   },
   error: {
     color: colors.textColor.error,
     marginTop: 10,
+    textAlign: "center",
   },
   heading: {
-    paddingBottom: 20,
+    // paddingBottom: 0,
+  },
+  icon: {
+    height: 32,
+    marginRight: 8,
+    marginTop: 8,
+    width: 24,
   },
   input: {
     borderBottomWidth: 1,
     borderColor: colors.borderColor.normal,
     color: colors.textColor.normal,
     fontSize: 24,
-    paddingBottom: 8,
+    width: "100%",
   },
   subSection: {
-    backgroundColor: colors.backgroundColor.normal,
-    paddingTop: "30%",
-  },
-  subSection2: {
-    backgroundColor: colors.backgroundColor.normal,
+    flex: 1,
+    justifyContent: "center",
+    padding: 15,
   },
 });
 

@@ -14,7 +14,7 @@ import { scale } from "../common/utils/scale";
 import TabbedEventDays from "./TabbedEventDays";
 import { useEventsState } from "../contexts/EventsContext/EventsHooks";
 import { EVENT_CATEGORIES } from "../hackathon.config";
-import EventDay from "../contexts/EventsContext/EventDay";
+import EventDay from "../common/models/EventDay";
 import EventsErrorHandler from "../common/components/events/EventsErrorHandler";
 import { useFollowingState } from "../contexts/FollowingContext/FollowingHooks";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import LargeEventCard from "./LargeEventCard";
-import Event from "../contexts/EventsContext/Event";
+import Event from "../common/models/Event";
 
 export default function EventsList({ events, shouldDisplay }) {
   return (

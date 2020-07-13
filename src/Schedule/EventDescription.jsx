@@ -6,7 +6,7 @@ import EventStar from "../common/components/events/EventStar";
 import PillBadge from "./PillBadge";
 import { H3, H4 } from "../common/components/Text";
 import ClickableEvent from "../common/components/events/ClickableEvent";
-import Event from "../contexts/EventsContext/Event";
+import Event from "../common/models/Event";
 
 export default function EventDescription({ event, style, origin }) {
   return (
