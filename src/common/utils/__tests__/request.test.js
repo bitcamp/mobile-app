@@ -62,7 +62,7 @@ describe("request()", () => {
 
   it("Doesn't call `fetch` with any of its custom options", async () => {
     const customOptions = {
-      accessToken: "some access token",
+      authToken: "some access token",
     };
     const fetchOptions = {
       method: "GET",
@@ -79,28 +79,28 @@ describe("request()", () => {
     );
   });
 
-  it("Sets the correct header value when `options.accessToken` is provided", async () => {
-    const accessToken = "some random JWT";
+  it("Sets the correct header value when `options.authToken` is provided", async () => {
+    const authToken = "some random JWT";
     const options = { blah: 1 };
 
-    await request(url, { ...options, accessToken });
+    await request(url, { ...options, authToken });
 
     expect(mockFetch).toHaveBeenLastCalledWith(url, {
       ...options,
-      headers: { "access-token": accessToken },
+      headers: { "access-token": authToken },
     });
   });
 
-  it("Doesn't override any other headers when  `options.accessToken` is provided", async () => {
-    const accessToken = "some random JWT";
+  it("Doesn't override any other headers when  `options.authToken` is provided", async () => {
+    const authToken = "some random JWT";
     const existingHeaders = { someHTTPHeader: "some value" };
     const options = { blah: 1, headers: existingHeaders };
 
-    await request(url, { ...options, accessToken });
+    await request(url, { ...options, authToken });
 
     expect(mockFetch).toHaveBeenLastCalledWith(url, {
       ...options,
-      headers: { ...existingHeaders, "access-token": accessToken },
+      headers: { ...existingHeaders, "access-token": authToken },
     });
   });
 
@@ -108,7 +108,7 @@ describe("request()", () => {
     const headers = { "access-token": "a manually-set token" };
 
     expect(request(url, { headers })).rejects.toThrow("access token");
-    expect(request(url, { headers, accessToken: "blah" })).resolves.toThrow(
+    expect(request(url, { headers, authToken: "blah" })).resolves.toThrow(
       "access token"
     );
   });

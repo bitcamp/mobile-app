@@ -64,3 +64,12 @@ export function hackingHasEnded(currTime = moment()) {
   checkValidTime(currTime);
   return moment(currTime).isAfter(HACKING_END_TIME);
 }
+
+/**
+ * Whether hacking is ongoing
+ * @param {string|moment} [currTime = moment()] A valid time string or moment object
+ */
+export function hackingIsOngoing(currTime = moment()) {
+  checkValidTime(currTime);
+  return moment(currTime).isBetween(HACKING_START_TIME, HACKING_END_TIME);
+}

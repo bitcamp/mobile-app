@@ -2,6 +2,10 @@
  * Holds all information specific to your hackathon
  */
 
+// Event name information
+export const HACKATHON_NAME = "Bitcamp";
+export const HACKATHON_YEAR = "2020";
+
 // Event timing information
 export const HACKING_START_TIME = "2019-04-12 21:00";
 export const HACKING_END_TIME = "2019-04-14 09:00";
@@ -15,6 +19,5 @@ export const EVENT_CATEGORIES = [
   "sponsored",
 ];
 
-// Event name information
-export const HACKATHON_NAME = "Bitcamp";
-export const HACKATHON_YEAR = "2020";
+// All possible hacker roles
+export const HACKER_ROLES = ["attendee", "mentor", "organizer", "admin"];

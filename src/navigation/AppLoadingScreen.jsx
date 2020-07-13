@@ -1,39 +1,18 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { AsyncStorage } from "react-native";
+import React, { useEffect } from "react";
 import { CenteredActivityIndicator } from "../common/components/Base";
+import { useAuthActions } from "../contexts/AuthContext/AuthHooks";
 
-export default class AppLoadingScreen extends Component {
-  componentDidMount() {
-    this.loadUserInfo();
-  }
+/**
+ * Displays a loading indicator while user information is being fetched and validated.
+ */
+export default function AppLoadingScreen() {
+  const { fetchUserInfo } = useAuthActions();
 
-  async loadUserInfo() {
-    const {
-      navigation: { navigate },
-    } = this.props;
+  // Fetch the user info on mount. When this process is done,
+  // the navigator will automatically redirect the user to the main app screen
+  useEffect(() => {
+    fetchUserInfo();
+  }, [fetchUserInfo]);
 
-    try {
-      const userInfo = await AsyncStorage.getItem("USER_DATA_STORE");
-
-      if (userInfo !== null) {
-        navigate("app");
-      } else {
-        navigate("login");
-      }
-    } catch (error) {
-      // Delete the old storage and go to the login screen
-      AsyncStorage.clear();
-      navigate("login");
-    }
-  }
-
-  render() {
-    return <CenteredActivityIndicator />;
-  }
+  return <CenteredActivityIndicator />;
 }
-
-AppLoadingScreen.propTypes = {
-  navigation: PropTypes.shape({ navigate: PropTypes.func.isRequired })
-    .isRequired,
-};

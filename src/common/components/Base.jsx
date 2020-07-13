@@ -102,11 +102,12 @@ PlainViewContainer.propTypes = {
 };
 
 ViewContainer.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   style: ViewPropTypes.style,
 };
 ViewContainer.defaultProps = {
   style: null,
+  children: null,
 };
 
 Heading.propTypes = {

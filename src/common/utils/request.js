@@ -8,16 +8,16 @@ import { BASE_URL } from "../../api.config";
  * @param {string} routeOrURL The location of the data you want, either as a URL (e.g. 'abc.com')
  * or a simple route (e.g. '/blah'). Routes will always start with a `/` and will be
  * prepended by the BASE_URL as defined in `src/api.config.js`. (REQUIRED)
- * @param {Object} options Options to be used by `fetch()`, along with extra configurations
+ * @param {object} options Options to be used by `fetch()`, along with extra configurations
  * for this function.
  * @param {any} [options.responseData = null] The data that you would like mockFetch to return
  * (TODO: delete in production)
- * @param {string} [options.accessToken] A token used to authenticate a request. Only needed for
+ * @param {string} [options.authToken] A token used to authenticate a request. Only needed for
  * routes that require users to be logged in.
  * @returns True if the fetch succeeded, false otherwise
  */
 export default async function request(routeOrURL, options = {}) {
-  const { accessToken, ...fetchOptions } = options;
+  const { authToken, ...fetchOptions } = options;
 
   if (!routeOrURL) {
     throw new Error(
@@ -34,10 +34,10 @@ export default async function request(routeOrURL, options = {}) {
   }
 
   // Set access token appropriately
-  if (accessToken) {
+  if (authToken) {
     fetchOptions.headers = {
       ...(fetchOptions.headers || {}),
-      "access-token": accessToken,
+      "access-token": authToken,
     };
   }
 

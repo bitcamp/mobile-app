@@ -85,4 +85,9 @@ module.exports = {
       },
     },
   },
+
+  env: {
+    // Gives access to React Native globals (like `fetch()`)
+    "react-native/react-native": true,
+  },
 };

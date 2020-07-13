@@ -57,7 +57,6 @@ export default function TabbedEventDays({ eventDays, extraTabs, origin }) {
       <ScrollableTabView
         style={styles.tabView}
         initialPage={0}
-        prerenderingSiblingsNumber={1}
         renderTabBar={({ goToPage, tabs, activeTab }) => (
           <SwipableTabBar {...{ goToPage, tabs, activeTab }} />
         )}

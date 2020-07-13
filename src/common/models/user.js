@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { HACKER_ROLES } from "../../hackathon.config";
 
 const USER_SCHEMA = yup
   .object()
@@ -16,7 +17,7 @@ const USER_SCHEMA = yup
     lastName: yup.string().required(),
     userType: yup
       .mixed()
-      .oneOf(["attendee", "mentor", "organizer", "admin"])
+      .oneOf(HACKER_ROLES)
       .required(),
     rsvp: yup.string().required(),
     checkIn: yup.string().required(),
@@ -27,8 +28,16 @@ const USER_SCHEMA = yup
   })
   .required();
 
-const validateUser = user => {
-  return USER_SCHEMA.validate(user);
+/**
+ * Checks if a user object is valid
+ */
+export const validateUser = user => {
+  return USER_SCHEMA.isValidSync(user, { strict: true });
 };
 
-export default validateUser;
+/**
+ * Strips extra data from the user object
+ */
+export const castUser = user => {
+  return USER_SCHEMA.cast(user, { strict: true, stripUnknown: true });
+};
